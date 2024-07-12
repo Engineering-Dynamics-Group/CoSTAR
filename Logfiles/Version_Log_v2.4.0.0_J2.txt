@@ -1,0 +1,212 @@
+--------------------------------------------
+---- ADDING OF FINITE-DIFFERENCE-METHOD ----
+--------------------------------------------
+
+Classes:
+
+	@Continuation:
+
+		- m_continuation:
+			--> elseif condition added for FDM in order to use FDM specific corrector function (lines 42 - 45)
+
+		- bifurcation_stability: 
+			--> elseif condition added for PS FDM in order to use FDM specific corrector function (lines 42 - 45)
+
+	--------------------
+	@costarhelp:
+
+		- costarhelp.m:
+			--> 'FDM' added to key_words_method (line 17)
+			--> 'finite-difference' added to alternative_method (line 18)
+
+	--------------------
+	@DynamicalSystem:
+
+		- s_DYN_gatekeeper:
+			--> 'finite-difference' added to p_approx_method_allowed_fieldvalues (line 116)
+			--> 'finite-difference' added to qp_approx_method_allowed_fieldvalues (line 181) 
+
+	--------------------
+	@AM_PS_FDM: --> Complete folder added
+
+	--------------------
+	@AM_QPS_FDM: --> Complete folder added
+
+	--------------------
+	@ApproxMethod:
+
+		- s_AM_gatekeeper:
+			--> Call of s_PS_FDM_gatekeeper added for PS FDM (lines 31 - 33)
+			--> Call of s_QPS_FDM_gatekeeper added for QPS FDM (lines 47 - 49)
+
+		- s_method_selection:
+			--> Initialization of AM-object and call of residual function added for PS FDM (lines 30 - 33)
+			--> Initialization of AM-object and call of residual function added for QPS FDM (lines 55 - 58)
+
+	--------------------
+	@SOL_PS_FDM: --> Complete folder added		
+
+	--------------------
+	@SOL_QPS_FDM: --> Complete folder added
+
+	--------------------
+	@Solution:
+
+		- s_solution_selection:
+			--> Initialization of SOL-object added for PS FDM (lines 26 - 28)
+			--> Initialization of SOL-object added for QPS FDM (lines 42 - 44)
+
+
+--------------------
+Functions:
+
+	- initial_solution:
+		--> elseif condition added for FDM in order to use FDM specific corrector function (lines 16 - 18)
+
+
+--------------------
+RHS:
+
+--> "ho_ap" adjusted
+--> "ho_ap_qp" adjusted
+
+
+--------------------
+test:
+
+--> "test_FDM_cvdP_QPS" added
+--> "test_FDM_duffing_PS" added
+--> "test_FDM_duffing_QPS" added
+--> "test_FDM_harmonic_PS" added
+--> "test_FDM_harmonic_QPS" added
+--> "test_FDM_laval_QPS" added
+--> "test_FDM_vdP_PS" added
+--> "test_FDM_vdP_QPS" added
+
+
+
+
+-----------------------------
+--------- TUTORIALS ---------
+-----------------------------
+
+RHS:
+
+- "coupledvdP" adjusted for tutorials
+- "duffing_ap_qp" adjusted for tutorials
+- "laval_qp" adjusted for tutorials
+
+
+--------------------
+Tutorials:
+
+- Slight adjustments to existing tutorials ("EQ_...", "PS_FDM_...", "PS_FGM_...", "PS_SHM_...")
+- "QPS_FDM_Tutorial" added
+- "QPS_FDM_Minimal_Example" added
+
+
+
+
+----------------------------
+--------- BUGFIXES ---------
+----------------------------
+
+Classes:
+
+	@CONTINUATION:
+
+		- plot_contplot:
+			--> " || strcmpi(DYN.stability,'off')" added to elseif condition in line 31 (block was not executed if DYN.stability = 'off')
+
+	--------------------
+	@SOL_... (all) :
+	
+		- SOL_... (all):
+			--> Direction vectors dy are saved correctly now. Unknown dy is represented by NaN (instead of zeros)
+			--> newton_flag is saved for all calculated points now. Unknown newton_flag is represented by NaN
+
+	--------------------
+	@SOL_PS_Shoot:
+
+		- evalsol_time:
+			--> Start-up integration added (lines 41 - 46 + adjustment in 48). Time plot is correct now if bottom limit of user-defined interval is greater than 0
+
+		- SOL_PS_Shoot:
+			--> Function "IF_arch_bfp_data" (lines 77 and 79): frequencies are taken from "CON.p_y_bfp" now (instead of "CON.p_J_bfp") 
+	
+	--------------------
+	@Solution:
+
+		- contplot:
+			--> Line 207: "xlim([min(mu),max(mu)])" changed to "xlim(DYN.opt_cont.mu_limit)" to prevent flicker of live-plot
+		
+		- contplot_gatekeeper:
+			--> Line 49: Input argument 'matrix' of obj.check_fcn_handle changed to 'solution_argument'. Similar to PS, it is now possible to create a ...
+		  		    continuation plot using a function (max/min/etc.) on the i-th torus function component, e.g. 'zaxis',@(z)max(z(:,:,2),[],[1,2]).
+
+		- solget_gatekeeper:
+			--> Line 52: "if min(interval)" changed to "if min(interval) < 0"
+
+		- solplot:
+			--> Line 345: "hypertime" array is accessed correctly now
+
+
+
+
+---------------------------------------
+---- OTHER TWEAKS AND IMPROVEMENTS ----
+---------------------------------------
+Classes\@DynamicalSystem:
+
+	- DynamicalSystem:
+		--> Properties param and act_param are initialized by "param = {0}" and "act_param = 1" now (lines 22 and 30).
+		    This enables calculating an initial solution without supplying obj.param and obj.act_param.
+		    (Attention: The function Fcn still has to be defined by Fcn = @(t,z,param), but param and act_param can be omitted in the options!)
+
+	- s_DYN_gatekeeper:
+		--> Added check: If 'param' is supplied, 'act_param' must be supplied as well (lines 39 - 45)
+		--> Updated check of RHS: Now RHS must always have 2 input arguments for EQ and 3 input arguments for PS and QPS (lines 89 - 93, 154 - 158, 211 - 215)
+		--> Logical check that act_param is supplied if opt_sol.cont = 'on' moved to lines 67 - 70
+		--> Added check: Approximation method for QPS must be shooting if opt_sol.stability = 'on'
+		--> Added GC.speak(); here and there
+
+
+Classes\ApproxMethod_SC\@AM_(Q)PS_FGM (FGM for PS and QPS):
+
+	- s_help_opt_approx_method_(Q)PS_FGM:
+		--> Changed text "higher harmonics" to "harmonics"
+
+	- s_help_opt_init_(Q)PS_FGM:
+		--> Changed text "higher harmonics" to "harmonics"
+		--> Corrected "n <= n_hh" to "n <= (n_hh-1)" at description of cmatrix and smatrix
+
+	- s_(Q)PS_FGM_gatekeeper:
+		--> Changed error message text "higher harmonics" to "harmonics"
+
+
+--------------------
+Classes\Solution_SC\@Solution:
+
+	- solget_gatekeeper:
+		--> 'interval' added to frequency_allowed_fieldnames (line 108)
+
+	- solget_up_index:
+		--> Function name corrected from "solget_up_index_reso" to "solget_up_index"
+
+	- solplot_gatekeeper:
+		--> 'interval' added to options_time_allowed_fieldnames for case 'frequency' (line 146)
+
+
+--------------------
+test\01postprocessing:
+
+	- benchmark_postprocess_periodic:
+		--> "[s,mu] = S.contplot(DYN,opt_contplot);" removed (former line 20) due to being redundant
+		--> Plot bifurcation diagram using min(norm()) added. Calls of contplot are similar to "benchmark_postprocess_quasiperiodic" now
+		--> Calls of solplot rearranged and comments tweaked
+
+	- benchmark_postprocess_quasiperiodic:
+		--> "'Color',[0,0,0]" added to last contplot. It is similar to "benchmark_postprocess_periodic" now
+		--> Calls of solplot rearranged and comments tweaked. It is similar to "benchmark_postprocess_periodic" now
+		--> Resolution of first frequency plot changed from 1e4 to 2^10 to reduce execution time
+		--> Second frequency plot: "'interval',[0,100]" added to improve quality of FFT. Resolution set to 2^(13) to take interval into account

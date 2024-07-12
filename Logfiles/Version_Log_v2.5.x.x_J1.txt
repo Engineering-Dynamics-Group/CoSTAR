@@ -1,0 +1,321 @@
+############################################
+############# CoSTAR v2.5.0.0 ##############
+############################################
+
+--------------------------------------------
+---------------- COSTARHELP ----------------
+--------------------------------------------
+
+Current folder is not changed to @costarhelp folder anymore when opening an example or tutorial via costarhelp.
+
+--------------------
+
+Added infot text in s_help_solplot (lines 56 - 57) for optional field "figure" (was missing).
+
+--------------------
+
+s_help_example-Files deleted from all approximation methods and removed as static method from each class (they are not needed since there are the example files in the Tutorials folder).
+
+
+--------------------------------------------
+--------- FINITE-DIFFERENCE-METHOD ---------
+--------------------------------------------
+
+Property ind_blkdiag_mat renamed to p_ind_blkdiag_mat. This affects:
+	
+	- @AM_PS_FDM:	
+		--> AM_PS_FDM 	--> getWeights	--> PS_FDM_residuum
+
+	- @AM_QPS_FDM:	
+		--> AM_QPS_FDM 	--> getWeights	--> QPS_FDM_residuum
+
+--------------------
+
+Tweaks to comments and variable names in getIV.
+
+--------------------
+
+Check of n_int >= (approx_order + 1) deactivated in Gatekeeper (@AM_PS_FDM: lines 40 - 48, 78 - 90 and 105 - 117, @AM_QPS_FDM: lines 41 - 49, 59 - 67, 103 - 115, 133 - 145, 160 - 172, 187 - 199).
+Changes to help files and tutorials correspondingly.
+
+
+-----------------------------
+--------- SOLUTION ----------
+-----------------------------
+
+Explanations of all evalsol-Methods (FDM, FGM & SHM) tweaked.
+
+--------------------
+
+Bugfixes, improvements and tweaks:
+
+	@Solution:
+
+		- contplot: 
+			--> General improvements
+			--> Removal of options field display for solget_options deleted
+			--> Evaluations for min2, mean2 and max2 of quasi-periodic solutions adapted to be able to process two different resolutions for the hypertime axis (lines 120, 134, 148)
+			--> Line colors are correct now when calling contplot after a continuation
+			--> index = "all" works now
+
+		- contplot_gatekeeper: 
+			--> General improvements
+			--> Check for field display removed
+
+		- s_help_solplot: 
+			--> Info for optional field "figure" added
+
+		- solget_gatekeeper: 
+			--> General improvements
+
+		- solget_up_index: 
+			--> "|| strcmpi(options.index,'all')" added so that index = 'all' works now (line 33) 
+
+		- solplot:
+			--> General improvements (\theta instead of \nu, tweaks to plots and code)
+
+		- solplot_gatekeeper:
+			--> General improvements
+	
+	--------------------
+	@SOL_PS_FGM:
+
+		- evalsol_hypertime:
+			--> Hypertime interval changed to [0,2*pi] (line 19)
+			
+	--------------------
+	@SOL_QPS_FGM:
+
+		- evalsol_hypertime:
+			--> Hypertime interval changed to [0,2*pi] (line 41)
+
+	--------------------
+	@SOL_QPS_SHM:
+
+		- evalsol_time:
+			--> Default time interval changed to [0,2*pi] (line 38)
+
+
+---------------------------------------
+----------- OTHER  BUGFIXES -----------
+---------------------------------------
+
+Classes:
+
+	@Continuation:
+
+		- bifurcation_stability: 
+			--> "if ST.iterate_bfp == true" changed to "if strcmpi(ST.iterate_bfp,'on')" (line 17)
+		
+		- m_continuation:
+			--> "if ST.iterate_bfp == true" changed to "if strcmpi(ST.iterate_bfp,'on')" (line 19)
+
+	--------------------
+	@Stability:
+
+		- Stability:
+			--> Default value of "iterate_bfp" changed to "on" (line 13)
+
+	@ST_QPS_SHM:
+
+		- ST_QPS_SHM:
+			--> Property "iterate_bfp" set to "off" in constructor temporarily since it does not work yet (line 21)
+
+
+---------------------------------------
+---- OTHER TWEAKS AND IMPROVEMENTS ----
+---------------------------------------
+
+It is now possible to set options.opt_cont.display to 'step_control'. Value 'on' displays the default output, while 'step_control' displays the default output plus additional step control information.
+Changes affect: 
+	
+	- @Continuation:
+		--> check_limits (line 13)	--> s_CON_gatekeeper (line 36)		--> s_help_opt_cont (lines 74 - 75)	--> stepcontrol (line 176)
+	
+--------------------
+
+Function "myFFT" renamed to "costarFFT".
+The function name was changed in:
+	- The function itself 
+	- getIV of AM_QPS_SHM (lines 132 and 141) 
+	- The "evalsol_frequency" method of:
+		--> @SOL_PS_FDM (line 37)		
+		--> @SOL_PS_SHM (line 22)			
+		--> @SOL_QPS_FDM (line 34)		
+		--> @SOL_QPS_SHM (line 21)
+
+
+
+
+############################################
+############ CoSTAR v2.5.1.0_J1 ############
+############################################
+
+--------------------------------------------
+--------- FINITE-DIFFERENCE-METHOD ---------
+--------------------------------------------
+
+It is now possible to provide a solution as initial value via opt_init.fdm_sol, but with a different discretization. If fdm_sol does not match n_int(_1) (and n_int_2) specified via opt_approx_method, 
+the provided solution is interpolated. Since the number of intervals n_int_1 and n_int_2 of fdm_sol can not be extracted from fdm_sol in the quasi-periodic case, the fields "n_int_1_fdm_sol" and 
+"n_int_2_fdm_sol" have been added to opt_init in the quasi-periodic case. These fields can be used to specify the number of intervals of fdm_sol if they do not match n_int_1 and n_int_2 defined in opt_approx_method.
+Changes affect:
+
+	- @AM_PS_FDM:	
+		--> getIV	--> s_PS_FDM_gatekeeper		--> s_help_opt_init_PS_FDM
+
+	- @AM_QPS_FDM:	
+		--> getIV	--> s_QPS_FDM_gatekeeper	--> s_help_opt_init_QPS_FDM	--> AM_QPS_FDM 
+
+
+--------------------------------------------
+------------- SHOOTING METHOD --------------
+--------------------------------------------
+
+The opt_init field "iv" (quasi-periodic solutions) now takes the method solution vector s (instead of solution vector y). 
+Moreover, the initial value is interpolated if it does not correspond to the value of the opt_approx_method field "n_char" (or its default value).
+Changes affect:
+
+	- @AM_QPS_SHM:
+
+		--> getIV (lines 25 - 34, 46, 54 and 55)
+		--> s_help_opt_init_QPS_SHM (lines 15 - 18)
+		--> s_QPS_SHM_gatekeeper (lines 48 - 52 plus setting of variable n_auto was deleted)
+
+
+-----------------------------
+--------- STABILITY----------
+-----------------------------
+
+It is now possible to iterate the bifurcation point in the quasi-periodic case. Changes affect:
+
+	@Stability:
+
+		- approx_posc:
+			--> Computation of y_app simplified
+
+		- s_stability_selection:
+			--> Test function for quasi-periodic shooting set to "NaN" (line 50)
+
+	@ST_QPS_SHM:
+
+		- QPS_SHM_calc_stability:
+			--> Preallocation of variable "LEVal" changed from row vector to column vector. Multipliers are stored in a column vector now (line 107)
+		
+		- s_help_opt_stability_QPS_SHM:
+			--> Help text of field "iterate_bfp" updated (lines 15 - 16)
+
+		- ST_QPS_SHM:
+			--> Properties bifurc_label and msg_label added (copied from @ST_PS_SHM\ST_PS_SHM) (lines 14 - 18)
+			--> Setting of property "iterate_bfp" to "off" in constructor removed
+
+	@SOL_QPS_SHM:
+	
+		- SOL_QPS_SHM:
+			--> Saving of bifurcation point added to function IF_arch_bfp_data (lines 78 - 99)
+
+
+--------------------------------------------
+----------- TUTORIALS & EXAMPLES -----------
+--------------------------------------------
+
+Added type of system (non-autonomous etc.) as subtitle for each section (for each example in the scripts).
+
+--------------------
+
+Jeffcott(-Laval) rotor: Set Fg = 0.3924 and adapted parameters of options.opt_init of FDM and FGM.
+
+--------------------
+
+QPS SHM: Removed options structure options.opt_stability since it is not necessary anymore.
+
+--------------------
+
+Adapted all tutorials and examples to recent changes.
+
+
+---------------------------------------
+---- OTHER TWEAKS AND IMPROVEMENTS ----
+---------------------------------------
+
+Parable and cubic predictor added. Can be used by setting options.opt_cont.pred = 'parable' or 'cubic'. Changes affect:
+
+@Continuation:
+
+	- Continuation:												- m_continuation:
+		--> p_C_parable added to private properties (line 82)							--> obj.p_y0_old is now initialized as 1x3 cell array of zero vectors (line 19)
+	
+	- direction_vector:											- error_control:
+		--> Direction vector for parable and cubic predictor added. Changes to if...elseif conditions		--> Update of solution dimension for obj.p_y0_old{2} added (lines 25 and 33)
+		--> Calculation of tangent adapted. QR factorization is closer to theory now				--> Update of solution dimension for obj.p_y0_old{3} added (lines 26 and 34)
+	
+	- iterate_data:												- predictor:
+		--> Iteration of property p_y0_old adapted (line 9)							--> Parable and cubic predictor added. Changes to if...elseif conditions
+	
+	- s_help_opt_cont:											- s_CON_gatekeeper:
+		--> Info text for predictor updated (lines 26 - 31)							--> 'parable' and 'cubic' added to allowed values of field pred (line 12)
+
+@AM_QPS_SHM:
+
+	- IF_up_res_data;
+		--> Getting of last curve point (line 23)
+
+--------------------
+
+Function "check_freq" added to "Functions" folder. This function checks given frequency values or the frequency(s) of a solution given by DynamicalSystem object DYN and solution vector y.
+It is checked whether the frequency(s) are above a frequency limit. To embed the functionality of the function in CoSTAR, following changes were made:
+
+Functions:
+
+	- check_freq:
+		--> Added
+
+	- initial_solution:
+		--> Frequency check added after solution was calculated (lines 33 - 38). Following methods are only executed if check passes. Continuation is deactivated if check fails
+
+@DynamicalSystem:
+
+	- s_DYN_gatekeeper:
+		--> Frequency value checks added for periodic (lines 126 - 140 and 144 - 148) and quasi-periodic solutions (lines 216 - 235 and 239 - 248)
+
+@Continuation:
+
+	- m_continuation:
+		--> Frequency check added after predictor (lines 43 - 48). Continuation loop is terminated if check fails since any further computation might fail otherwise
+		--> Frequency check added after solution was calculated (lines 87 - 94). Following methods of the continuation loop are only executed if check passes. Continuation stops if check fails
+
+@Solution:
+
+	- Solution:
+		--> Comment added for value 3 of property "flag". This value states that CoSTAR stopped due to failed frequency check (line 21)
+
+--------------------
+
+Classes:
+
+	@Continuation:
+
+		- plot_contplot:
+			--> The curve is displayed in black when stability changes from stable to unstable or vice versa if the bifurcation points are not iterated (lines 43 - 54)
+
+		- stepcontrol:
+			--> Display output of step control information improved
+
+	--------------------
+	@Gatekeeper:
+
+		- check_data:
+			--> Added "obj.speak();" in lines 60, 74 and 99
+
+	--------------------
+	@Solution:
+
+		- contplot:
+			--> Code of the plot adjusted so that the line colors are correct for all possible scenarios regarding the requested indices (lines 235 - 271)
+			--> "elseif" condition added to handle the case if stability was computed but the bifurcation points were not iterated (see also added feature of plot_contplot above) (lines 209 - 233)
+			--> if condition in line 278 adapted to take "bifurc_idx_local = 0" into account if the variable is empty
+
+		- contplot_gatekeeper:
+			--> Additional check for options field "index" added: Check that all elements are adjacent integers in increasing numbering (lines 83 - 90)
+
+		- solget_gatekeeper:
+			--> Check of options field "index" adapted. The allowed values are not checked by check_data anymore since check_data displays all allowed values for "index" in case of an error (lines 84 - 97)

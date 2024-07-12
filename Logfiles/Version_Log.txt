@@ -1,0 +1,206 @@
+Log of different Code Versions
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+v0.24.1_beta.1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% main file
+--> main file is now called benchmark file and contains duffing and vdP in parallel together with time simulation results for reference
+--> Changed plot_shoot_sol to be universally applicable for non-autonmous and autonomous cases.
+--> Change the computed values for solution_max. Since max(abs(Z),[],1) gives back the maximum 
+of each column in a vector, which are in general not for the same time-step.
+--> Changed the plotting in plot_solution accordingly.
+--> What does sort_solution do? Seems not to be needed for the two test-cases
+
+
+%%% initial_solution
+--> Deleted some allocations of parameters and called them directly from the object. 
+
+
+%%% Shoot
+--> Removed multiple shooting method for now (not needed at the moment).
+
+%%% DynamicalSystem
+--> renamed type as order, which is now a uint8 data type
+
+%%%Solution
+--> Removed jacobian property
+--> Removed predefined option structure of continuation 
+
+
+%%% Period 
+--> The code now uses base_frquencies instead of period duration. This seems to be more suitable w.r.t. to quasi-periodicity,
+where we operate on base frquencies.
+--> The user must supply an initial (guess) base_frqn vector. This can either be a function handle if it is dependent on the 
+bifurcation parameter or not. This is corrected internally by the DynamicalSystem class and overwritten, so that base_frqn 
+is always a function_handle. 
+--> The change from period to base_frqn transports also to the shooting functions and other classes. base_frqn basically 
+replaced period.
+
+%%% Initial Conditions
+--> The intial conditions vector is now only the state space vector. If it is an autonomous system, the initial condition 
+vector is appended by the base_frqn value(s).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+v0.24.1_beta.2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% DynamicalSystem & Solution
+All Parameters and solution specific parameters are now properties of DynamicalSystem.
+To emphasize the difference between the system and the solution, the options structures are 
+named differently. 	
+SolutionClass is only a container for solution data and acts as a superclass. Solution
+now also contains solution_method specific methods for plotting or analysing the results. 
+Thus, the SolutionClass is a superclass from which Solution_Shooting (e.g.) inherits. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+v0.24.1_beta.3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%DynamicalSystem
+--> dim_statespace seems not to be needed at the moment and is removed.
+--> n_auto seems no to be needed at the moment and is removed.
+--> stiff is removed from the system structure and put into the SolutionType structure 
+(this is only relevant for shooting...)
+--> key "multiple" in solution structure is removed - not needed at the moment. 
+--> introduction of the variables n_auto_freq and auto_freq. These replace base_frqn
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+v0.24.1_beta.4
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Continuer and SolutionType
+--> method_selection is now a static method of SolutionType class. The static method creates an object of the respective solution type subclass (e.g. Shoot).
+No need for creating a SolutionType object and a Shoot object.
+
+--> Stiff and non-stiff methods are replaced by a single file. No difference in speed aparently.
+
+
+--> SolutionType now offers a universal interface for the continuert to update data in the SolutionType object.
+This is e.g. needed for the poincare phase condition, where the intitial value of the Newton-type solver is needed.
+ 
+--> Adapted nomenclature of variables in Continuation (Y --> y)
+
+--> Replaced x, mu in the continuert function calls by y.Therefore I needed to create an Equilibrium class (otherwise... no unified call possible).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+v0.24.1_beta.5
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+--> build in the active parameter idea
+	--> functions get the necessary variables (e.g. t,z) and a universal parameter vector "param".
+	--> function handle is then universal: @(t,z,param).
+	--> system structur gets the new parameter param
+	--> mu0 parameter is no longer necessary
+	
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+v0.24.1_beta.6
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+--> SolutionType is now SuperClass from which the single subclasses Equilibrium and Shoot are inheriting
+--> Solution is now a superclass from which the single subclasses EQ_Sol and PS_Shoot_Sol are inheriting
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+v0.24.1_beta.6/7/8
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+--> Gatekeeper function implemented: Checks all incoming options by calling static methods of DynamicalSystem, SolutionType and Continuation Class (or subclass).
+	--> All struct option calls get internally converted to lower case characters.
+	
+--> Gatekeeper class implemented with several methods.
+--> class specific static gatekeeper methods implemented: the DynamicalSystem, Continuation and SolutionType Class all have static gatekeeper methods, which check the respective option structures.
+
+	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+v0.24.1_beta.9
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+--> initial solution is no longer stored separately
+--> storing initial solution is done by method IF_arch_init_data for the respective Solution Subclass
+--> transferred check_archive code into m_continuation for better readability 
+--> renamed tangent method as direction_vector
+--> renamed therefor ytng0 and ytng1 as dy and dy_old
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+v0.29 --> v0.30
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--> "info" is now an allowed key in the system struct for the gatekeeper
+--> Check for Nan and inf implemented in gatekeeper ckeck_data
+--> DYN_Gatekeeper now separately checks solution_types for logic and for values (e.g. equilbirium does not have the allowed values non_auto_freq and auto_freq)
+--> logical parameter array for active parameter exchanged for DYN.param(DYN.act_param) = mu
+--> Equilibrium does now have to have order 0 as input parameter
+--> updateoptions is now a stand-alone function and simply called in the different classes
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+v0.30 --> v0.33
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--> solget function and its subfunctions (solget_gatekeeper, solget_up_index) are now superclass methods of the Solution. 
+The functions evalsol_xxx (solution, time, torus, frequency) are abstract methods of Solution and muste be implemented in all subclasses. 
+solget accesses these subclass methods.
+--> ID concept is integrated: When DYN is created, it gets an identification key (date, time...).
+--> trajectory and hypertime as new plot methods are implemented. Trajectory is based on solget.space = time
+--> solplot implemented together with solget gatekeeper
+--> check_fcn_handle is new method of solution class and checks a supplied function handle for the solplot and contplot method
+--> contplot implemented
+--> evaluated solutions via solget are not saved anymore (TODO for later)
+--> All gatekeepers now check additionally, if supplied arguments are struct's
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+v0.33 --> v0.34
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--> evalsol_xxx for class Equilibrium implemented
+--> Help texts added for solget, solplot, contplot
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+v0.34 --> v0.35
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--> Mistake in evalsol_frequency in PS_Shoot_Sol fixed
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+v0.35 --> v0.35.1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--> property and method names changed according to guidlines
+--> help text for function codysol implemented
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+v0.35.1 --> v0.35.2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--> secant predictor implmented, can be called by property 'pred'='secant' in options for Continuation
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+v0.39 --> v0.40
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--> method getIV in class SolutionType implemented. Method generates initial value for solution method from initial condition
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+v0.40 --> v0.41
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--> option 'stiff' of opt_sol_method for solution method 'shoot' has been replaced by option 'solver'. Choose now the ode solver itself default 'ode45'
+--> option 'display' for contplot 0 if only the data of the diagram is needed, 1 diagram is plotted, default 1
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+v0.41 --> v0.43
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--> option 'display' for contplot removed
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+v0.43 --> v1.0
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--> ST_init_gatekeeper and ST_gatekeeper unified
+--> Commentation
+
+
+
+
+

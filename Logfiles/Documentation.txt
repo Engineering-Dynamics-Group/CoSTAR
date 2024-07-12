@@ -1,0 +1,44 @@
+%%%%% This is the documentation of the CoSTAR Algorithm %%%%%
+
+General Variable Nomenclature
+
+z		solution vector of the state or system space (first or second order ode)
+s		solution vector of the solution method: does not contain the autonomous frequencies
+x 		solution vector of the solution method: contains s and possibly the autonomous frequencies
+y		solution vector of the continuation: contains x and the continuation parameter	(y0 is the initial solution)		
+
+ic 		initial condition: point in state space
+iv		initial value: start vector for newton iteration (potentially including autonomous frequency: s0 or x0)
+	
+--> Object names are all capital letters e.g.: CON for the Continuation object.
+--> All variables, which contain a number of something start with "n_", e.g. n_auto contains the number of autonomous frequencies.
+
+
+Systematic of Method Nomenclature
+---------------------------------------------------------------------------------------------------
+
+For example:
+
+ST.IF_arch_data(CON)
+This method is called in the Continuer object and updates the SolutionType object 
+
+Variable Dimension:
+The last dimension of any variable is the continuation direction.
+e.g.: size(mu) = [1,50]:	50 continuation steps were performed
+      size(s)  = [10,50]:	50 continuation steps were performed for a 10-dimensional solution vector
+	  
+The solution vector dimension is the second to last direction.
+e.g.:       size(s)  = [10,50]:				50 continuation steps were performed for a 10-dimensional solution vector
+			size(s_time) = [200,10,50]	    Time simulation results were done for every of the 10-dimensional simulation vector for every of the 50 continuation steps	
+
+Gatekeeper
+---------------------------------------------------------------------------------------------------
+The gatekeeper class performs initial checks on the user supplied input data. This is done by calling
+the main method m_gatekeeper, which checks the options structure (which contains 2 to 4 further structures).
+The single substructures like system, opt_sol, opt_sol_method and opt_con are then analysed in class and 
+subclass specific static gatkeeper methods like DYN_gatekeeper, etc.
+The important part is that every SolutionType Subclass has it's own static gatekeeper method.
+Internally, all fieldnames of the options super- and substructures as well as all string fieldvalues are
+converted to lower case strings.
+
+

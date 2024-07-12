@@ -1,0 +1,419 @@
+--------------------------------------------
+---------------- COSTARHELP ----------------
+--------------------------------------------
+
+Help file s_help_solget for the solget function has been added to the @Solution folder.
+
+
+--------------------
+Methods tutorial and s_call_for_tutorial have been added to the @costarhelp folder.
+The examples and tutorials are shown and linked within costarhelp now.
+Clicking on the link will open the help pages in the command window or the requested tutorial / example in the editor.
+
+
+--------------------
+Help files have been improved and corrected. This applies for:
+
+	@costarhelp:					@Continuation:					@DynamicalSystem:
+
+		- contplot					- s_help_opt_cont				- s_help_system
+		- costar											- s_help_opt_sol
+		- example
+		- opt_approx_method		
+		- opt_cont				@Solution:					@AM_(Q)PS_SHM:
+		- opt_init				
+		- opt_sol					- s_help_contplot				- s_help_opt_approx_method_(Q)PS_SHM
+		- opt_stability					- s_help_solplot				- s_help_opt_init_QPS_SHM
+		- options
+		- s_disp_help_text
+		- solget
+		- solplot
+		- system
+
+
+	@AM_Equilibrium:				@AM_(Q)PS_FDM:					@AM_(Q)PS_FGM:
+
+		- s_help_opt_init_EQ				-s_help_opt_init_(Q)PS_FDM 			- s_help_opt_approx_method_(Q)PS_FGM
+		- s_help_opt_approx_method_EQ
+
+
+	@ST_EQ:						@ST_PS_SHM:					@ST_QPS_SHM:
+		
+		- s_help_opt_stability_EQ			- s_help_opt_stability_PS_SHM			- s_help_opt_stability_QPS_SHM:
+															--> complete method added
+
+
+
+--------------------------------------------
+--------- FINITE-DIFFERENCE-METHOD ---------
+--------------------------------------------
+
+It is now possible to provide a calculated method solution vector s in opt_init instead of c0, c1 and s1 (PS) / instead of c0, c1_matrix and s1_matrix (QPS)
+	
+	@AM_PS_FDM:
+
+		- AM_PS_FDM:
+			--> Property fdm_sol added (line 16)
+		
+		- getIV:
+			--> Adjusted to use fdm_sol if provided (lines 13 - 19 and 42)
+
+		- s_help_opt_init_PS_FDM 
+			--> Explanation of fdm_sol added (lines 29 -31), other explanations were adjusted accordingly
+
+	--------------------
+	@AM_QPS_FDM:
+
+		- AM_QPS_FDM:
+			--> Property fdm_sol added (line 21)
+		
+		- getIV:
+			--> Adjusted to use fdm_sol if provided (lines 13 - 19 and 42)
+
+		- s_help_opt_init_QPS_FDM 
+			--> Explanation of fdm_sol added (lines 39 -41), other explanations were adjusted accordingly
+
+
+--------------------
+Sparse matrices are utilized to calculate the Jacobian matrix and the Jacobian matrix is saved as sparse matrix now
+
+	@AM_PS_FDM:
+
+		- AM_PS_FDM:
+			--> Property ind_blkdiag_mat added (line 31)
+			--> Property p_blkdiag_ones and its calculation in constructor removed
+		
+		- getWeights
+			--> p_w_mat_J is calculated using sparse matrix (linea 148 - 149)
+			--> ind_blkdiag_mat is calculated (lines 152 - 156)
+
+		- PS_FDM_residuum:
+			--> dFcn_ds_mat is calculated using sparse matrix (line 118)
+
+	--------------------
+	@AM_QPS_FDM:
+
+		- AM_QPS_FDM:
+			--> Property ind_blkdiag_mat added (line 38)
+			--> Property p_blkdiag_ones and its calculation in constructor removed
+		
+		- getWeights
+			--> p_w_1_mat_J and p_w_2_mat_J are calculated using sparse matrices (lines 250 - 252 and 266 - 267)
+			--> ind_blkdiag_mat is calculated (lines 270 - 274)
+
+		- QPS_FDM_residuum:
+			--> dFcn_ds_mat is calculated using sparse matrix (line 152)
+
+	--------------------
+	@SOL_PS_FDM:
+
+		- SOL_PS_FDM:
+			--> Jacobian matrix is saved as sparse matrix in a cell array (lines 34, 64 and 94)
+
+	--------------------
+	@SOL_QPS_FDM:
+
+		- SOL_QPS_FDM:
+			--> Jacobian matrix is saved as sparse matrix in a cell array (lines 34 and 63)
+
+
+--------------------
+Calculation of the Jacobian matrix is more precise now
+
+	@AM_PS_FDM:
+
+		- PS_FDM_residuum:
+			--> Calculation of Jacobian matrix adjusted (lines 102 - 139)
+
+	--------------------
+	@AM_QPS_FDM:
+
+		- QPS_FDM_residuum:
+			--> Calculation of Jacobian matrix adjusted (lines 136 - 189)
+
+
+--------------------
+A [1x2] array can be used now to set the resolution of quasi-periodic hypertime plots
+
+	@SOL_QPS_FDM:
+	
+		- evalsol_hypertime:
+			--> Adapted to be able to use a scalar value as well as a [1x2] array for the resolution
+
+
+
+-----------------------------------
+--------- SHOOTING METHOD ---------
+-----------------------------------
+
+Abbreviation "Shoot" or "shoot" renamed to "SHM". This affects folder-, subclass- and method-names, method calls and comments of following files:
+
+	@ApproxMethod:				@AM_PS_SHM:					@AM_QPS_SHM:
+
+		- s_AM_gatekeeper			- AM_PS_SHM					- AM_QPS_SHM
+		- s_method_selection			- s_PS_SHM_gatekeeper				- FcnWrapperODE2 and FcnWrapperODE5
+							- SHM_single_auto_fun				- fun_Jac_wrapper and fun_Jac_wrapper_init
+							- SHM_single_fun				- getIV, IF_up_res_data and poincare_int
+													- qp_SHM_auto_fun, qp_SHM_mixed_fun and qp_SHM_non_auto_fun
+													- s_QPS_SHM_gatekeeper
+
+
+	@Solution:				@SOL_PS_SHM:					@SOL_QPS_SHM:
+
+		- s_solution_selection			- SOL_PS_SHM					- SOL_QPS_SHM
+							- evalsol_time					- evalsol_time
+							- evalsol_hypertime				- evalsol_hypertime
+							- evalsol_frequency				- evalsol_frequency
+													- FcnWrapper_SOL_ODE2
+
+
+	@Stability:				@ST_PS_SHM:					@ST_QPS_SHM:
+
+		- s_ST_gatekeeper			- ST_PS_SHM					- ST_QPS_SHM
+		- s_stability_selection			- crit_multi					- crit_multi
+							- PS_SHM_calc_stability_auto			- GSOrthonormalization
+							- PS_SHM_calc_stability_non_auto		- jacobi_int
+							- s_ST_PS_SHM_gatekeeper			- QPS_calc_stability
+							- SHM_single_auto_fun				- QPS_SHM_calc_stability
+							- SHM_single_fun				- s_ST_QPS_SHM_gatekeeper
+
+
+
+-----------------------------
+--------- SOLUTION ----------
+-----------------------------
+
+Postprocessing method evalsol_solution has been removed due to being not required / useless.
+
+	@SOL_... (all):
+
+		- evalsol_solution removed
+
+		- SOL_...:
+			--> evalsol_solution removed from methods
+
+	--------------------
+	@Solution:
+
+		- s_help_solget, solget, solget_gatekeeper and Solution:
+			--> Everything in connection with evalsol_solution or 'space' = 'solution' removed
+
+
+--------------------
+Bugfixes, improvements and tweaks:
+
+	@Solution:
+
+		- solget:
+			--> "ndims(s)" replaced by s_array_dim (lines 150, 154, 158 and 170), which is calculated in lines 135 - 139. The if-elseif statements are accessed correctly now
+	
+		- solget_gatekeeper:
+			--> Check of field 'resolution' extended (lines 47 - 56). Now, scalars and [1x2] arrays are permitted for quasi-periodic hypertime plots using the FDM
+			--> It is now checked that the value(s) of the field 'resolution' are positive integer(s) (lines 58 - 60)
+			
+	--------------------
+	@SOL_EQ:
+
+		- evalsol_hypertime:
+			--> Header text corrected and tweaked
+
+		- evalsol_solution:
+			--> s(:,:,:) changed to s(:,:) (line 15)
+
+		- evalsol_time:
+			--> Header text tweaked
+	
+	--------------------
+	@SOL_PS_FGM:
+
+		- evalsol_time:
+			--> Default time interval changed to [0,T] (line 47). Trajectory plot without defining 'interval' displays closed curves now
+			
+	--------------------
+	@SOL_QPS_FGM:
+
+		- evalsol_time:
+			--> Default time interval changed to [0,2*pi] (line 50)
+
+
+
+-----------------------------
+--------- TUTORIALS ---------
+-----------------------------
+
+Tutorials:
+
+	- Tutorials renamed to "Tutorials_<solution-type>_<approx-method>"
+	- Slight adjustments to existing tutorials
+	- "Tutorial_QPS_FGM" added
+	- "Tutorial_QPS_SHM" added
+
+
+--------------------
+Examples:
+
+	- Minimal examples renamed to "Examples_<solution-type>_<approx-method>"
+	- Slight adjustments to existing examples
+	- "Example_QPS_FGM" added
+	- "Example_QPS_SHM" added
+
+
+
+----------------------------
+--------- BUGFIXES ---------
+----------------------------
+
+Classes:
+
+	@Continuation:
+
+		- check_limits:
+			--> "if obj.display == 1" changed to "if strcmpi(obj.display,'on')" (line 28)
+		
+		- Continuation:
+			--> Default value of propterty "display" changed to "on" (line 10)
+			--> Default value of propterty "plot" changed to "on" (line 11)
+
+		- m_continuation:
+			--> "if obj.plot == 1;" changed to "if strcmpi(obj.plot,'on');" (line 88)
+
+		- s_CON_gatekeeper:
+			--> Check of field "plot" adapted. Now, only the values 'on' or 'off' (instead of 0 and 1) are accepted (line 35)
+			--> Check of field "display" adapted. Now, only the values 'on' or 'off' (instead of 0 and 1) are accepted (line 36)
+
+		- step_control:
+			--> "if obj.display == 1 && ..." changed to "if strcmpi(obj.display,'on') && ..." (line 176)
+			--> Display messages corrected (lines 180 - 184)
+
+	--------------------
+	@Gatekeeper:
+
+		- m_gatekeeper:
+			--> "if options.opt_sol.cont == 1" changed to "if strcmpi(options.opt_sol.cont,'on')" (line 76)
+
+	--------------------
+	@ApproxMethod:
+
+		- ApproxMethod:
+			--> "error_control = 0" changed to "error_control = 'off'" (line 10)
+
+	--------------------
+	@AM_PS_FGM:
+
+		- AM_PS_FGM:
+			--> "error_control = 1" changed to "error_control = 'on'" (line 71)
+
+	--------------------
+	@AM_QPS_FGM:
+
+		- AM_QPS_FGM:
+			--> "error_control = 1" changed to "error_control = 'on'" (line 47)
+
+
+
+---------------------------------------
+---- OTHER TWEAKS AND IMPROVEMENTS ----
+---------------------------------------
+
+It is now possible to use 'eq', 'ps' and 'qps' for options.opt_sol.sol_type. It is also now possible to use 'fgm', 'shm' and 'fdm' for options.opt_sol.approx_method.
+	
+	@DynamicalSystem:				@ApproxMethod:			 @Stability:
+
+		- s_DYN_gatekeeper				- s_AM_gatekeeper 		- s_ST_gatekeeper
+		- s_help_opt_sol:
+			--> Explanations updated
+		- DynamicalSystem:
+			--> Constructor changes abbreviations to "old" keys (whole words) if user provided abbreviations since code is written using whole words
+	
+
+
+--------------------
+Classes:
+
+	@Continuation:
+
+		- check_limits:
+			--> Adjustment to take new initial value of obj.p_local_cont_counter into account
+			--> Display output is now generated before stopping criteria are checked. As a result, the display output is also shown for the final solution point before the stopping message is displayed.
+
+		- choose_stepcontrol_param:
+			--> Some variables renamed (and comments adjusted) as previous names were partially misleading
+
+		- Continuation:
+			--> Property stepcontrol renamed to step_control. s_CON_gatekeeper, stepcontrol, choose_stepcontrol_param, s_help_opt_cont, test-files and tutorials were adjusted accordingly
+			--> Property stepcontrol_param renamed to step_control_param. s_CON_gatekeeper, stepcontrol, choose_stepcontrol_param, s_help_opt_cont, test-files and tutorials were adjusted accordingly
+			--> Property maxcontstep renamed to max_cont_step. Continuation, check_limits, s_CON_gatekeeper, s_help_opt_cont and test-files were adjusted accordingly
+			--> Property p_local_cont_counter is initialized with value 1 now to enhance clarity
+
+		- direction_vector:
+			--> Small adjustment to take new initial value of obj.p_local_cont_counter into account
+
+		- m_continuation:
+			--> Some comments tweaked
+
+		- plot_contplot:
+			--> Small adjustment to take new initial value of obj.p_local_cont_counter into account
+
+		- step_control:
+			--> Method renamed to stepcontrol. Continuation and m_continuation were adjusted accordingly
+			--> Some variables renamed (and comments adjusted) as previous names were partially misleading
+	
+	--------------------
+	@Stability:
+
+		- s_ST_gatekeeper:
+			--> Now calls the subclass gatekeepers
+
+	--------------------
+	@ST_EQ:
+
+		- s_ST_EQ_gatekeeper
+			--> Is now identical to former s_ST_gatekeeper
+			--> Allowed values of field 'iterate_bfp' changed to 'on' and 'off'
+
+	--------------------
+	@ST_PS_SHM:
+
+		- s_ST_PS_SHM_gatekeeper
+			--> Renamed from s_ST_PS_gatekeeper
+			--> Taken from former gatekeeper s_ST_gatekeeper and check for field 'solver' added
+			--> Allowed values of field 'iterate_bfp' changed to 'on' and 'off'
+
+	--------------------
+	@ST_QPS_SHM:
+
+		- s_ST_QPS_SHM_gatekeeper
+			--> Renamed from s_ST_QPS_gatekeeper
+			--> Taken from former gatekeeper s_ST_gatekeeper and check for field 'solver' added
+			--> Allowed values of field 'iterate_bfp' changed to 'on' and 'off'
+
+
+--------------------
+
+test:
+
+	check_costar:
+		--> Display output improved. Warnings and error messages are shown now
+
+	check_tutorials:
+		--> Added. Can be used similar to check_costar in order to check the tutorials and minimal examples
+
+	- Test files renamed in order to have the structure "test_<approx-method>_<solution-type>_<system-name>"
+
+	-------------------
+	01postprocessing:
+
+		- benchmark_postprocess_equilibrium:
+			--> Output arguments removed (line 1)
+			--> Output arguments of solget and contplot methods corrected
+			--> contplot methods adapted. They are similar to periodic and quasi-periodic postprocessing now
+
+		- benchmark_postprocess_periodic:
+			--> Output arguments removed (line 1)
+			--> Variable names of opt_contplot and opt_solplot corrected
+			--> Output arguments of solget, solplot and contplot methods corrected
+
+		- benchmark_postprocess_quasiperiodic:
+			--> Output arguments removed (line 1)
+			--> Variable names of opt_contplot and opt_solplot corrected
+			--> Output arguments of solget, solplot and contplot methods corrected

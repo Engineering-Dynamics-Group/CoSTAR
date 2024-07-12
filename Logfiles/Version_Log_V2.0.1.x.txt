@@ -1,0 +1,440 @@
+Log of different Code Versions of branch V2.0.1.x 
+(Implementation of Quasi-periodic Shooting)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+V2.0.1.26
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+AM_QPS_Shooting
+
+	s_QPS_Shoot_gatekeeper
+		- opt_sol_mandatory_fieldnames renamed to opt_approx_method_mandatory_fieldnames
+		- opt_sol_allowed_fieldnames renamed to opt_approx_method_allowed_fieldnames
+		- opt_init_mandatory_fieldnames added
+		- opt_init_allowed_fieldnames added
+		- Line 20 added GC.check_fields(opt_init)
+ 		- Lines 27-29 added check mandatory fields
+		- Lines 33-39 added check ic and set to zeros if ic is not provided 		
+	getIV
+		- Line 52 added IC is set to given initial condition if no initial value is supplied
+ 		- display of frecuencies removed (previously line 144)
+		
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+V2.0.1.25
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+AM_QPS_Shoot
+
+	following methods removed:
+		- FcnWrapperODE1
+		- FcnWrapperODE3
+		- getIV2
+		- getIV3
+		- getPattern_fd_bb
+		- initial_solution
+		- phase_shift
+		- qp_shoot_auto
+		- qp_shoot_auto_fun
+		- qp_shoot_auto_fun_Jac
+		- qp_shoot_auto_fun01
+		- qp_shoot_auto_fun5
+   		- qp_shoot_auto_fun6
+  		- qp_shoot_auto_fun7
+		- qp_shoot_auto2
+		- qp_shoot_mixed
+		- qp_shoot_mixed_fun
+		- qp_shoot_mixed_fun01
+		- qp_shoot_mixed_fun2
+		- qp_shoot_mixed_fun4
+		- qp_shoot_mixed_fun5
+		- qp_shoot_mixed_fun6
+		- qp_shoot_mixed_fun10
+		- qp_shoot_non_auto_fun_Jac
+		- qp_shoot_non_auto_fun_Jac2
+		- qp_shoot_non_auto_fun_Jac3
+		- qp_shoot_non_auto_fun_Jac4
+		- qp_shoot_non_auto_fun_Jac5
+		- qp_shoot_non_auto_fun_Jac6
+		- qp_shoot_non_auto_fun_Jac7
+		- qp_shoot_non_auto_fun_Jac8
+		- qp_shoot_non_auto_fun_Jac9
+		- qp_shoot_non_auto_fun_Jac9b
+		- qp_shoot_non_auto_fun_Jac9c
+		- qp_shoot_non_auto_fun_Jac9d
+		- qp_shoot_non_auto_fun_Jac10
+		- qp_shoot_non_auto_fun_Jac11
+		- qp_shoot_non_auto_fun_Jac15
+		- residual
+
+	methods renamed:
+		- qp_shoot_auto_fun16  now  qp_shoot_auto_fun
+			Commented Lines removed (Ln 92-93, Ln 99, Ln 133)
+
+		- qp_shoot_mixed_fun16  now  qp_shoot_mixed_fun
+		- qp_shoot_non_auto_fun16  now  qp_shoot_non_auto_fun
+
+
+ApproxMethod
+
+	s_method_selection
+		- Line 40 residual for QPS_Shooting_nonauto now  qp_shoot_non_auto_fun
+		- Line 42 residual for QPS_Shooting_mixed now  qp_shoot_mixed_fun		
+		- Line 44 residual for QPS_Shooting_auto now  qp_shoot_auto_fun
+
+
+SOL_QPS_Shoot
+
+	evalsol_hypertime
+		- Commented Lines removed (previously Lines 21-22, 24, 67-68, 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+V2.0.1.23
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	Continuation
+
+		properties:
+			- Line 19 fsolve_opts entry MaxIter changed from 30 back 1e3
+		
+		m_continuation
+			- Line 25 added maximal number of iterations of fsolve set to 30
+			- changes to fsolve_opts removed (previously Lines 28 to 30)
+			- Commented lines removed (previously Lines 35 to 37)
+
+	
+	AM_QPS_Shoot
+
+		methods:
+			- Lines 54 to 63 commented
+			- Lines 66 to 70 commented
+			- Lines 74 to 77 commented
+			- Lines 84 to 93 commented
+			- Line 95 commented
+
+		s_QPS_Shoot_gatekeeper
+			- Arguments added  opt_sol,opt_approx_method,opt_init
+			- Line 17 'opt_sol_method' in GC.check_fields changed to 'opt_approx_method'
+			- Line 21 solvers ode78 and ode89 added to solver_allowed_values
+
+
+	ApproxMethod
+
+		s_AM_gatekeeper
+			- Lines 37 to 39 added (commented)
+	
+
+	SOL_QPS_Shoot
+
+		properties:
+			- Line 15 removed (property for phase shift previously commented)
+		
+		IF_arch_data
+			- Argument name changed from ST to AM
+			- Phase shift assignment removed (previously Line 63)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+V2.0.1.22
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	AM_QPS_Shoot
+		
+		methods:
+			- Line 79 added	Residual for full-autonomous case with Jacobian
+			- Line 86 added Residual for full-autonomous case without Jacobian
+		
+		qp_shoot_auto_fun01 (new function) provides residual for full-autonomous case for quasi-periodic shooting (no Jacobian provided)
+			            based on function qp_shoot_mixed_fun01
+			- Line 16 added first autonomous frequency fetched from vector y
+			- Line 24 added Derivate of reference solution with respect to theta_1 assigned to h1
+			- Line 67 added Phase condition for first autonomous frequency
+
+		qp_shoot_auto_fun16 (new function) provides residual for full-autonomous case for quasi-periodic shooting (including Jacobian)
+				    based on function qp_shoot_mixed_fun16
+			- Line 16 added first autonomous frequency fetched from vector y
+			- Line 25 added Derivate of reference solution with respect to theta_1 assigned to h1
+			- Line 68 added Phase condition for first autonomous frequency
+			- Lines 90-125 added to compute entries for Jacobian dres/domega_1
+			- Lines 129-160 added to compute entries for Jacobian dres/domega_2
+
+
+	ApproxMethod
+
+		s_method_selection
+			- Line 63 added (commented)
+			- Line 64 added Residual for quasi-periodic shooting full-autonomous case now  qp_shoot_auto_fun16
+			- Line 66 added (commented) Residual for quasi-periodic shooting full-autonomous case now  qp_shoot_auto_fun01 (without Jacobian)
+
+
+	SOL_QPS_Shoot
+
+		evalsol_frequency
+			- Line 25 added Changed time interval for time integration to get sharper fourier-spectrum
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+V2.0.1.21
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	Continuation
+
+		Continuation
+			- Line 74 step_width_limit changed from [0.01.*obj.step_width,5.*obj.step_width] to [0.001.*obj.step_width,5.*obj.step_width]
+		
+		m_continuation
+			- Line 16 Semicolon added after else
+			- Line 35 commented (UseParallel)
+
+		step_control
+			- Line 8 changed from  rho0 = obj.it_nominal/obj.p_it  to  rho0 = sqrt(obj.it_nominal/obj.p_it)
+
+
+	AM_QPS_Shoot	
+	
+		methods:
+			- Line 72 added	Residual for mixed case with Jacobian
+			- Line 85 added Residual for mixed case without Jacobian
+
+		
+		IF_up_res_data
+			- Line 33 commented (evaluate phase shift of solution)
+
+		qp_shoot_mixed_fun01 (new function)
+			- Function provides residual for mixed with interpolation of intial values instead of and values 
+			  to be able to use periodic boundary conditions, provides only residual no Jacobian
+
+		qp_shoot_mixed_fun10 (new function)
+			- Interpolation of initial values instead of end values to be able to use periodic boundary conditions,
+			  provides residual and jacobian
+
+		qp_shoot_mixed_fun16 (new function)
+			- Line 33 Differential constant for all characteristics
+			- Not functioning yet!
+
+	ApproxMethod
+
+		s_method_selection
+			- Line 56 added (commented)
+			- Line 57 added Residual for quasi-periodic shooting mixed case now  qp_shoot_mixed_fun16
+			- Line 59 added (commented)
+			- Line 61 added (commented)
+
+
+	SOL_QPS_Shoot
+
+		IF_arch_data
+			- Line 63 commented (phase-shift of solution no longer calculated)
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+V2.0.1.20
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	Continuation
+		
+		M_continuation
+			- Line 35 added fsolve uses parallel computing for numerical evaluation of Jacobian matrix
+
+	
+	ApproxMethod_SC
+		S_method_selection
+			- Selected residual AM.res for quasi-periodic shooting non_autonomous case (Line 52) changed from qp_shoot_non_auto_fun_Jac9 to qp_shoot_non_auto_fun_Jac16
+
+	
+	AM_QPS_Shoot
+
+		Qp_shoot_non_auto_fun_Jac9c
+			- Residual for Quasi-periodic-Shooting based on Qp_shoot_non_auto_fun_Jac9b, but interpolation of initial values fully vectorized (Lines 34-37)
+
+		Qp_shoot_non_auto_fun_Jac9d
+			- Residual for Quasi-periodic-Shooting based on Qp_shoot_non_auto_fun_Jac9c but reshaping of residuals and initial values in for-loop for “analytical” Jacobian
+
+		Qp_shoot_non_auto_fun_Jac15 (new function)
+			- Line 24 removed G,G1 and H no longer preassigned
+			- Line 28 Differential dx now constant for all characteristics
+			- Line 68 to 74 uncommented Interpolation now in for loop to determine pattern of jacobian (for debugging)
+	
+		Qp_shoot_non_auto_fun_Jac16 (new function) (changes to Qp_shoot_non_auto_fun_Jac15)
+			- Line 29 removed (commented)
+			- Lines 55 and 56 removed (commented)
+			- Lines 54 to 57 Interpolation now fully vectorized
+			- Jacobian in loop removed (commented)
+	
+	Functions
+		Initial_solution
+			- Line 11 added commented (UseParallel=true)
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+V2.0.1.19
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+SolutionType: 	Class SolutionType renamed to Class ApproximationMethod
+		All SolutionType subclasses renamed AM_*
+
+	Continuation
+		M_continuation
+			- Lines 28-30 added fsolve opts for testing
+			- Lines 36-37 added (commented) to check residual function with numerical Jacobian
+	
+
+	AM_QPS_Shoot
+
+		Qp_shoot_non_auto_fun_Jac8
+			- Lines 53-56 commented
+			- Lines 58-60 added csape uses now not-a-knot boundary conditions
+
+		QP_shoot_non_auto_fun_Jac9 (new)
+			- Lines 54-59 added (Makes matrix of initial values for perturbated and unperturbated initial values)
+			- Lines 61-67 Now Initial Values will be interpolated using csape and periodic boundary condtions
+
+		QP_shoot_non_auto_fun_Jac9b (new)
+			- Function is similar to QP_shoot_non_auto_fun_Jac9 but provides only the residual and not the Jacobian (for testing purposes)
+
+		QP_shoot_non_auto_fun_Jac10 
+			- Non working intermediate function
+
+		QP_shoot_non_auto_fun_Jac11
+			- Non working intermediate function
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+V2.0.1.16
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	SOL_PS_Shoot
+		Evalsol_solution
+			- Line 20 removed (previously commented)
+
+
+	SOL_QPS_Shoot
+		Evalsol_solution
+			- Lines 20-21 added (previously no function)
+		
+		Evalsol_time (rewritten)
+			- Method previously computed time solution along characteristics
+			- Method now computes actual time solution in given interval
+
+	
+	ST_PS_Shoot
+		setSolver removed (will be done by function setSolver)
+
+
+	ST_QPS_Shoot
+		setSolver removed (will be done by function setSolver)
+		
+		qp_shoot_non_auto_fun6
+			-Lines 52-72 Interpolation of end values with griddedInterpolant vectorized
+		qp_shoot_non_auto_fun7 added
+			- Lines 51-57 (commented) removed from qp_shoot_non_auto_fun6
+		qp_shoot_non_auto_fun8 added
+			- Line 52-57 Interpolation replaced by csape 
+	
+	Functions
+		setSolver added
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+V2.0.1.15
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	SOL_QPS_Shoot
+		Evalsol_frequency
+			- Method written (previously empty without function)
+		Evalsol_hypertime
+			- Lines 21-22 commented
+			- Line 23 added Interval now from 0 to 2pi
+			- Line 24 commented
+			- Line 25 added Interval now from 0 to 2pi
+			- Lines 64-65 commented, replaced with Lines 70-71 now repmat is used
+			- Line 81 scattertedInterpolant uses now condition “natural” instead of “nearest”
+			- Lines 93-101 added boundaries of hypertime manifold will now be interpolated to ensure smooth boundary because of lack of data for interpolation
+	SolutionType
+		S_method_selection
+			- Line 46 added method for quasi-periodic shooting non_auto now qp_shoot_non_auto_fun6
+			- Lines 45-46, 49-51, 54, 56-59, 61 removed
+	ST_QPS_Shoot
+		getIV
+			- Lines 175-178 commented (figure for spectrum)
+			- qp_shoot_non_auto_fun_Jac6 added
+		ST_QPS_Shoot
+			- Lines 60-62 commented
+			- Line 65 added Method qp_shoot_non_auto_fun_Jac6
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+V2.0.1.14
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	Continuation
+
+		Predictor
+			- Line 10 removed
+
+		M_continuation
+			-Lines 24-35 comment removed
+
+		Step_control
+			- Line 8 added (commented) rho = sqrt(it_nom_it)
+			- Line 17 removed (display)
+
+
+	ST_QPS_Shoot
+
+		getIV
+			- Line 7 removed
+			- Line 8 added mu0 as variable (replaced in method)
+			- Line 15-80 if statement added so provided initial value can be used Time integration will only be done if no initial value is supplied
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+V2.0.1.13
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+	Continuation
+		m_continuation 
+			-Lines 34-35 added to be able to override previous if statement (commented)
+
+	SolutionType
+		s_method_selection
+			- Line 59 commented
+			- Line 60 added
+	
+	ST_QPS_Shoot
+		getIV
+			- Lines 72-73 commented Time Interval for integration redefined
+			- Lines 127-142 removed (figures)
+			- Plots (for testing purposes) removed
+		
+		qp_Shoot_auto_fun7 removed
+	
+		ST_QPS_Shoot
+			- Line 74 qp_shoot_auto_fun7 removed
+
+	Functions
+		Initial_solution
+			-Line 18 added (commented)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+V2.0.1.9
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	ST_QPS_Shoot
+		qp_shoot_mixed_fun4 
+			-comments supplemented
+
+		qp_shoot_non_auto_Jac4
+			- comments supplemented
+
+
+
+
