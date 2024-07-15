@@ -18,6 +18,10 @@ elseif(strcmpi(DYN.sol_type,'periodic'))
     if(strcmpi(DYN.approx_method,'shooting'))
         S = SOL_PS_SHM(AM);
     end
+
+    if(strcmpi(DYN.approx_method,'mshm'))
+        S = SOL_PS_MSHM(AM);
+    end
     
     if(strcmpi(DYN.approx_method,'fourier-galerkin'))
         S = SOL_PS_FGM();

@@ -279,5 +279,9 @@ Changes affect:
 - intial_solution
     --> line 115 additional or statement to if added (&& 'mshm')
     
+@Solution
+    - s_solution_selection
+        --> lines 22-24 added (if-statement for multiple shooting)
 
+@SOL_PS_MSHM (new subclass) Solution subclass for multiple shooting
 
