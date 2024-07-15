@@ -7,7 +7,7 @@
 %@res: resdiual vector for the newton-type corrector method in Continuation class
 
 
-function res = SHM_single_fun(obj,y,DYN)
+function res = MSHM_single_fun(obj,y,DYN)
 
     Fcn = DYN.rhs;
     x = y(1:(end-1));

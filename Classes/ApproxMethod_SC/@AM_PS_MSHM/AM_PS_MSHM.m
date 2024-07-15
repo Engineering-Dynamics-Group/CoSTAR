@@ -22,7 +22,7 @@ classdef AM_PS_MSHM < ApproxMethod
     %%%%%%%%%%%%%%%
     methods
         %% Constructor
-        function obj = AM_PS_SHM(DYN)     
+        function obj = AM_PS_MSHM(DYN)     
             obj = updateoptions(obj,DYN.opt_approx_method);                 %updateoptions method is a general method
             obj = obj.getIV(DYN);                                           %Set initial value (Has to be set here, because residual accesses iv
             obj = setSolver(obj,obj.solver);

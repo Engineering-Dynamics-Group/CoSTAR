@@ -253,5 +253,21 @@ Changes affect:
     - s_DYN_gatekeeper
         --> line 111 'mshm' added to p_approx_method_allowed_fieldvalues
 
+@ApproxMethod
+    - s_method_selection
+        --> lines 25-32 added
+
+@AM_PS_MSHM
+    - Constructor
+        --> renamed AM_PS_MSHM
+    
+    - MSHM_auto_fun 
+        --> renamed
+
+    - MSH_fun       
+        --> renamed
+
+    
+    
 
 
