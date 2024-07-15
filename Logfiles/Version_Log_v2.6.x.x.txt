@@ -268,17 +268,25 @@ Changes affect:
     
     - MSHM_auto_fun 
         --> renamed
+        --> Multiple changes to repurpose this file for multiple shooting
 
     - MSHM_fun       
         --> renamed
         --> multiple changes to repurpose this file for multiple shooting
 
     - getIV
-        --> if-statement added (lines 9-29)
+        --> if-statement added (lines 29-47) (autonomous case)
             => checks whether there is more than one shooting point
             => If n_shoot>1, do time integration from supplied ic
             => Extract values from shooting points
             => Set iv for multiple shooting
+
+        --> if-statement added (lines 29-47) (non-autonomous case)
+            => checks whether there is more than one shooting point
+            => If n_shoot>1, do time integration from supplied ic
+            => Extract values from shooting points
+            => Set iv for multiple shooting
+         
         
 @ST_PS_SHM
     - PS_SHM_calc_stability_non_auto
