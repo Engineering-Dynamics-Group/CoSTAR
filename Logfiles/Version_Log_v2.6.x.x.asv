@@ -293,12 +293,6 @@ Changes affect:
 
 @SOL_PS_MSHM (new subclass) Solution subclass for multiple shooting
     - evalsol_time
-        --> line 16 added (fetch dimension of state-space)
-        --> line 38 s0 changed to s0(1:dim,1) to choose only the first shooting point
-        --> line 44 s1 changed to s1(1:dim,1) to choose only the first shooting point
-
-
-
-
-
+        --> line 37 s0 changed to s0(1:dim,1) to choose only the first shooting point
+        --> line 43 s1 changed to s1(1:dim,1) to choose only the first shooting point
 

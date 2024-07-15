@@ -1,4 +1,4 @@
-% Method of SOL_PS_MSHM: This method (re-)calculates a periodic orbit of a multiple shooting solution
+% Method of SOL_PS_SHM: This method (re-)calculates a periodic orbit of a shooting solution
 % starting from the iterated point on the periodic oribt
 %
 % @obj:     Solution subclass object
@@ -13,7 +13,6 @@
 function  [s,mu,t] = evalsol_time(obj,DYN,options)
 
     index = options.index;
-    dim = DYN.dim;
     N = numel(index);
   
     for k =1:N
