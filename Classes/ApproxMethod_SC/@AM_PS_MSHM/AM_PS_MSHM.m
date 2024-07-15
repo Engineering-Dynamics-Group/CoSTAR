@@ -6,7 +6,7 @@ classdef AM_PS_MSHM < ApproxMethod
         odeOpts = odeset('RelTol',1e-8,'AbsTol',1e-10);                    %options for the ODE integrators.     
         solver string = 'ode45';
         solver_function function_handle
-        n_shoot = 1;                                                        % Number of shooting points for multiple shooting 
+        n_shoot = 2;                                                        % Number of shooting points for multiple shooting 
         
         %Inherited Properties
         % res function_handle
@@ -25,8 +25,9 @@ classdef AM_PS_MSHM < ApproxMethod
         %% Constructor
         function obj = AM_PS_MSHM(DYN)     
             obj = updateoptions(obj,DYN.opt_approx_method);                 %updateoptions method is a general method
-            obj = obj.getIV(DYN);                                           %Set initial value (Has to be set here, because residual accesses iv
             obj = setSolver(obj,obj.solver);
+            obj = obj.getIV(DYN);                                           %Set initial value (Has to be set here, because residual accesses iv
+           
         end
         
         %% Methods

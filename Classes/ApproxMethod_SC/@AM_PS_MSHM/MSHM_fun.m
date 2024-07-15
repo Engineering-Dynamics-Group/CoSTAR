@@ -11,6 +11,7 @@ function res = MSHM_fun(obj,y,DYN)
 
     Fcn = DYN.rhs;
     mu = y(end);
+    x = y(1:end-1,:);
     n_shoot = obj.n_shoot;                                                  % Number of shooting points
     dim = DYN.dim;
     T = 2*pi./DYN.non_auto_freq(mu);
@@ -36,8 +37,8 @@ function res = MSHM_fun(obj,y,DYN)
     end
         
     yend = reshape(Zend,[dim*n_shoot,1]);                                   % Reshape Zend to dim*n_shoot x 1 array
-    y_perm(1:end-dim,1) = y(dim+1:end,1);                                   % Shift initial vector y to allow direct subtraction
-    y_perm(end-dim+1:end,1) = y(1:dim,1);                                   % Shift initial vector y to allow direct subtraction
+    y_perm(1:end-dim,1) = x(dim+1:end,1);                                   % Shift initial vector y to allow direct subtraction
+    y_perm(end-dim+1:end,1) = x(1:dim,1);                                   % Shift initial vector y to allow direct subtraction
 
     res = yend-y_perm;                                                      % Calculate residual
 

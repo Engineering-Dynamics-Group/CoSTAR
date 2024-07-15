@@ -264,6 +264,7 @@ Changes affect:
 
     - Constructor
         --> renamed AM_PS_MSHM
+        --> lines 28 and 29 switched to ensure that solver_function is set before getIV is called
     
     - MSHM_auto_fun 
         --> renamed
@@ -271,6 +272,13 @@ Changes affect:
     - MSHM_fun       
         --> renamed
         --> multiple changes to repurpose this file for multiple shooting
+
+    - getIV
+        --> if-statement added (lines 9-29)
+            => checks whether there is more than one shooting point
+            => If n_shoot>1, do time integration from supplied ic
+            => Extract values from shooting points
+            => Set iv for multiple shooting
         
 @ST_PS_SHM
     - PS_SHM_calc_stability_non_auto

@@ -8,20 +8,18 @@ else
     
     if(obj.n_shoot>1)
         Fcn = DYN.rhs;
-
         y = DYN.opt_init.ic(:);
         mu = y(end);
         n_shoot = obj.n_shoot;                                                  % Number of shooting points
         dim = DYN.dim;
         T = 2*pi./DYN.non_auto_freq(mu);
 
-        T0 = linspace(0,T,n_shoot+1);
-        param = DYN.param;
-        param{DYN.act_param} = mu;
-        
-        [~,Z] = obj.solver_function(@(t,z)Fcn(t,z,param),T0,y,obj.odeOpts); 
+        dT = T/n_shoot;                                                         % Time for each shooting operation
 
-        obj.iv = reshape(Z(1:end-1,:).',[dim*n_shoot,1]);
+        T0 = [0:dT:(n_shoot-1)*dT;dT:dT:n_shoot*dT].';                          % Define time intervals according to number of shooting points
+
+        [~,Z] = obj.solver_function(@(t,z)Fcn(t,z,param),T0(k,:),z0(:,k),obj.odeOpts); 
+
     else   
         obj.iv = DYN.opt_init.ic(:);
     end
