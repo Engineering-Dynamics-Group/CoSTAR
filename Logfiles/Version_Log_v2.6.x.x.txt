@@ -243,3 +243,15 @@ Changes affect:
 		--> Bugfix: "~isempty" in line 22 changed to "isfield"
 		--> if...else condition for n_int_2 added (similar to evalsol_hypertime, see above) (lines 27 - 31)
 
+
+
+--------------------------------------------
+--------------- v2.6.3.1.1 -----------------
+--------------------------------------------
+
+@DynamicalSystem:
+    - s_DYN_gatekeeper
+        --> line 111 'mshm' added to p_approx_method_allowed_fieldvalues
+
+
+
