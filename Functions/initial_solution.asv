@@ -112,7 +112,7 @@ else
         disp('--------------- Initial solution found! ---------------')
         disp('-------------------------------------------------------')
 
-        if strcmpi(DYN.sol_type,'quasiperiodic') && strcmpi(DYN.approx_method,'shooting') && strcmpi(DYN.approx_method,'mshm')
+        if strcmpi(DYN.sol_type,'quasiperiodic') && strcmpi(DYN.approx_method,'shooting') && strcmpi(DYN.approx_method,'MSHM')
             S.IF_arch_init_data(y,J,AM.Ik,newton_flag,AM.phi,DYN,added_output);
         else
             S.IF_arch_init_data(y,J,newton_flag,DYN,AM,added_output);

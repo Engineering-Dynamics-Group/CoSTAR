@@ -20,7 +20,7 @@ function   [multipliers,vectors,n_unstable,stability_flag] = PS_SHM_calc_stabili
                 
 
                 M = J(1:end-1,1:end-1) + eye(numel(y)-1);             %end-1: Exclude the row and column associated to the subspace contstraint
-            
+            % Elseif for multiple shooting
 
            else %Recompute the solution with shooting algorithm to get the monodromy matrix 
 

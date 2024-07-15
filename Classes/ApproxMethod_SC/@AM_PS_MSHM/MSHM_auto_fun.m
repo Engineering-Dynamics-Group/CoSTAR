@@ -7,7 +7,7 @@
 %@res: resdiual vector for the newton-type corrector method in Continuation class
 
 
-function res = MSHM_single_auto_fun(obj,y,DYN)
+function res = MSHM_auto_fun(obj,y,DYN)
 
     % This preallocation of the variable makes the code for some reasons
     % way faster... don't know why...

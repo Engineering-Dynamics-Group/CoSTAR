@@ -6,6 +6,7 @@ classdef AM_PS_MSHM < ApproxMethod
         odeOpts = odeset('RelTol',1e-8,'AbsTol',1e-10);                    %options for the ODE integrators.     
         solver string = 'ode45';
         solver_function function_handle
+        n_shoot = 1;                                                        % Number of shooting points for multiple shooting 
         
         %Inherited Properties
         % res function_handle

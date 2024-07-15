@@ -256,18 +256,28 @@ Changes affect:
 @ApproxMethod
     - s_method_selection
         --> lines 25-32 added
+        --> lines 28,30 changed (methods renamed)
 
 @AM_PS_MSHM
+    - properties
+        --> line 9 added n_shoot (number of shooting points)
+
     - Constructor
         --> renamed AM_PS_MSHM
     
     - MSHM_auto_fun 
         --> renamed
 
-    - MSH_fun       
+    - MSHM_fun       
         --> renamed
+        --> multiple changes to repurpose this file for multiple shooting
+        
+@ST_PS_SHM
+    - PS_SHM_calc_stability_non_auto
+        --> line 23 added (comment)
 
-    
+- intial_solution
+    --> line 115 additional or statement to if added (&& 'mshm')
     
 
 

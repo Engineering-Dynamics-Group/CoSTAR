@@ -25,9 +25,9 @@ elseif(strcmpi(DYN.sol_type,'periodic'))
     if(strcmpi(DYN.approx_method,'mshm'))
         AM = AM_PS_MSHM(DYN);
         if(DYN.n_auto==0)
-                AM.res = @(y)AM.MSHM_single_fun(y,DYN);                    %Residual for non-autonomous single shooting
+                AM.res = @(y)AM.MSHM_fun(y,DYN);                    %Residual for non-autonomous single shooting
         elseif(DYN.n_auto==1)
-                AM.res = @(y)AM.MSHM_single_auto_fun(y,DYN);               %Residual for autonomous single shooting
+                AM.res = @(y)AM.MSHM_auto_fun(y,DYN);               %Residual for autonomous single shooting
         end
     end
 
