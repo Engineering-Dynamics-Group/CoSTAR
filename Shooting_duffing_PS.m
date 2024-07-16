@@ -20,7 +20,7 @@ non_auto_freq = @(mu) mu;
 options.system              = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);    %Properties of the System
 options.opt_sol             = costaropts('stability','off','cont','on','non_auto_freq',non_auto_freq,'sol_type','periodic','approx_method','MSHM','act_param',active_parameter);   %Properties of the solution
 options.opt_cont            = costaropts('step_control','angle','mu_limit',mu_limit,'step_width',0.1,'step_width_limit',[0.001,0.3]);        %Properties for continuation
-options.opt_approx_method   = costaropts('solver','ode78','n_shoot',10);
+options.opt_approx_method   = costaropts('solver','ode78','n_shoot',2);
 options.opt_init            = costaropts('ic',[0;1]);
 options.opt_stability       = costaropts('iterate_bfp','off');
 
