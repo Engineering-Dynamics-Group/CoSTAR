@@ -12,15 +12,18 @@
 %@n_unstable:       number of unstable Floquet multipliers
 %@stability_flag:   Flag inidicating success of stability computation
 
-function   [multipliers,vectors,n_unstable,stability_flag] = PS_SHM_calc_stability_non_auto(obj,y,J,DYN,AM)
+function   [multipliers,vectors,n_unstable,stability_flag] = PS_MSHM_calc_stability_non_auto(obj,y,J,DYN,AM)
        
 
            stability_flag = 1;
-           if strcmpi(DYN.approx_method,'shooting')  % Solution has already been computed by shooting - no need to do it again
+           if strcmpi(DYN.approx_method,'mshm')  % Solution has already been computed by shooting - no need to do it again
+                dim = DYN.dim;
+                n_shoot = AM.n_shoot;
                 
 
                 M = J(1:end-1,1:end-1) + eye(numel(y)-1);             %end-1: Exclude the row and column associated to the subspace contstraint
             % Elseif for multiple shooting
+                
 
            else %Recompute the solution with shooting algorithm to get the monodromy matrix 
 
@@ -36,7 +39,7 @@ function   [multipliers,vectors,n_unstable,stability_flag] = PS_SHM_calc_stabili
                
                J = eye(numel(x0));
                try
-                    [~,~,stability_flag,~,J] = fsolve(@(x)obj.SHM_single_fun(x,mu,DYN),x0,obj.fsolve_opts);      %Reshoot the solution to get J
+                    [~,~,stability_flag,~,J] = fsolve(@(x)obj.MSHM_fun(x,mu,DYN),x0,obj.fsolve_opts);      %Reshoot the solution to get J
                catch
                     stability_flag = 0;
                end

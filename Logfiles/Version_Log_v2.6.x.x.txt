@@ -308,7 +308,13 @@ Changes affect:
         --> lines 33-42 added (Stability now with multiple shooting)
 
 @ST_PS_MSHM     (New Subclass) Calculates stability using multiple shooting
-
+    - Subclass renamed
+    
+    - methods renamed
+        --> MSHM_fun
+        --> MSHM_auto_fun
+        --> PS_MSHM_calc_stability_auto
+        --> PS_MSHM_calc_stability_nonauto
 
 
 

@@ -2,7 +2,7 @@
     %the (Lyapunov) stability of periodic solutions via shooting.
     
     
-    classdef ST_PS_SHM < Stability
+    classdef ST_PS_MSHM < Stability
     
         properties
     
@@ -21,7 +21,7 @@
     
         methods
     
-            function obj = ST_PS_SHM(DYN)
+            function obj = ST_PS_MSHM(DYN)
     
                 obj = updateoptions(obj,DYN.opt_stability);             %updateoptions method is a general function
     
