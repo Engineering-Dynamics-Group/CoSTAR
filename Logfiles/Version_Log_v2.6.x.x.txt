@@ -298,6 +298,18 @@ Changes affect:
         --> line 44 s1 changed to s1(1:dim,1) to choose only the first shooting point
 
 
+------------------------------------------------
+------- Feature_Stability_Multiple_Shoot -------
+------------------------------------------------
+
+@Stability
+    - s_stability_selection
+        --> lines 25-31 commented (Stability of single shooting disabled)
+        --> lines 33-42 added (Stability now with multiple shooting)
+
+@ST_PS_MSHM     (New Subclass) Calculates stability using multiple shooting
+
+
 
 
 
