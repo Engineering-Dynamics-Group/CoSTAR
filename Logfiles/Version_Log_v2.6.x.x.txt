@@ -317,6 +317,8 @@ Changes affect:
         --> PS_MSHM_calc_stability_nonauto
 
 
-
+    - PS_MSHM_calc_stability_non_auto
+        --> lines 20-27 added
+        --> lines 29-32 commented
 
 

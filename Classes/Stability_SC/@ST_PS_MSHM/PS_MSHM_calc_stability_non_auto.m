@@ -20,10 +20,16 @@ function   [multipliers,vectors,n_unstable,stability_flag] = PS_MSHM_calc_stabil
                 dim = DYN.dim;
                 n_shoot = AM.n_shoot;
                 
+                M0 = eye(dim,dim);
+                for k=1:n_shoot
+                    M0 = J((k-1)*dim+1:k*dim,(k-1)*dim+1:k*dim)*M0;
+                end
+                M = M0;
 
-                M = J(1:end-1,1:end-1) + eye(numel(y)-1);             %end-1: Exclude the row and column associated to the subspace contstraint
-            % Elseif for multiple shooting
-                
+%                 J_temp = J(1:end-1,1:end-1);
+%                 I = repmat(eye(dim,dim),[1,n_shoot]);
+% 
+%                 M = J(1:end-1,1:end-1) + eye(numel(y)-1);             %end-1: Exclude the row and column associated to the subspace contstraint              
 
            else %Recompute the solution with shooting algorithm to get the monodromy matrix 
 
