@@ -18,9 +18,9 @@ function IC = getIC(obj,y,DYN,n_shoot)
 
     spl = csape(T,[Z,Z(:,1)],'periodic');
 
-    Tint = linspace(0,T_p,n_shoot+1);
-    Z_int = fnval(spl,Tint);
+    Tint = linspace(0,T_p,n_shoot);
+    
 
-    IC = reshape(Z_int(:,1:end-1),[dim*n_shoot,1]);                                  % The initial condition vector is the state space vector z(theta=0)
+    IC = y(1:dim);                                  % The initial condition vector is the state space vector z(theta=0)
  
 end

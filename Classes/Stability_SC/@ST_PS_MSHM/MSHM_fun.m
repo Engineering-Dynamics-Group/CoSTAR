@@ -7,11 +7,10 @@
 %@res: resdiual vector for the newton-type corrector method in Continuation class
 
 
-function res = MSHM_fun(obj,y,DYN)
+function res = MSHM_fun(obj,y,mu,DYN)
 
     Fcn = DYN.rhs;
-    mu = y(end);
-    x = y(1:end-1,:);
+    x = y;
     n_shoot = obj.n_shoot;                                                  % Number of shooting points
     dim = DYN.dim;
     T = 2*pi./DYN.non_auto_freq(mu);
@@ -21,7 +20,7 @@ function res = MSHM_fun(obj,y,DYN)
     y_perm = zeros(dim*n_shoot,1);                                          % Initialize permuted vector y_perm
 
     T0 = [0:dT:(n_shoot-1)*dT;dT:dT:n_shoot*dT].';                          % Define time intervals according to number of shooting points
-    z0 = reshape(y(1:end-1),[dim,n_shoot]);                                 % reshape y to state-space dimension x number of shooting points 
+    z0 = reshape(y,[dim,n_shoot]);                                 % reshape y to state-space dimension x number of shooting points 
 
     Z = cell(n_shoot,1);                                                    % Initialize cell-array for solutions of shooting (necessary 
 

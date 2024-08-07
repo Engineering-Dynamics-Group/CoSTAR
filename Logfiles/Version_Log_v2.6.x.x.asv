@@ -309,6 +309,9 @@ Changes affect:
 
 @ST_PS_MSHM     (New Subclass) Calculates stability using multiple shooting
     - Subclass renamed
+
+    - Properties
+        --> n_shoot (line 11) added, to define number of shooting points for stability calculation
     
     - methods renamed
         --> MSHM_fun
@@ -316,9 +319,17 @@ Changes affect:
         --> PS_MSHM_calc_stability_auto
         --> PS_MSHM_calc_stability_nonauto
 
+    - new methods
+        --> MSHM_fun
+        --> MS
 
     - PS_MSHM_calc_stability_non_auto
         --> lines 20-27 added
-        --> lines 
+        --> lines 29-32 commented
 
+
+@AM_PS_FDM
+    - getIC
+        --> Additional argument n_shoot added to be able to use multiple shooting to determine stability
+        --> Multiple changes to interpolate solution over period and extract shooting points
 

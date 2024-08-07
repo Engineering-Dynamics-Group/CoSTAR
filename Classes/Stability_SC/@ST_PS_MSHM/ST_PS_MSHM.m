@@ -8,6 +8,7 @@
     
             odeOpts = odeset('RelTol',1e-8,'AbsTol',1e-10);                    %options for the ODE integrators.
             solver string = 'ode45';
+            n_shoot = 5;
             solver_function function_handle
             fsolve_opts = optimoptions('fsolve','Display','none','UseParallel',false,'MaxFunctionEvaluations', 20000,'MaxIter',1e3); %Options for fsolve to solve corrector-equation
 
@@ -41,7 +42,10 @@
 
             res = SHM_single_fun(obj,x,mu,DYN);                                                   %ODE integration function for use in a shooting method for non-autonomous systems: Here, for usage in computing Floquet multipliers 
             res = SHM_single_auto_fun(obj,x,mu,x0,DYN);                                            %ODE integration function for use in a shooting method for autonomous systems: Here, for usage in computing Floquet multipliers
-   
+            
+            res = MSHM_fun(obj,x,mu,DYN);
+            res = MSHM_auto_fun(obj,x,mu,DYN);
+
         end
     
         methods(Access = protected)
