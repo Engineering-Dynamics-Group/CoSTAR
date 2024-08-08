@@ -44,7 +44,7 @@
             res = SHM_single_auto_fun(obj,x,mu,x0,DYN);                                            %ODE integration function for use in a shooting method for autonomous systems: Here, for usage in computing Floquet multipliers
             
             res = MSHM_fun(obj,x,mu,DYN);
-            res = MSHM_auto_fun(obj,x,mu,DYN);
+            res = MSHM_auto_fun(obj,x,x0,mu,DYN);
 
         end
     

@@ -7,27 +7,37 @@
 %@res: resdiual vector for the newton-type corrector method in Continuation class
 
 
-function res = MSHM_auto_fun(obj,y,DYN)
-
-    % This preallocation of the variable makes the code for some reasons
-    % way faster... don't know why...
+function res = MSHM_auto_fun(obj,x,x0,mu,DYN)
 
     Fcn     = DYN.rhs;
-    s0      = obj.iv(1:(end-1)); 
-    x       = y(1:(end-1));
-    mu      = y(end);
-    s       = x(1:(end-1),:);
-    
-    %Evaluate the active parameter (for some reason preallocating these variable is way faster
-    % than using them directly)
+    n_shoot = obj.n_shoot;                                                  % Number of shooting points
+    dim = DYN.dim;
+
+    Zend = zeros(dim+1,n_shoot);                                            % Initialize array for end/intermediate points of shooting
+    Z = cell(n_shoot,1);
+    y_perm = zeros(dim*n_shoot,1);                                          % Initialize permuted vector y_perm
+
+    s0 = x0(1:end-1,1);
+    s  = x(1:(end-1),:);
+    dT = 2*pi/n_shoot;
+    T0 = [0:dT:(n_shoot-1)*dT;dT:dT:n_shoot*dT].';                          % Define time intervals according to number of shooting points
+    z0 = [reshape(s,[dim,n_shoot]);repmat(x(end,1),[1,n_shoot])];           % reshape s to state-space dimension x number of shooting points and add autonomous frequency
+
     param = DYN.param;
     param{DYN.act_param} = mu;
 
-    [~,temp] = obj.solver_function(@(t,y)FCNwrapper(t,y,@(tau,z)Fcn(tau,z,param)),[0,2*pi],x,obj.odeOpts);
+    for k=1:n_shoot
+        [~,Z{k,1}] = obj.solver_function(@(t,y)FCNwrapper(t,y,@(tau,z)Fcn(tau,z,param)),T0(k,:),z0(:,k),obj.odeOpts); 
+        Zend(:,k) = Z{k,1}(end,:);
+    end
     f = Fcn(0,s0,param);
+    
+    yend = reshape(Zend(1:end-1,:),[dim*n_shoot,1]);                        % Reshape Zend to dim*n_shoot x 1 array
+    y_perm(1:end-dim,1) = s(dim+1:end,1);                                   % Shift initial vector y to allow direct subtraction
+    y_perm(end-dim+1:end,1) = s(1:dim,1);                                   % Shift initial vector y to allow direct subtraction
 
-    res = temp(end,1:(end-1)).'-s;
-    res(end+1,:) = f.'*(s-s0);              %This is the Poincare condition
+    res = yend-y_perm;                                                      % Calculate residual
+    res(end+1,:) = f.'*(s(1:dim,1)-s0(1:dim,1));                            % This is the Poincare condition
     
 end
 

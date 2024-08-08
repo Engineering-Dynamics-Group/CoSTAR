@@ -10,12 +10,17 @@
 function IC = getIC(obj,y,DYN,n_shoot)                                            
 
     dim = DYN.dim;                                                          % Dimension of state space 
-    Omega = DYN.non_auto_freq(y(end,1));
     n_int = obj.n_int;
+    if(DYN.n_auto>0)
+        Omega = y(end-1,1);
+        Z = reshape(y(1:end-2,1),[dim,n_int]);
+    else
+        Omega = DYN.non_auto_freq(y(end,1));
+        Z = reshape(y(1:end-1,1),[dim,n_int]);
+    end
     T_p = 2.*pi/Omega;
     T = linspace(0,T_p,n_int+1);
-    Z = reshape(y(1:end-1,1),[dim,n_int]);
-
+    
     spl = csape(T,[Z,Z(:,1)],'periodic');                                   % Spline interpolation of FD solution with periodic boundary conditions
 
     Tint = linspace(0,T_p,n_shoot+1);                                       % Define time interval of shooting points

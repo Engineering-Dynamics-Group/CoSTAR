@@ -3,7 +3,7 @@ addpath(genpath(cd));
 
 %% DUFFING EXAMPLE
 %% Parameters and Equation
-mu_limit = [0.2, 2.5];
+mu_limit = [0.01, 3];
 epsilon = mu_limit(1);
 
 param = {epsilon};
@@ -30,4 +30,5 @@ S.contplot(DYN,opts);
 
 
 figure('Color','white')
-plot(S.arclength,abs(S.multipliers))
+plot(S.arclength,abs(S.multipliers),'LineWidth',2)
+grid on

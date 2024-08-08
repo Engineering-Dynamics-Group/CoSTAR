@@ -337,12 +337,13 @@ Changes affect:
     
     - PS_MSHM_calc_stability_auto
         --> Name of method changed
-        --> 
+        --> Multiple changes for switch to multiple shoot
 
 @AM_PS_FDM
     - getIC
         --> Additional argument n_shoot added to be able to use multiple shooting to determine stability
         --> Multiple changes to interpolate solution over period and extract shooting points
+        --> Lines 14-20 added. If statement to check whether system is autonomous or not, fetch frequency accordingly and reshape Z accordingly
 
 @AM_PS_FGM
     - getIC
