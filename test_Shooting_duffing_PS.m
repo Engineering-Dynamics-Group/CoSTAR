@@ -34,3 +34,4 @@ S.contplot(DYN,opts);
 
 figure('Color','white')
 plot(S.arclength,abs(S.multipliers))
+
