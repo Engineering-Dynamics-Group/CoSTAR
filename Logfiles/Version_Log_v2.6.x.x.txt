@@ -349,6 +349,7 @@ Changes affect:
     - getIC
         --> Additional argument n_shoot added to be able to use multiple shooting to determine stability
         --> Multiple changes to interpolate solution over period and extract shooting points
+        --> Lines 15-19 added choose either autonomous or non-autonomous frequency
 
 
 

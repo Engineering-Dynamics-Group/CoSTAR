@@ -12,7 +12,11 @@ function IC = getIC(obj,y,DYN,n_shoot)
 dim = DYN.dim;                                                              % Dimension of the state space
 s = y(1:end-1-DYN.n_auto);                                                  % Get the Fourier-Coefficients
 n_hh = (size(s,1)/dim-1)/2+1;                                               % Compute the number of higher harmonics
-Omega = DYN.non_auto_freq(y(end,1));
+if(DYN.n_auto>0)
+    Omega = y(end-1,1);
+else
+    Omega = DYN.non_auto_freq(y(end,1));
+end
 
 FC = [s(1:dim,1);s((dim+1):(n_hh)*dim,1)-1i.*s(((n_hh)*dim+1):end)];        % Assemble complex Fourrier vector
 FC = reshape(FC,dim,n_hh);
