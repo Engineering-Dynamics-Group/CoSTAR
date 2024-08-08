@@ -152,16 +152,16 @@ end
 
 %% Make FFT
 
-    Fs = 1/t_step;
+    Fs = 1/t_step;          % Attention: t_step and Fs is correctly computed via length(T), but length(T) can be uneven number
 
     Y = fft(Zi);
     L = length(Y);
-    Y = Y/L;
-    f = Fs/L*(0:(L/2-1));
+    Y = Y/L;                % L is an even number in any case due to if condition in line 121 -> f is not correct when length(T) is uneven number!
+    f = Fs/L*(0:(L/2-1));   % f start at 0 and goes up to Fs/2 - Fs/L (Fs/2: Nyquist frequency)
    
     S = Y(1:L/2,:);
-    S(2:end-1,:) = 2*S(2:end-1,:);
-
+    S(2:end-1,:) = 2*S(2:end-1,:);      % NOT CORRECT: end-1 only when f(end) is Nyquist frequency
+                                        % Should we include the Nyquist frequency? If yes: numel(f) = res/2 + 1 --> Tutorials need to be changed!
     if strcmpi(output,'polar')
          
         varargout{1} = abs(S);
