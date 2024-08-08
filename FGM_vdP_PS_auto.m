@@ -17,7 +17,7 @@ options.opt_sol  = costaropts('stability','on','cont','on','auto_freq',auto_freq
 options.opt_cont = costaropts('step_control','angle','pred','tangent','subspace','pseudo-arc','mu_limit',mu_limit,'step_width',0.1);             %Properties for continuation
 options.opt_approx_method = costaropts('n_FFT',2^6,'phasecond','poincare');                                                                                                       %Properties for approx_method (e.g. Shoot)
 options.opt_init = costaropts('cmatrix',c_max,'smatrix',s_max,'c0',zeros(2,1),'Hmatrix',[0,1,3,5,7,9,11,13,15,17]);
-options.opt_stability       = costaropts('iterate_bfp','on');
+options.opt_stability       = costaropts('iterate_bfp','on','solver','ode45','n_shoot',7);
 
 [S,DYN] = costar(options);                                                                                                      %Calculate initial solution and continue the curve to set limits
 

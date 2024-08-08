@@ -20,7 +20,7 @@ options.opt_sol  = costaropts('stability','on','cont','on','non_auto_freq',non_a
 options.opt_cont = costaropts('step_control','angle','direction',1,'pred','tangent','subspace','pseudo-arc','mu_limit',mu_limit,'step_width',0.1);                 %Properties for continuation
 options.opt_approx_method = costaropts('n_FFT',2^6,'error_control','on','error_limit',[0,0.001]);                                                                                                           %Properties for approx_method (e.g. Shoot)
 options.opt_init = costaropts('C0',zeros(2,1),'Cmatrix',[c_max,[0.01;0.01]],'Smatrix',[s_max,[0.01;0.01]],'Hmatrix',[0,1,3]);
-options.opt_stability       = costaropts('iterate_bfp','on');
+options.opt_stability       = costaropts('iterate_bfp','on','solver','ode45','n_shoot',7);
 
 [S,DYN] = costar(options);
 

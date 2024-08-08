@@ -21,6 +21,7 @@ options.opt_sol = costaropts('sol_type','periodic','approx_method','finite-diffe
 options.opt_init = costaropts('c0',zeros(2,1),'c1',C1,'s1',S1);                                                             % Property for initial solution
 options.opt_approx_method = costaropts('n_int',200,'points',[-4,-3,-2,-1,0,1,2]);                                           % Properties of approximation method FDM
 options.opt_cont = costaropts('mu_limit',mu_limit,'display','step_control_info');                                           % Properties for continuation
+options.opt_stability       = costaropts('iterate_bfp','on','solver','ode45','n_shoot',7);
 
 %% Continuation
 tic                                                                     % Record current time

@@ -19,7 +19,7 @@ options.opt_sol             = costaropts('stability','on','cont','on','auto_freq
 options.opt_cont            = costaropts('step_control','angle','mu_limit',mu_limit,'step_width',0.1,'step_width_limit',[0.001,0.3]);        %Properties for continuation
 options.opt_approx_method   = costaropts('solver','ode45','n_shoot',5);
 options.opt_init            = costaropts('ic',[0;1]);
-options.opt_stability       = costaropts('iterate_bfp','off');
+options.opt_stability       = costaropts('iterate_bfp','on');
 
 %% Continuation
 [S,DYN] = costar(options);
