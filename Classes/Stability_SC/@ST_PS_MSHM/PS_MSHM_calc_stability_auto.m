@@ -12,14 +12,19 @@
 %@n_unstable:       number of unstable Floquet multipliers
 %@stability_flag:   Flag inidicating success of stability computation
 
-function   [multipliers,vectors,n_unstable,stability_flag] = PS_SHM_calc_stability_auto(obj,y,J,DYN,AM)
+function   [multipliers,vectors,n_unstable,stability_flag] = PS_MSHM_calc_stability_auto(obj,y,J,DYN,AM)
 
     stability_flag = 1;
-    if strcmpi(DYN.approx_method,'shooting')  % Solution has already been computed by shooting - no need to do it again
+    if strcmpi(DYN.approx_method,'mshm')  % Solution has already been computed by shooting - no need to do it again
+        
+        dim = DYN.dim;
+        n_shoot = AM.n_shoot;
 
-
-        M = J(1:end-2,1:end-2) + eye(numel(y)-2);             %end-2: Exclude the row and column associated to the subspace contstraint and the autonomous frequency
-
+        M0 = eye(dim,dim);
+        for k=1:n_shoot
+            M0 = J((k-1)*dim+1:k*dim,(k-1)*dim+1:k*dim)*M0;
+        end
+        M = M0;
 
     else %Recompute the solution with shooting algorithm to get the monodromy matrix
 

@@ -15,7 +15,7 @@ auto_freq = 1;
 
 %% Define the input options
 options.system              = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);    %Properties of the System
-options.opt_sol             = costaropts('stability','off','cont','on','auto_freq',auto_freq,'sol_type','periodic','approx_method','MSHM','act_param',active_parameter);   %Properties of the solution
+options.opt_sol             = costaropts('stability','on','cont','on','auto_freq',auto_freq,'sol_type','periodic','approx_method','MSHM','act_param',active_parameter);   %Properties of the solution
 options.opt_cont            = costaropts('step_control','angle','mu_limit',mu_limit,'step_width',0.1,'step_width_limit',[0.001,0.3]);        %Properties for continuation
 options.opt_approx_method   = costaropts('solver','ode45','n_shoot',5);
 options.opt_init            = costaropts('ic',[0;1]);

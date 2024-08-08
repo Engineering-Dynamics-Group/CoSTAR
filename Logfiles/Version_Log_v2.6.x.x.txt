@@ -334,7 +334,10 @@ Changes affect:
     - PS_MSHM_calc_stability_non_auto
         --> lines 20-27 added
         --> lines 29-32 commented
-
+    
+    - PS_MSHM_calc_stability_auto
+        --> Name of method changed
+        --> 
 
 @AM_PS_FDM
     - getIC
