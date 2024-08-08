@@ -6,7 +6,7 @@ kappa = 0.3;                                    % Coefficient of non-linear stif
 D = 0.05;                                       % Damping factor
 g = 1;                                          % Amplitude of excitation
 
-mu_limit = [0.01, 2.5];   eta0 = mu_limit(1);   % Limits of continuation diagram and mu-value at start of continuation
+mu_limit = [0.1, 2.5];   eta0 = mu_limit(1);    % Limits of continuation diagram and mu-value at start of continuation
 
 param = {kappa, D, eta0, g};                    % Parameter array
 active_parameter = 3;                           % Defines where the continuation parameter is located within param
@@ -24,7 +24,7 @@ options.opt_sol = costaropts('sol_type','periodic','approx_method','finite-diffe
 options.opt_init = costaropts('c1',C1,'s1',S1);                                                                             % Property for initial solution
 options.opt_approx_method = costaropts('n_int',200,'scheme','central','approx_order',6);                                    % Properties of approximation method FDM
 options.opt_cont = costaropts('mu_limit',mu_limit,'pred','secant','display','step_control_info');                           % Properties for continuation
-options.opt_stability = costaropts('iterate_bfp','off','solver','ode45');                                                   % Properties for stability
+options.opt_stability = costaropts('iterate_bfp','on','solver','ode45');                                                   % Properties for stability
 
 % Step control options
 options.opt_cont.step_width = 0.2;
@@ -38,7 +38,8 @@ tic                                             % Record current time
 toc                                             % Display elapsed time since tic
 
 
-
+figure('Color','white')
+plot(S.arclength,abs(S.multipliers))
 
 
 

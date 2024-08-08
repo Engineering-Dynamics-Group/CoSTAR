@@ -38,7 +38,7 @@ classdef AM_PS_FGM < ApproxMethod
         error_limit = [1e-3,1e-1];      %Limit for the spectral error 
         ec_iter_max = 10;               %Maximal iteration number for error control
         n_hh_max      = Inf;          %Maximum number of higher harmonics (for automatic increase by error_control)
-
+        
     end
 
         %Inherited Properties from Superclass 
@@ -142,7 +142,7 @@ classdef AM_PS_FGM < ApproxMethod
         [yp,flag] = IF_increase_discretization(obj,CON,DYN);                %Method, which increases the number of harmonics by 1 
         [yp,flag] = IF_decrease_discretization(obj,CON,DYN);                %Method, which decreasses the number of harmonics by 1
         varargout = IF_update_sol_dim(obj,DYN,new_dim, varargin);           %Method which updates previous curve point varargin/out{1,1} or tangent/secant varargin/out{1,2} properties used in according to a new solution space dimension new_dim
-        IC        = getIC(obj,y,DYN);                                       %Method for getting an initial point in state space on the periodic solution orbit             
+        IC        = getIC(obj,y,DYN,n_shoot);                                       %Method for getting an initial point in state space on the periodic solution orbit             
 
         %% Functions for residuum and computation
         res = PS_FGM_residuum(obj,y,DYN);

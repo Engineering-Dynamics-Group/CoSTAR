@@ -333,3 +333,13 @@ Changes affect:
         --> Additional argument n_shoot added to be able to use multiple shooting to determine stability
         --> Multiple changes to interpolate solution over period and extract shooting points
 
+@AM_PS_FGM
+    - getIC
+        --> Additional argument n_shoot added to be able to use multiple shooting to determine stability
+        --> Multiple changes to interpolate solution over period and extract shooting points
+
+
+
+
+
+
