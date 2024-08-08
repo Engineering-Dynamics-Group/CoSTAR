@@ -224,13 +224,16 @@ function varargout = solplot(obj,DYN,options)
 
                 % Plot
                 idx_mu = zeros(numel(solget_options.index),2);            % Preallocate
-                for k = 1:numel(solget_options.index)       % k loop: through the indices (no j loop needed since there is only one plot per solution)
-                    x = options.xaxis(s_traj(:,:,k));       % The function_handle is applied at this stage - otherwise solget would need to be called 3 times
-                    z = options.zaxis(s_traj(:,:,k));
-                    y = options.yaxis(s_traj(:,:,k));
+                x = zeros(size(s_traj,1),1,numel(solget_options.index));
+                z = zeros(size(s_traj,1),1,numel(solget_options.index));
+                y = zeros(size(s_traj,1),1,numel(solget_options.index));
+                for k = 1:numel(solget_options.index)           % k loop: through the indices (no j loop needed since there is only one plot per solution)
+                    x(:,1,k) = options.xaxis(s_traj(:,:,k));    % The function_handle is applied at this stage - otherwise solget would need to be called 3 times
+                    z(:,1,k) = options.zaxis(s_traj(:,:,k));
+                    y(:,1,k) = options.yaxis(s_traj(:,:,k));
                     counter = counter + 1;
                     idx_mu(counter,:) = [solget_options.index(k),round(mu(k)*100)/100];   % Round mu to 2 decimals
-                    plot3(x,z,y,'Color',obj.custom_color(options));
+                    plot3(x(:,1,k),z(:,1,k),y(:,1,k),'Color',obj.custom_color(options));
                 end
 
                 view(3);                % hold on also holds the view command... view(3) switches to 3D depiction
@@ -248,12 +251,14 @@ function varargout = solplot(obj,DYN,options)
                 
                 % Plot
                 idx_mu = zeros(numel(solget_options.index),2);                      % Preallocate
-                for k = 1:numel(solget_options.index)       % k loop: through the indices (no j loop needed since there is only one plot per solution)
-                    x = options.xaxis(s_traj(:,:,k));       % The function_handle is applied at this stage - otherwise solget would need to be called 2 times
-                    z = options.zaxis(s_traj(:,:,k));
+                x = zeros(size(s_traj,1),1,numel(solget_options.index));
+                z = zeros(size(s_traj,1),1,numel(solget_options.index));
+                for k = 1:numel(solget_options.index)           % k loop: through the indices (no j loop needed since there is only one plot per solution)
+                    x(:,1,k) = options.xaxis(s_traj(:,:,k));    % The function_handle is applied at this stage - otherwise solget would need to be called 2 times
+                    z(:,1,k) = options.zaxis(s_traj(:,:,k));
                     counter = counter + 1;
                     idx_mu(counter,:) = [solget_options.index(k),round(mu(k)*100)/100];     % Round mu to 2 decimals
-                    plot(x,z,'Color',obj.custom_color(options),'linestyle',linestyle);
+                    plot(x(:,1,k),z(:,1,k),'Color',obj.custom_color(options),'linestyle',linestyle);
                 end
 
                 % Output
@@ -373,7 +378,7 @@ function varargout = solplot(obj,DYN,options)
             % Set title, labels and legend
             title('Frequency Domain','Interpreter','latex');
             xlabel('Angular Frequency $\omega$','Interpreter','latex');
-            ylabel('Absolute Amplitude $|\mathcal{F}(z_i)|$','Interpreter','latex');
+            ylabel('Absolute Amplitude $|\mathcal{F}(\omega)|$','Interpreter','latex');
             LegStr = cell(1,size(idx_mu,1));                            % Allocate cell memory
             for k = 1:size(idx_mu,1)
                 LegStr{1,k} = ['IDX: ',num2str(idx_mu(k,1)),'; $\mu_',num2str(DYN.act_param),'=',num2str(idx_mu(k,2)),'$'];

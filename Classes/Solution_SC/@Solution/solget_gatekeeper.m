@@ -120,9 +120,9 @@ function options = solget_gatekeeper(obj,DYN,options)
                 GC.speak('Error while using postprocessing method "solget" with solution space "time":');
 
         case 'hypertime'
-                trajectory_mandatory_fieldnames  = {'eval','space'};                                            %mandatory fieldsnames in the options super structure
-                trajectory_allowed_fieldnames    = {'eval','space','resolution','index','mu'};                  %allowed fieldsnames in the options super structure
-                GC.check_fields(options,'options',trajectory_mandatory_fieldnames,trajectory_allowed_fieldnames);     %updates the error_msg property of the gatekeeper        
+                hypertime_mandatory_fieldnames  = {'eval','space'};                                                 %mandatory fieldsnames in the options super structure
+                hypertime_allowed_fieldnames    = {'eval','space','resolution','index','mu'};                       %allowed fieldsnames in the options super structure
+                GC.check_fields(options,'options',hypertime_mandatory_fieldnames,hypertime_allowed_fieldnames);     %updates the error_msg property of the gatekeeper        
                 GC.speak('Error while using postprocessing method "solget" with solution space "hypertime":');
 
 

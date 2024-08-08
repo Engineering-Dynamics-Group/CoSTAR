@@ -69,10 +69,10 @@ opt_solplot = costaropts('zaxis',@(z) z(:,2),'xaxis',@(z) z(:,1),'space','trajec
 [x_val,z_val,mu_val,empty] = S.solplot(DYN,opt_solplot);
 
 
-opt_solplot = costaropts('zaxis','all','space','frequency','resolution',2^(10),'index',index,'Color','r');                       % Plot frequency spectrum to specific index
+opt_solplot = costaropts('zaxis','all','space','frequency','resolution',2^(8)+1,'index',index,'Color','r');                       % Plot frequency spectrum to specific index
 [f_val,z_val,mu_val,empty] = S.solplot(DYN,opt_solplot);
 
-opt_solplot = costaropts('zaxis',@(z) z(:,1),'space','frequency','resolution',2^(13),'index',index(2),'interval',[0,100]);     % Plot frequency spectrum to specific index
+opt_solplot = costaropts('zaxis',@(z) z(:,1),'space','frequency','resolution',2^(10),'index',index(2),'interval',[0,100]);     % Plot frequency spectrum to specific index
 [f_val,z_val,mu_val,empty] = S.solplot(DYN,opt_solplot);
 
 

@@ -65,12 +65,12 @@ function options = solplot_gatekeeper(obj,DYN,options)
         if isa(options.color,'char')
             GC.check_data(options.color,'options.color','char',[],allowed_colornames);
         elseif isa(options.color,'double')
-            GC.speak('Error while using postprocessing method "solplot":');
+            GC.check_data(options.color,'options.color','double',[1,3],[]);
             if max(options.color)>1||min(options.color)<0
-                GC.error_msg{1,end+1} = append('You supplied an rgb vector via options.color. Maximal and minimal allowed values are 0 and 1. However your maximum  is ',num2str(max(options.color)),' and your minimum is ',num2str(min(options.color)),'.');
+                GC.error_msg{1,end+1} = append('You supplied an rgb vector via options.color, whose values must be in the range of [0,1]. However, your maximum is ',num2str(max(options.color)),' and your minimum is ',num2str(min(options.color)),'.');
             end
         else
-            GC.error_msg{1,end+1} = append('The fieldvalue options.color of contplot options must either be a "char" or 3x1 array containing rgb values. Allowed color values are ', GC.my_join(allowed_colornames));
+            GC.error_msg{1,end+1} = append('The fieldvalue options.color of contplot options must either be a ''char'' or [1x3] array containing rgb values. Allowed ''char'' values are: ', GC.my_join(allowed_colornames));
         end
         GC.speak('Error while using postprocessing method "solplot":');
     end
@@ -81,7 +81,7 @@ function options = solplot_gatekeeper(obj,DYN,options)
     end
 
 
-    % Now check dependent on the space, in which is to be plotted
+    % Now check dependent on the solution space in which to plot
     switch options.space
 
         case 'time'
@@ -138,7 +138,7 @@ function options = solplot_gatekeeper(obj,DYN,options)
             end
             
             if strcmpi(DYN.sol_type,'quasiperiodic') && isfield(options,'color')
-                GC.error_msg{1,end+1} = 'The options.color options is not allowed, when plotting hypertime manifolds for quasiperiodic solutions.';
+                GC.error_msg{1,end+1} = 'The options field ''color'' is not allowed when plotting hypertime manifolds for quasi-periodic solutions.';
             end
 
             GC.speak('Error while using postprocessing method "solplot" with solution space "hypertime":');

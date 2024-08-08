@@ -107,19 +107,19 @@ end
 
 %% Interpolation of ODE data (in case not equally spaced)
 t_step = (max(T)-min(T))./(length(T)-1);
-Ti = [0:t_step:(max(T)-min(T))];  
+Ti = 0:t_step:(max(T)-min(T));            % REPLACE BY LINSPACE TO AVOID NUMERICAL ERROR DUE TO COMPUTATION OF t_step?
 
 [~,idx] = sort(size(Z),'descend');
-Z = permute(Z,idx);       %Make sure Z is a column vector (excpected by interp)
+Z = permute(Z,idx);             % Make sure Z is a column vector (expected by interp)
 
 Zi = interp1((T-min(T)),Z, Ti); 
 
 [~,idx] = sort(size(Zi),'descend');
-Zi = permute(Zi,idx);       %Make sure Zi is a column vector (excpected by ft)
+Zi = permute(Zi,idx);           % Make sure Zi is a column vector (excpected by ft)
 
    
-if rem(length(Zi),2) == 1  %Make sure Zi has an even number of elements
-    Zi = Zi(1:(end-1),:);
+if rem(length(Zi),2) == 1       % Make sure Zi has an even number of elements
+    Zi = Zi(1:(end-1),:);   % REPLACE BY INTERPOLATION
 end
 
 %% Apply window

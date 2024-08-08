@@ -243,3 +243,23 @@ Changes affect:
 		--> Bugfix: "~isempty" in line 22 changed to "isfield"
 		--> if...else condition for n_int_2 added (similar to evalsol_hypertime, see above) (lines 27 - 31)
 
+
+----------
+
+ADDITIONAL CHANGES AFTER LAUNCH OF v2.6.3
+    - Tutorial_Postprocessing further written
+    - s_help_solplot adapted
+    - s_help_contplot adapted
+    - solplot_gatekeeper adapted for color (line 68 new, error texts in line 70, 73 and 141 adapted)
+    - contplot_gatekeeper adapted for color (error texts in line 70 and 73 adapted)
+    - solplot: 
+        * trajectory solution space only returned last solution, not all requested solutions -> fixed 
+               (lines 227 - 229 and 254 - 255 added, lines 231 - 233, 236, 257 - 258 and 261 adapted)
+        * ylabel of frequency plots: "z_i" replaced by "\omega" (line 381)
+    - benchmark_postprocess_periodic: 
+        * line 63: "index" replaced by "index(2)", resolution adapted to 2^11, interval added
+    - benchmark_postprocess_quasiperiodic: Small modifications of resolution for 'frequency' plots (lines 72 and 75)
+    - @costarhelp/solget: Info text updated (solution space removed)
+    - solget: varargout removed and method (output arguments) adapted
+    - @SOL_EQ/evalsol_hypertime: returned hypertime array is empty now. Moreover, the method does not call evalsol_time anymore
+    - solget_gatekeeper: renamed trajectory_[...]_fieldnames to hypertime_[...]_fieldnames (lines 123 - 125)

@@ -84,7 +84,7 @@
 %           [s,mu,time] = S.solget(DYN,options);
 
 
-function [s_out,varargout] = solget(obj,DYN,options)      
+function [s_out,mu,x,options] = solget(obj,DYN,options)            % [s_out,varargout]  
     
     %% Check the options structure: !!! BE CAREFUL - FUNCTION MAY CHANGE OPTIONS STRUCTURE AND SOLUTION OBJECT
     if ~isfield(options,'axes_values_old')              %When this field is present, contplot is called from the plot_contplot method during a continuation. The two following methods can be skipped in this case since the developers make sure that the options struct is fine
@@ -102,25 +102,25 @@ function [s_out,varargout] = solget(obj,DYN,options)
     end
 
     %% Get the solutions and do the calculations (if necessary)
-    varargout = cell(1,3);
+    % varargout = cell(1,3);
 
     switch options.space
 
         case 'time'
             %This method must return array structures
             [s,mu,x]  = obj.evalsol_time(DYN,options);
-            varargout{1,2} = x;
+            % varargout{1,2} = x;
 
         case 'hypertime' %time and trajectory store to the same thing... mainly relevant for 
             %This method must return array structures
             [s,mu,x]   = obj.evalsol_hypertime(DYN,options);
-            varargout{1,2} = x;
+            % varargout{1,2} = x;
 
         case 'frequency'        
             %This method must return array structures: It operates on
             %hyper-time series.
             [s,mu,x]   = obj.evalsol_frequency(DYN,options);
-            varargout{1,2} = x;
+            % varargout{1,2} = x;
 
     end
 
@@ -141,15 +141,15 @@ function [s_out,varargout] = solget(obj,DYN,options)
     % Apply the requested function to the data
     if isa(options.eval,'function_handle')
 
-        if s_array_dim == (1+idx_assist)                % EQ for 'hypertime'
+        if s_array_dim == (1+idx_assist)                % EQ 'hypertime'
             for k = 1:numel(options.index)
                 s_out(:,k) = options.eval(s(:,k));
             end
-        elseif s_array_dim == (2+idx_assist)            % EQ for 'time' and 'frequency' | PS for 'time', 'hypertime' and 'frequency' | QPS for 'time' and 'frequency'
+        elseif s_array_dim == (2+idx_assist)            % PS 'hypertime', 'time' and 'frequency'
             for k = 1:numel(options.index)
                 s_out(:,:,k) = options.eval(s(:,:,k));
             end
-        elseif s_array_dim == (3+idx_assist)           % QPS for 'hypertime'
+        elseif s_array_dim == (3+idx_assist)            % QPS 'hypertime'
             for k = 1:numel(options.index)
                s_out(:,:,:,k) = options.eval(s(:,:,:,k));
             end
@@ -171,8 +171,8 @@ function [s_out,varargout] = solget(obj,DYN,options)
 
     end
 
-    varargout{1,1} = mu;
-    varargout{1,3} = options;
+    % varargout{1,1} = mu;
+    % varargout{1,3} = options;
 
 
 end

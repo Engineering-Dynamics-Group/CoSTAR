@@ -38,4 +38,4 @@ tic
 zeit = toc;
 
 %% Test Postprocessing  
-benchmark_postprocess_equilibrium(DYN,S);
+%benchmark_postprocess_equilibrium(DYN,S);

@@ -5,11 +5,16 @@ index = [round(n/4,0),round(n/2,0),round(3*n/4,0)];                             
 
 
 %% Solget
-opt_solget = costaropts('eval',@(z) z(:,1),'space','time','resolution',1e3,'index',1);
+opt_solget = costaropts('eval',@(z) z,'space','time','resolution',1e3,'index',1);
 [z_val,mu_val,t_val,options] = S.solget(DYN,opt_solget);
 
-opt_solget = costaropts('eval',@(z)norm(z),'space','hypertime','index',index);
+opt_solget = costaropts('eval',@(z) z(1),'space','hypertime','index',index);
 [z_val,mu_val,t_val,options] = S.solget(DYN,opt_solget);
+
+%{
+opt_solget = costaropts('eval','all','space','frequency','index',index,'resolution',228);
+[z_val,mu_val,t_val,options] = S.solget(DYN,opt_solget);
+%}
 
 
 %% Contplot

@@ -67,10 +67,10 @@ function options = contplot_gatekeeper(obj,DYN,options)
         elseif isa(options.color,'double')
             GC.check_data(options.color,'options.color','double',[1,3],[]);
             if max(options.color)>1||min(options.color)<0
-                GC.error_msg{1,end+1} = append('You supplied an rgb vector via options.color. Maximal and minimal allowed values are 0 and 1. However your maximum  is ',num2str(max(options.color)),' and your minimum is ',num2str(min(options.color)),'.');
+                GC.error_msg{1,end+1} = append('You supplied an rgb vector via options.color, whose values must be in the range of [0,1]. However, your maximum  is ',num2str(max(options.color)),' and your minimum is ',num2str(min(options.color)),'.');
             end
         else
-            GC.error_msg{1,end+1} = append('The fieldvalue options.color of contplot options must either be a "char" or 3x1 array containing rgb values. Allowed color values are ', GC.my_join(allowed_colornames));
+            GC.error_msg{1,end+1} = append('The fieldvalue options.color of contplot options must either be a ''char'' or [1x3] array containing rgb values. Allowed ''char'' values are: ', GC.my_join(allowed_colornames));
         end
         GC.speak('Error while using postprocessing method "contplot":');
     end
