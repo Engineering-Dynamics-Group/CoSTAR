@@ -12,6 +12,7 @@ opt_solget = costaropts('eval',@(z)z(:,:,1),'space','hypertime','index',index);
 [z_val,mu_val,t_val,options] = S.solget(DYN,opt_solget);
 
 
+
 %% Contplot
 opt_contplot = costaropts('zaxis','max2','resolution',30,'Color','r');                              % Plot bifurcation diagram using max(norm())
 [z_val,mu_val] = S.contplot(DYN,opt_contplot);
@@ -22,16 +23,19 @@ opt_contplot = costaropts('zaxis','mean2','resolution',30,'figure',gcf,'Color','
 opt_contplot = costaropts('zaxis','min2','resolution',30,'figure',gcf,'Color','g');                 % Plot bifurcation diagram using min(norm())
 [z_val,mu_val] = S.contplot(DYN,opt_contplot);
 
+
 % opt_contplot = costaropts('zaxis',@(z)max(z(:,2)),'resolution',30,'Color',[0,0,0]);                 % Plot bifurcation diagram with user-set function
 % [z_val,mu_val] = S.contplot(DYN,opt_contplot);
 
 opt_contplot = costaropts('zaxis',@(z)max(z(:,:,2),[],'all'),'resolution',30,'Color',[0,0,0]);      % Plot bifurcation diagram with user-set function
 [z_val,mu_val] = S.contplot(DYN,opt_contplot);
 
+
 %{
 opt_contplot = costaropts('zaxis','max2','resolution',50,'index','all');
 [z_val,mu_val] = S.contplot(DYN,opt_contplot);
 %}
+
 
 
 %% Solplot
@@ -45,35 +49,39 @@ opt_solplot = costaropts('zaxis','all','space','hypertime','resolution',20,'inde
 [hypertime_val,z_val,mu_val,empty] = S.solplot(DYN,opt_solplot);
 
 %{
-opt_solplot = costaropts('zaxis','all','space','hypertime','resolution',[25,25],'index',index(2:3));                    % Plot for individual checks
+opt_solplot = costaropts('zaxis','all','space','hypertime','resolution',[25,25],'index',index(2:3));           % Plot for individual checks
 [hypertime_val,z_val,mu_val,empty] = S.solplot(DYN,opt_solplot);
 %}
 
-opt_solplot = costaropts('zaxis',@(z)z(:,1),'space','time','resolution',100,'index',index);                                % Plot time solution z_1 to specific index
+opt_solplot = costaropts('zaxis',@(z)z(:,1),'space','time','resolution',100,'index',index);                                     % Plot time solution z_1
 [t_val,z_val,mu_val,empty] = S.solplot(DYN,opt_solplot);
 
-opt_solplot = costaropts('zaxis',@(z)z(:,1),'space','time','resolution',1000,'index',1,'interval',[0,100],'Color','k');    % Plot interval of time solution z_1 to specific index and resolution
+opt_solplot = costaropts('zaxis',@(z)z(:,1),'space','time','resolution',1000,'index',index(2),'interval',[0,100],'Color','k');  % Plot interval of time solution z_1 of specific index
 [t_val,z_val,mu_val,empty] = S.solplot(DYN,opt_solplot);
 
 
-opt_solplot = costaropts('zaxis',@(z) z(:,2),'xaxis',@(z) z(:,1),'space','trajectory','index',index);                                                   % Plot trajectory to specific index
+opt_solplot = costaropts('zaxis',@(z) z(:,2),'xaxis',@(z) z(:,1),'space','trajectory','index',index);                                                                   % Plot trajectory of specific index
 [x_val,z_val,mu_val,empty] = S.solplot(DYN,opt_solplot);
 
-opt_solplot = costaropts('zaxis',@(z) z(:,2),'xaxis',@(z) z(:,1),'space','trajectory','mu',S.mu(1,round(size(S.mu,2)/2,0)),'figure',gcf,'Color','m');   % Plot trajectory to specific mu-value
+opt_solplot = costaropts('zaxis',@(z) z(:,2),'xaxis',@(z) z(:,1),'space','trajectory','mu',S.mu(1,index(2)),'figure',gcf);                                              % Plot trajectory of specific mu-value
 [x_val,z_val,mu_val,empty] = S.solplot(DYN,opt_solplot);
 
-opt_solplot = costaropts('zaxis',@(z)z(:,2),'xaxis',@(z)z(:,1),'space','trajectory','resolution',104,'index',index(2),'Color','r');                    % Plot trajectory to specific index and resolution
+opt_solplot = costaropts('zaxis',@(z)z(:,2),'xaxis',@(z)z(:,1),'space','trajectory','resolution',1000,'index',index(2),'interval',[0,30]);                              % Plot interval of trajectory of specific index
 [x_val,z_val,mu_val,empty] = S.solplot(DYN,opt_solplot);
 
-opt_solplot = costaropts('zaxis',@(z) z(:,2),'xaxis',@(z) z(:,1),'space','trajectory','resolution',1000,'index',index(2),'interval',[0,30]);            % Plot interval of trajectory to specific index and resolution
+opt_solplot = costaropts('zaxis',@(z) z(:,2),'xaxis',@(z) z(:,1),'space','trajectory','resolution',104,'index',index(2),'Color','r','linestyle','--','figure',gcf);     % Plot trajectory of specific index
 [x_val,z_val,mu_val,empty] = S.solplot(DYN,opt_solplot);
 
 
-opt_solplot = costaropts('zaxis','all','space','frequency','resolution',2^(8)+1,'index',index,'Color','r');                       % Plot frequency spectrum to specific index
+opt_solplot = costaropts('zaxis','all','space','frequency','index',index(2),'resolution',2^10,'interval',[0,10*2*pi/S.freq(min(index(2)))]);                    % Plot frequency spectrum of specific index
 [f_val,z_val,mu_val,empty] = S.solplot(DYN,opt_solplot);
 
-opt_solplot = costaropts('zaxis',@(z) z(:,1),'space','frequency','resolution',2^(10),'index',index(2),'interval',[0,100]);     % Plot frequency spectrum to specific index
+opt_solplot = costaropts('zaxis',@(z) z(:,1),'space','frequency','index',index(1),'resolution',2^10,'interval',[0,10*2*pi/S.freq(min(index(1)))]);              % Plot frequency spectrum of z_1 of specific index
 [f_val,z_val,mu_val,empty] = S.solplot(DYN,opt_solplot);
+
+opt_solplot = costaropts('zaxis',@(z) z(:,1),'space','frequency','index',index(3),'resolution',2^10,'interval',[0,10*2*pi/S.freq(min(index(3)))],'figure',gcf); % Plot frequency spectrum of z_1 of specific index
+[f_val,z_val,mu_val,empty] = S.solplot(DYN,opt_solplot);
+
 
 
 end

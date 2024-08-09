@@ -76,7 +76,7 @@ function options = solget_gatekeeper(obj,DYN,options)
     end
 
     %Check that only mu or index has been set
-    if isfield(options,'index')&&isfield(options,'mu')
+    if isfield(options,'index') && isfield(options,'mu')
         GC.error_msg{1,end+1} = 'You provided options.index (the index of the continuation parameter) and options.mu (the continuation parameter itself). However, only either of the options is allowed.'; 
         GC.speak('Error while using postprocessing method "solget" or "solplot":'); 
     end
@@ -131,6 +131,12 @@ function options = solget_gatekeeper(obj,DYN,options)
                 frequency_allowed_fieldnames    = {'eval','space','resolution','index','mu','interval'};                %allowed fieldsnames in the options super structure
                 GC.check_fields(options,'options',frequency_mandatory_fieldnames,frequency_allowed_fieldnames);         %updates the error_msg property of the gatekeeper        
                 GC.speak('Error while using postprocessing method "solget" with solution space "frequency":');
+                if isfield(options,'resolution')            % Make sure that 'resolution' is an even number (everything else has already been checked above)
+                    if mod(options.resolution,2) ~= 0       % ('resolution' is a scalar in solution space frequency)
+                        GC.error_msg{1,end+1} = append('The data value of options.resolution is ', num2str(options.resolution), '. However, the resolution must be a positive even integer in solution space "frequency".');
+                    end
+                end
+                GC.speak('Error while using postprocessing method "solget" or "solplot" with solution space "frequency":'); 
 
     end
 

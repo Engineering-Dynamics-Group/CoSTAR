@@ -255,7 +255,7 @@ ADDITIONAL CHANGES AFTER LAUNCH OF v2.6.3
     - solplot: 
         * trajectory solution space only returned last solution, not all requested solutions -> fixed 
                (lines 227 - 229 and 254 - 255 added, lines 231 - 233, 236, 257 - 258 and 261 adapted)
-        * ylabel of frequency plots: "z_i" replaced by "\omega" (line 381)
+        * ylabel of frequency plots: "\mathcal{F} (z_i)" replaced by "\mathcal{F}_i (\omega)" (line 381)
     - benchmark_postprocess_periodic: 
         * line 63: "index" replaced by "index(2)", resolution adapted to 2^11, interval added
     - benchmark_postprocess_quasiperiodic: Small modifications of resolution for 'frequency' plots (lines 72 and 75)
@@ -263,3 +263,8 @@ ADDITIONAL CHANGES AFTER LAUNCH OF v2.6.3
     - solget: varargout removed and method (output arguments) adapted
     - @SOL_EQ/evalsol_hypertime: returned hypertime array is empty now. Moreover, the method does not call evalsol_time anymore
     - solget_gatekeeper: renamed trajectory_[...]_fieldnames to hypertime_[...]_fieldnames (lines 123 - 125)
+
+    - costarFFT modified. Moreover, res is only allowed to be an even number when frequency space is selected
+        * Adaptions to benchmark_postprocess_periodic and ..._quasiperiodic
+        * solget_gatekeeper: lines 134 - 139 added
+        * s_help_solget and s_help_solplot

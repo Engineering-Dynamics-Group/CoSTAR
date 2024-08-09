@@ -378,7 +378,7 @@ function varargout = solplot(obj,DYN,options)
             % Set title, labels and legend
             title('Frequency Domain','Interpreter','latex');
             xlabel('Angular Frequency $\omega$','Interpreter','latex');
-            ylabel('Absolute Amplitude $|\mathcal{F}(\omega)|$','Interpreter','latex');
+            ylabel('Absolute Amplitude $|\mathcal{F}_i (\omega)|$','Interpreter','latex');
             LegStr = cell(1,size(idx_mu,1));                            % Allocate cell memory
             for k = 1:size(idx_mu,1)
                 LegStr{1,k} = ['IDX: ',num2str(idx_mu(k,1)),'; $\mu_',num2str(DYN.act_param),'=',num2str(idx_mu(k,2)),'$'];
