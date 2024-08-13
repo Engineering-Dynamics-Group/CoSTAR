@@ -158,7 +158,7 @@ function varargout = solplot(obj,DYN,options)
 
     if isfield(options,'figure')
         figure(options.figure);                     % Use existing figure
-        set(gcf,'DefaultLineLineWidth',2)
+        set(gcf,'DefaultLineLineWidth',2)           
     else
         figure;
         set(gcf,'Color','w','NumberTitle','off','DefaultLineLineWidth',2,'Name','Plot by SOLUTION.solplot');
@@ -166,8 +166,9 @@ function varargout = solplot(obj,DYN,options)
         grid on;
     end
 
-    hold on;                                        % Allow multiple lines to be plotted and enable grid
-    counter = 0;                                    % Counter needed for legend
+    hold on;                                                    % Allow multiple lines to be plotted and enable grid
+    counter = 0;                                                % Counter needed for legend
+    LegStr_old = get(findobj(gcf,'type','Legend'),'String');    % Get existing legend. Output is empty or a [1 x n] cell (n: number of legend entries)
     %Set all interpreters globally to Latex... what does groot mean?
     % set(groot,'TickLabelInterpreter','latex');
     % set(groot,'defaulttextinterpreter','latex');
@@ -183,7 +184,6 @@ function varargout = solplot(obj,DYN,options)
             [z,mu,time,solget_options] = obj.solget(DYN,solget_options);    % Get the solution(s)
 
             % Plot
-            LegStr_old = cell(get(findobj(gcf,'type','Legend'),'String'));  % Get existing legend
             idx_mu = zeros(numel(solget_options.index)*size(z,2),2);        % Preallocate
             for k = 1:numel(solget_options.index)   % k loop: through the indices; j loop: needed, for the legend to work properly
                 for j = 1:size(z,2)
@@ -193,16 +193,11 @@ function varargout = solplot(obj,DYN,options)
                 end
             end
 
-            % Set title, labels, limits and legend
+            % Set title and labels (legend is set after switch...case because it is the same code for all cases, except quasi-periodic hypertime)
             title('Time Domain','Interpreter','latex');
             xlabel('Time $t$','Interpreter','latex');
             xlim([min(time,[],'all'),max(time,[],'all')]);
             ylabel('State $z_i (t)$','Interpreter','latex');
-            LegStr = cell(1,size(idx_mu,1));                            % Allocate cell memory
-            for k = 1:size(idx_mu,1)
-                LegStr{1,k} = ['IDX: ',num2str(idx_mu(k,1)),'; $\mu_',num2str(DYN.act_param),'=',num2str(idx_mu(k,2)),'$'];
-            end
-            legend([LegStr_old,LegStr],'Interpreter','latex');          % Set the legend
 
             % Output
             varargout = cell(1,4);
@@ -217,7 +212,6 @@ function varargout = solplot(obj,DYN,options)
             solget_options.space = 'time';      % Trajectory is a time solution plotted in state space
             solget_options.eval = 'all';        % Tell solget what to evaluate (function handles apllied later)
             [s_traj,mu,~,solget_options] = obj.solget(DYN,solget_options);      % Get the solution(s)
-            LegStr_old = cell(get(findobj(gcf,'type','Legend'),'String'));      % Get existing legend
 
             % 3D Plot
             if isfield(options,'yaxis')                     
@@ -265,15 +259,10 @@ function varargout = solplot(obj,DYN,options)
 
             end
 
-            % Set title, labels and legend
+            % Set title and labels (legend is set after switch...case because it is the same code for all cases, except quasi-periodic hypertime)
             title('Trajectory','Interpreter','latex');
             xlabel('State $z_j$','Interpreter','latex');
             ylabel('State $z_k$','Interpreter','latex');
-            LegStr = cell(1,size(idx_mu,1));                            % Allocate cell memory
-            for k = 1:size(idx_mu,1)
-                LegStr{1,k} = ['IDX: ',num2str(idx_mu(k,1)),'; $\mu_',num2str(DYN.act_param),'=',num2str(idx_mu(k,2)),'$'];
-            end
-            legend([LegStr_old,LegStr],'Interpreter','latex');          % Set the legend
 
 
         case 'hypertime'
@@ -283,9 +272,8 @@ function varargout = solplot(obj,DYN,options)
 
             % Periodic solutions (solplot is not available for equilibrium solutions)
             if DYN.n_freq == 1
-
+                
                 % Plot
-                LegStr_old = cell(get(findobj(gcf,'type','Legend'),'String'));  % Get existing legend
                 idx_mu = zeros(numel(solget_options.index)*size(z,2),2);        % Preallocate
                 for k = 1:numel(solget_options.index)       % k loop: through the indices; j loop: needed, for the legend to work properly
                     for j =1:size(z,2)
@@ -295,18 +283,13 @@ function varargout = solplot(obj,DYN,options)
                     end
                 end
 
-                % Set title, labels, ticks and legend
+                % Set title and labels (legend is set after switch...case because it is the same code for all cases, except quasi-periodic hypertime)
                 title('Hypertime Domain','Interpreter','latex');
                 xlabel('Hypertime $\theta$','Interpreter','latex')
                 xlim([0,2*pi]);
                 xticks([0,pi/2, pi,3/2*pi, 2.*pi])
                 xticklabels({'$0$','$\frac{1}{2}\pi$','$\pi$','$\frac{3}{2}\pi$','$2 \pi$'})
                 ylabel('State $z_i (\theta)$','Interpreter','latex');
-                LegStr = cell(1,size(idx_mu,1));                            % Allocate cell memory
-                for k = 1:size(idx_mu,1)
-                    LegStr{1,k} = ['IDX: ',num2str(idx_mu(k,1)),'; $\mu_',num2str(DYN.act_param),'=',num2str(idx_mu(k,2)),'$'];
-                end
-                legend([LegStr_old,LegStr],'Interpreter','latex');          % Set the legend
 
             % Quasi-Periodic solutions
             elseif DYN.n_freq == 2
@@ -360,7 +343,6 @@ function varargout = solplot(obj,DYN,options)
             [z,mu,f,solget_options] = obj.solget(DYN,solget_options);       % Get the solution(s)
 
             % Plot
-            LegStr_old = cell(get(findobj(gcf,'type','Legend'),'String'));  % Get existing legend
             idx_mu = zeros(numel(solget_options.index)*size(z,2),2);        % Preallocate
             for k = 1:numel(solget_options.index)       % k loop: through the indices; j loop: needed, for the legend to work properly
                 for j = 1:size(z,2)
@@ -370,15 +352,10 @@ function varargout = solplot(obj,DYN,options)
                 end
             end
 
-            % Set title, labels and legend
+            % Set title and labels (legend is set after switch...case because it is the same code for all cases, except quasi-periodic hypertime)
             title('Frequency Domain','Interpreter','latex');
             xlabel('Angular Frequency $\omega$','Interpreter','latex');
             ylabel('Absolute Amplitude $|\mathcal{F}(z_i)|$','Interpreter','latex');
-            LegStr = cell(1,size(idx_mu,1));                            % Allocate cell memory
-            for k = 1:size(idx_mu,1)
-                LegStr{1,k} = ['IDX: ',num2str(idx_mu(k,1)),'; $\mu_',num2str(DYN.act_param),'=',num2str(idx_mu(k,2)),'$'];
-            end
-            legend([LegStr_old,LegStr],'Interpreter','latex');          % Set the legend
 
             % Output -> TODO: Implement for 3D
             varargout = cell(1,4);
@@ -387,6 +364,16 @@ function varargout = solplot(obj,DYN,options)
             varargout{1,3} = mu;
             varargout{1,4} = [];
 
+    end
+
+
+    % Set the legend (except for quasi-periodic solutions in hypertime space)
+    if ~(strcmpi(options.space,'hypertime') && DYN.n_freq == 2)
+        LegStr = cell(1,size(idx_mu,1));                            % Allocate cell memory
+        for k = 1:size(idx_mu,1)
+            LegStr{1,k} = ['IDX: ',num2str(idx_mu(k,1)),'; $\mu_',num2str(DYN.act_param),'=',num2str(idx_mu(k,2)),'$'];
+        end
+        legend([LegStr_old,LegStr],'Interpreter','latex');          % Set the legend
     end
 
 
