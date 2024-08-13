@@ -339,6 +339,9 @@ Changes affect:
         --> Name of method changed
         --> Multiple changes for switch to multiple shoot
 
+    - getIV
+        --> Line 33 changed, extract initial mu from DYN.non_auto_freq instead of y(end,1)
+
 @AM_PS_FDM
     - getIC
         --> Additional argument n_shoot added to be able to use multiple shooting to determine stability
@@ -352,7 +355,18 @@ Changes affect:
         --> Lines 15-19 added choose either autonomous or non-autonomous frequency
 
 
+@test
+    Multiple files regardind SHM changed to mshm 
+    - test_SHM_PS_fvdP 
+        --> approx_method now 'mshm', opt_approx_method.n_shoot = 5 added
+    - test_SHM_PS_langford
+        --> approx_method now 'mshm', opt_approx_method.n_shoot = 5 added
+    - test_SHM_PS_laval
+        --> approx_method now 'mshm', opt_approx_method.n_shoot = 5 added
+    - test_SHM_PS_vdP 
+        --> approx_method now 'mshm', opt_approx_method.n_shoot = 5 added
 
-
-
+@functions
+    - inital solution
+        --> line 115 if statement changed now if(quasiperiodic and (shooting or mshm)) instead of if(quasiperiodic and shooting and mshm)
 

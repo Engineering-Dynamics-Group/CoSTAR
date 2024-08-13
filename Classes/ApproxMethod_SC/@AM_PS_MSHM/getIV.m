@@ -30,7 +30,7 @@ else
         Fcn = DYN.rhs;
 
         y = DYN.opt_init.ic(:);
-        mu = y(end);
+        mu = DYN.non_auto_freq(DYN.param{DYN.act_param});
         n_shoot = obj.n_shoot;                                                  % Number of shooting points
         dim = DYN.dim;
         T = 2*pi./DYN.non_auto_freq(mu);
