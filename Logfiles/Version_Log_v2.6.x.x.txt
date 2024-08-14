@@ -354,6 +354,11 @@ Changes affect:
         --> Multiple changes to interpolate solution over period and extract shooting points
         --> Lines 15-19 added choose either autonomous or non-autonomous frequency
 
+@AM_PS_SHM
+    - subclass removed, no single shooter needed, task is now performed by AM_PS_MSHM
+
+@SOL_PS_SHM
+    - subclass removed, no single shooter needed, task is now performed by SOL_PS_MSHM
 
 @test
     Multiple files regardind SHM changed to mshm 
