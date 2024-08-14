@@ -13,7 +13,7 @@ Fcn = @(t,z,param)vdP_auto_ap(t,z,param);                                       
 
 %% Properties
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);                                                                                               %Properties of the System
-options.opt_sol  = costaropts('stability','off','cont','on','auto_freq',auto_freq,'sol_type','periodic','approx_method','mshm','act_param',active_parameter);               %Properties of the solution
+options.opt_sol  = costaropts('stability','off','cont','on','auto_freq',auto_freq,'sol_type','periodic','approx_method','shm','act_param',active_parameter);               %Properties of the solution
 options.opt_cont = costaropts('step_control','off','pred','tangent','subspace','pseudo-arc','mu_limit',mu_limit,'direction',dir);                                                                    %Properties for continuation
 options.opt_init = costaropts('ic',IC);                                                                 %Properties for continuation
 options.opt_approx_method = costaropts('solver','ode45','n_shoot',3);                                                                                                                 %Properties for approx_method (e.g. Shoot)

@@ -17,7 +17,7 @@ Fcn = @(t,z,param)langford(t,z,param);                                          
 
 %% Properties
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',3);                                                                                               %Properties of the System
-options.opt_sol  = costaropts('stability','on','cont','off','auto_freq',auto_freq,'sol_type','periodic','approx_method','mshm','act_param',active_parameter);               %Properties of the solution
+options.opt_sol  = costaropts('stability','on','cont','off','auto_freq',auto_freq,'sol_type','periodic','approx_method','shm','act_param',active_parameter);               %Properties of the solution
 options.opt_init = costaropts('ic',IC);                                                                 %Properties for continuation
 options.opt_approx_method = costaropts('solver','ode45','n_shoot',5);                                                                                                                 %Properties for approx_method (e.g. Shoot)
 options.opt_stability = costaropts('iterate_bfp','on');                                                                                                                      %Changes the direction of continuation (uncomment only if algorithm doesn't start properly)
@@ -30,7 +30,7 @@ zeit = toc;
 
 %% Properties
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',3);                                                                                               %Properties of the System
-options.opt_sol  = costaropts('stability','on','cont','on','auto_freq',auto_freq,'sol_type','periodic','approx_method','mshm','act_param',active_parameter);               %Properties of the solution
+options.opt_sol  = costaropts('stability','on','cont','on','auto_freq',auto_freq,'sol_type','periodic','approx_method','shm','act_param',active_parameter);               %Properties of the solution
 options.opt_init = costaropts('ic',IC);
 options.opt_cont = costaropts('step_control','on','pred','tangent','subspace','pseudo-arc','mu_limit',mu_limit,'step_width',0.05,'step_width_limit',[1e-5,0.01]);                                                                    %Properties for continuation
 options.opt_approx_method = costaropts('solver','ode45','n_shoot',5);                                                                                                                 %Properties for approx_method (e.g. Shoot)

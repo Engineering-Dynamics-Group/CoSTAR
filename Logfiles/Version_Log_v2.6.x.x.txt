@@ -334,13 +334,29 @@ Changes affect:
     - PS_MSHM_calc_stability_non_auto
         --> lines 20-27 added
         --> lines 29-32 commented
+        --> line 19 if statement changed from 'mshm' to 'shooting'
     
     - PS_MSHM_calc_stability_auto
         --> Name of method changed
         --> Multiple changes for switch to multiple shoot
+        --> line 18 if statement changed from 'mshm' to 'shooting'
 
     - getIV
         --> Line 33 changed, extract initial mu from DYN.non_auto_freq instead of y(end,1)
+
+    - s_PS_SHM_gatekeeper
+        --> Line 14 new allowed field value 'n_shoot'
+        --> Lines 28-31 added
+
+ST_PS_SHM
+    - subclass removed, tasks now performed by ST_PS_MSHM
+
+@ApproxMethod_SC
+    - s_AM_gatekeeper
+        --> line 24 method call changed from 'AM_PS_SHM.s_PS_SHM_gatekeeper' to 'AM_PS_MSHM.s_PS_SHM_gatekeeper'
+    
+    - s_method_selection
+        --> if statement for old shooting removed (lines 16-23), if statement 'mshm' renamed to 'shooting'
 
 @AM_PS_FDM
     - getIC
@@ -357,6 +373,10 @@ Changes affect:
 @AM_PS_SHM
     - subclass removed, no single shooter needed, task is now performed by AM_PS_MSHM
 
+@Solution_SC
+    - s_solution_selection
+        --> Lines 18-20 removed, if statement 'mshm' renamed to 'shooting'
+
 @SOL_PS_SHM
     - subclass removed, no single shooter needed, task is now performed by SOL_PS_MSHM
 
@@ -364,14 +384,31 @@ Changes affect:
     Multiple files regardind SHM changed to mshm 
     - test_SHM_PS_fvdP 
         --> approx_method now 'mshm', opt_approx_method.n_shoot = 5 added
+        --> approx_method now 'shm'
     - test_SHM_PS_langford
         --> approx_method now 'mshm', opt_approx_method.n_shoot = 5 added
+        --> approx_method now 'shm'
     - test_SHM_PS_laval
         --> approx_method now 'mshm', opt_approx_method.n_shoot = 5 added
+        --> approx_method now 'shm'
     - test_SHM_PS_vdP 
         --> approx_method now 'mshm', opt_approx_method.n_shoot = 5 added
+        --> approx_method now 'shm'
 
 @functions
     - inital solution
         --> line 115 if statement changed now if(quasiperiodic and (shooting or mshm)) instead of if(quasiperiodic and shooting and mshm)
+
+
+@DynamicalSystem
+    - s_DYN_gatekeeper
+        --> line 111 'mshm' and 'shooting' removed from allowed field values for approx_method
+    
+    
+
+
+
+
+
+
 

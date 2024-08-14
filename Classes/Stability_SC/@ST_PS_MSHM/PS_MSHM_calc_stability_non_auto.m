@@ -16,7 +16,7 @@ function   [multipliers,vectors,n_unstable,stability_flag] = PS_MSHM_calc_stabil
 
 
 stability_flag = 1;
-if strcmpi(DYN.approx_method,'mshm')  % Solution has already been computed by shooting - no need to do it again
+if strcmpi(DYN.approx_method,'shooting')  % Solution has already been computed by shooting - no need to do it again
     dim = DYN.dim;
     n_shoot = AM.n_shoot;
 

@@ -16,10 +16,6 @@ if(strcmpi(DYN.sol_type,'equilibrium'))
 elseif(strcmpi(DYN.sol_type,'periodic'))
     
     if(strcmpi(DYN.approx_method,'shooting'))
-        S = SOL_PS_SHM(AM);
-    end
-
-    if(strcmpi(DYN.approx_method,'mshm'))
         S = SOL_PS_MSHM(AM);
     end
     

@@ -20,7 +20,7 @@ Fcn = @(t,z,param)laval_ps(t,z,param);                                          
 
 %% Properties
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',4);                                                                                               %Properties of the System
-options.opt_sol  = costaropts('stability','on','cont','on','non_auto_freq',non_auto_freq,'sol_type','periodic','approx_method','mshm','act_param',active_parameter);       %Properties of the solution
+options.opt_sol  = costaropts('stability','on','cont','on','non_auto_freq',non_auto_freq,'sol_type','periodic','approx_method','shm','act_param',active_parameter);       %Properties of the solution
 options.opt_init = costaropts('ic',IC);
 options.opt_approx_method = costaropts('solver','ode45','n_shoot',5);                                                                                                %Properties for approx_method (e.g. Shoot)
 options.opt_stability       = costaropts('iterate_bfp','on');
