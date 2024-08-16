@@ -30,19 +30,19 @@ All "example_text" within the costarhelp display texts changed to ''example_text
 Changes affect:
 
 	@Continuation:				@DynamicalSystem:			@Solution:
-	    - s_help_opt_cont 		    	    - s_help_opt_sol		    	    - s_help_contplot
-					    	    - s_help_system		    	    - s_help_solget
-									    		    - s_help_solplot
+	    - s_help_opt_cont 		    - s_help_opt_sol		    - s_help_contplot
+					    	        - s_help_system		    	- s_help_solget
+									    		                - s_help_solplot
 
-	@AM_PS_FDM:				@AM_PS_FGM:				@AM_PS_SHM
-	    - s_help_opt_approx_method_PS_FDM	    - s_help_opt_approx_method_PS_FGM	    - s_help_opt_approx_method_PS_SHM
+	@AM_PS_FDM:				                    @AM_PS_FGM:				                    @AM_PS_SHM:
+	    - s_help_opt_approx_method_PS_FDM	        - s_help_opt_approx_method_PS_FGM	        - s_help_opt_approx_method_PS_SHM
 
-	@AM_QPS_FDM:				@AM_QPS_FGM:				@AM_QPS_SHM
-	    - s_help_opt_approx_method_QPS_FDM	    - s_help_opt_approx_method_QPS_FGM	    - s_help_opt_approx_method_QPS_SHM
-											    - s_help_opt_init_QPS_SHM
+	@AM_QPS_FDM:				                @AM_QPS_FGM:				                @AM_QPS_SHM
+	    - s_help_opt_approx_method_QPS_FDM	        - s_help_opt_approx_method_QPS_FGM	        - s_help_opt_approx_method_QPS_SHM
+											        - s_help_opt_init_QPS_SHM
 	    
-	@Stability_EQ				@Stability_PS_SHM			@Stability_QPS_SHM
-	    - s_help_opt_stability_EQ	    	- s_help_opt_stability_PS_SHM    	- s_help_opt_stability_QPS_SHM
+	@Stability_EQ				                @Stability_PS_SHM			                @Stability_QPS_SHM
+	    - s_help_opt_stability_EQ	    	        - s_help_opt_stability_PS_SHM    	        - s_help_opt_stability_QPS_SHM
 
 
 ----------
@@ -53,19 +53,19 @@ Changes affect:
 
 	@Continuation:
 	    - Continuation:
-		--> Private property "p_axes_values_old" added (line 66)
+		    --> Private property "p_axes_values_old" added (line 66)
 	    - plot_contplot:
-		--> The property "p_axes_values_old" stores the the axes values of the old solution (lines 30, 39, 51, 60, 63, 68, 71, 76 and 79)
-		--> The options structure for all contplot calls (except for the call when the continuation has just started) include the field 'axes_values_old', 
-		    which stores the axes values of the old solution (lines 37, 49, 58, 61, 66, 69, 74 and 77)
+		    --> The property "p_axes_values_old" stores the the axes values of the old solution (lines 30, 39, 51, 60, 63, 68, 71, 76 and 79)
+		    --> The options structure for all contplot calls (except for the call when the continuation has just started) include the field 'axes_values_old', 
+		        which stores the axes values of the old solution (lines 37, 49, 58, 61, 66, 69, 74 and 77)
 
 	@Solution:
 	    - contplot:
-		--> The method "contplot_gatekeeper" is skipped when the options-field 'axes_values_old' is present (lines 61 - 63)
-		--> solget_options.index is updated when the options-field 'axes_values_old' is present (lines 97 - 102)
-		--> Output arguments mu and s_out must be corrected when the options-field 'axes_values_old' is present (lines 168 - 171)
-	    - solget:
-		--> The methods "solget_gatekeeper" and "solget_up_index" are skipped when the options-field 'axes_values_old' is present (lines 90 - 93)
+		    --> The method "contplot_gatekeeper" is skipped when the options-field 'axes_values_old' is present (lines 61 - 63)
+		    --> solget_options.index is updated when the options-field 'axes_values_old' is present (lines 97 - 102)
+		    --> Output arguments mu and s_out must be corrected when the options-field 'axes_values_old' is present (lines 168 - 171)
+        - solget:
+		    --> The methods "solget_gatekeeper" and "solget_up_index" are skipped when the options-field 'axes_values_old' is present (lines 90 - 93)
 		
 
 ----------
@@ -83,8 +83,6 @@ Changes affect:
         --> When plotting another solution in already existing figure, the legend entry is added to already existing legend now
         --> Lines 186, 220, 288, 363 added and lines 205, 276, 309, 381 changed
 
-
-----------
 
 @ST_PS_SHM:
 
@@ -206,6 +204,7 @@ Changes affect:
 		- ST_PS_SHM:
 			--> "vectors" added to output arguments of method "PS_SHM_calc_stability_non_auto" (line 38)
 			--> "vectors" added to output arguments of method "PS_SHM_calc_stability_auto" (line 39)
+
 	@ST_QPS_SHM:
 		- QPS_SHM_calc_stability:
 			--> "vectors" added to output arguments (line 15)
@@ -223,15 +222,18 @@ Changes affect:
 	- s_disp_out_help_struct:
 		--> Headers of first two columns changed to "field name" and "allowed field values" (line 19)
 
+
 @Solution:
 
 	- s_help_contplot:
 		--> Descriptions adapted
 
+
 @SOL_PS_FDM:
 
 	- evalsol_hypertime:
 		--> Bugfix: "~isempty" in line 23 changed to "isfield"
+
 
 @SOL_QPS_FDM:
 
@@ -244,27 +246,99 @@ Changes affect:
 		--> if...else condition for n_int_2 added (similar to evalsol_hypertime, see above) (lines 27 - 31)
 
 
+
+--------------------------------------------
+----------------- v2.6.3.1 -----------------
+--------------------------------------------
+
+Version compatibility fix: cell of empty array returned error in version R2021 of MATLAB, which could occur in solplot.
+
+@Solution:
+
+    - solplot:
+        --> Old Legend is got in line 171 now without cell() function
+        --> Setting and getting of the legend removed from all switch cases (lines 186, 201 - 205, 220, 272 - 276, 288, 305 - 309, 363, 377 - 381)
+        --> Legend is now set by new code in ines 370 - 377 (line numbers correspond to after removal of code described above)
+
+
+
+--------------------------------------------
+------------------ v2.6.4 ------------------
+--------------------------------------------
+    
+Functions:
+
+    - costarFFT:
+        --> Description, error message and comments improved
+        --> Section "Interpolation of ODE data" adapted. Last element of Zi is not removed anymore when Zi has uneven number of elements
+  
+          
+----------  
+
+Tutorials:
+
+    - Tutorial_Postprocessing:
+        --> Split into Tutorial_contplot, Tutorial_solget and Tutorial_solplot
+
+    - Tutorial_contplot:
+        --> Tutorial added and finished
+
+    - Tutorial_solget:
+        --> Tutorial added and finished
+
+    - Tutorial_solplot:
+        --> Tutorial added and finished  
+
+
+---------- 
+
+Test:
+
+    - benchmark_postprocess_periodic: 
+        --> Various adjustments of the option structures
+
+    - benchmark_postprocess_quasiperiodic: 
+        --> Various adjustments of the option structures
+
+
 ----------
 
-ADDITIONAL CHANGES AFTER LAUNCH OF v2.6.3
-    - Tutorial_Postprocessing further written
-    - s_help_solplot adapted
-    - s_help_contplot adapted
-    - solplot_gatekeeper adapted for color (line 68 new, error texts in line 70, 73 and 141 adapted)
-    - contplot_gatekeeper adapted for color (error texts in line 70 and 73 adapted)
-    - solplot: 
-        * trajectory solution space only returned last solution, not all requested solutions -> fixed 
-               (lines 227 - 229 and 254 - 255 added, lines 231 - 233, 236, 257 - 258 and 261 adapted)
-        * ylabel of frequency plots: "\mathcal{F} (z_i)" replaced by "\mathcal{F}_i (\omega)" (line 381)
-    - benchmark_postprocess_periodic: 
-        * line 63: "index" replaced by "index(2)", resolution adapted to 2^11, interval added
-    - benchmark_postprocess_quasiperiodic: Small modifications of resolution for 'frequency' plots (lines 72 and 75)
-    - @costarhelp/solget: Info text updated (solution space removed)
-    - solget: varargout removed and method (output arguments) adapted
-    - @SOL_EQ/evalsol_hypertime: returned hypertime array is empty now. Moreover, the method does not call evalsol_time anymore
-    - solget_gatekeeper: renamed trajectory_[...]_fieldnames to hypertime_[...]_fieldnames (lines 123 - 125)
+@costarhelp:
 
-    - costarFFT modified. Moreover, res is only allowed to be an even number when frequency space is selected
-        * Adaptions to benchmark_postprocess_periodic and ..._quasiperiodic
-        * solget_gatekeeper: lines 134 - 139 added
-        * s_help_solget and s_help_solplot
+    - solget: 
+        --> Ssolution space "solution" in description removed (lines 14 and 15)
+
+
+@Solution:
+
+    - contplot_gatekeeper 
+        --> Gatekeeper texts for field 'color' adapted (lines 70 and 73)
+
+    - s_help_contplot:
+        --> Variously improved and updated
+
+    - s_help_solplot:
+        --> Variously improved and updated
+
+    - solget: 
+        --> Method output arguments adapted and varargout code lines commented (lines 87, 105 ,112, 117, 123, 174 and 175)
+
+    - solget_gatekeeper: 
+        --> Renamed trajectory_[...]_fieldnames to hypertime_[...]_fieldnames (lines 123 - 125)
+        --> Field 'resolution' must be even number now when frequency solution space is selected (lines 134 - 139)
+
+    - solplot: 
+        --> Solutions in trajectory solution space are now returned for all indices 
+            (lines 227 - 229 and 254 - 255 added, lines 231 - 233, 236, 257 - 258 and 261 adapted)
+        --> ylabel of frequency plots "\mathcal{F} (z_i)" replaced by "\mathcal{F}_i (\omega)" (line 381)
+
+    - solplot_gatekeeper:
+        --> Array size of field 'color' is now checked when data type is double (line 68)
+        --> Gatekeeper texts for field 'color' adapted (lines 70, 73 and 141)
+
+
+@SOL_EQ:
+
+    - evalsol_hypertime: 
+        --> Returned hypertime array is empty now (line 20) 
+        --> Method does not call evalsol_time anymore (lines 18 and 19)
