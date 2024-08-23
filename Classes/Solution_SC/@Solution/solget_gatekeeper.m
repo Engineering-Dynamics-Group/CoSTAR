@@ -23,6 +23,13 @@ function options = solget_gatekeeper(obj,DYN,options)
         GC.error_msg{1,end+1} = append('The contplot options structure was not created using the costaropts function, which is mandatory.');
     end
 
+    % Check that solget is not called for an equilibrium solution by the user (ATTENTION: solget can be called from contplot even for EQ, which is why options.call_from_contplot is needed)
+    if isfield(options,'call_from_contplot')                    % If solget is called from contplot (which is fine)
+        options = rmfield(options,'call_from_contplot');        % Remove the field (to not interfere with the allowed fieldnames) and proceed
+    elseif strcmpi(DYN.sol_type,'equilibrium')                  % When solget is not called from contplot: Check if solution type is equilibrium. If yes: User called solget for EQ solution, which is not allowed
+        GC.error_msg{1,end+1} = 'You are trying to use solget for an equilibrium solution object, which is not meaningful.';    % solget could also be called by solplot, but solplot is not allowed for EQ -> solget cannot be called by solplot for EQ
+    end
+
     GC.speak('Error while using postprocessing method "solget":');
 
 

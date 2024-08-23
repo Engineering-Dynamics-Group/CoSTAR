@@ -265,6 +265,31 @@ Version compatibility fix: cell of empty array returned error in version R2021 o
 --------------------------------------------
 ------------------ v2.6.4 ------------------
 --------------------------------------------
+
+Default resolution of 50 for quasi-periodic solutions and of 200 for periodic solutions now affects continuation as well as postprocessing.
+
+    @Continuation:
+        - plot_contplot:
+            --> Definition of default resolution removed (former lines 10 - 15)
+            --> Field 'resolution' in option structs removed (lines 22, 31, 43, 52, 55, 60, 63, 68, 71)
+
+    @Solution:
+        - solget:
+            --> Definition of default resolution added/modified (lines 102 - 106)
+  
+          
+----------  
+
+It is now prohibited for the user to use solget for equilibrium solutions (call of solget from contplot is still available).
+
+    @Solution:
+        - contplot:
+            --> Field 'call_from_contplot' is added to solget_options to tell solget that it was called from contplot (line 77)
+        - solget_gatekeeper:
+            --> Lines 26 - 31 added
+
+
+----------  
     
 Functions:
 

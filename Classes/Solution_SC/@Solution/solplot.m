@@ -1,10 +1,4 @@
 % This function plots prescribed solution points in a 2D or 3D plot
-% necessary input is:
-% @obj                 Object of Solution-Class
-% @DYN                 Object of DynamicalSystem-Class
-% @options             struct containing options for plotting/fieldnames:
-%
-%   [s_out,varargout] = solplot(obj,DYN,options)
 %
 % Input Arguments
 % @obj:                 Object of Solution class
@@ -84,52 +78,39 @@
 %                       'color'         Define a color for the plot either by 
 %                                       providing an rgb array or a char 
 %                                       'r','g','b','c','m','y' or 'k'
+%
+%
 % Output Arguments:
-% @s_out:               Solution vector in the dimension [options.resolution,
-%                       statespace dimension, number of curve points].
-%                       statespace dimension depends on options.eval
-% @varargout:           Contains the data, which is plotted
-%                       options.space = 'time'
-%                           varargout{1,1}: time
-%                           varargout{1,2}: zaxis
-%                           varargout{1,3}: mu
-%                           varargout{1,4}: empty
-%                        options.space = 'trajectory' 2D
-%                           varargout{1,1}: xaxis
-%                           varargout{1,2}: zaxis
-%                           varargout{1,3}: mu
-%                           varargout{1,4}: empty
-%                        options.space = 'trajectory' 3D
-%                           varargout{1,1}: xaxis
-%                           varargout{1,2}: zaxis
-%                           varargout{1,3}: yaxis
-%                           varargout{1,4}: mu
-%                        options.space = 'hypertime' 2D
-%                           varargout{1,1}: hypertime
-%                           varargout{1,2}: zaxis
-%                           varargout{1,3}: mu
-%                           varargout{1,4}: empty
-%                        options.space = 'hypertime' 3D (not implemented yet)
-%                           varargout{1,1}: hypertime 1
-%                           varargout{1,2}: hypertime 1
-%                           varargout{1,3}: zaxis
-%                           varargout{1,4}: mu
-%                        options.space = 'frequency' 2D
-%                           varargout{1,1}: frequency
-%                           varargout{1,2}: zaxis
-%                           varargout{1,3}: mu
-%                           varargout{1,4}: empty
-%                        options.space = 'frequency' 3D (not implemented yet)
-%                           varargout{1,1}: frequency along basefrequency 1
-%                           varargout{1,2}: frequency along basefrequency 2
-%                           varargout{1,3}: zaxis
-%                           varargout{1,4}: mu
-
-%Example:   options = struct('xaxis',@(z)z(:,1),'zaxis',@(z)z(:,2),'space','trajectory','mu',[0.5,1,1.5]);
-%           [x,y] = S.soplot(DYN,options);
+% @output:              Struct containing plotted solution data, domain data (if possible) and mu-values. 
+%                       Fields depend on solution space:
+%                        - options.space = 'time'
+%                           output.z:    zaxis valus
+%                           output.time: time values
+%                           output.mu:   mu values
+%                        - options.space = 'trajectory' (2D)
+%                           output.x:  xaxis values
+%                           output.z:  zaxis values
+%                           output.mu: mu values
+%                        - options.space = 'trajectory' (3D)
+%                           output.x:  xaxis values
+%                           output.z:  zaxis values
+%                           output.y:  yaxis values
+%                           output.mu: mu values
+%                        - options.space = 'hypertime'
+%                           output.z:         zaxis values
+%                           output.hypertime: hypertime values
+%                           output.mu:        mu values
+%                        - options.space = 'frequency'
+%                           output.amplitude: absolute amplitude values
+%                           output.frequency: angular frequency values
+%                           output.mu:        mu values
+%
+%
+% Example:   options = costaropts('xaxis',@(z)z(:,1),'zaxis',@(z)z(:,2),'space','trajectory','mu',[0.5,1,1.5]);
+%            output = S.solplot(DYN,options);
 
 
-function varargout = solplot(obj,DYN,options)
+function output = solplot(obj,DYN,options)
 
     %% Gatekeeper check of input: Only the input not checked by solget_gatekeeper is checked here
     options = obj.solplot_gatekeeper(DYN,options);
@@ -180,7 +161,11 @@ function varargout = solplot(obj,DYN,options)
         case 'time'
 
             solget_options.eval = options.zaxis;                            % Tell solget what to evaluate
-            [z,mu,time,solget_options] = obj.solget(DYN,solget_options);    % Get the solution(s)
+            solget_output = obj.solget(DYN,solget_options);                 % Get the solution(s)
+            z              = solget_output.solution_eval;                   % Extract the fields from solget_output which are needed
+            time           = solget_output.time;
+            mu             = solget_output.mu;
+            solget_options = solget_output.options;
 
             % Plot
             LegStr_old = cell(get(findobj(gcf,'type','Legend'),'String'));  % Get existing legend
@@ -205,32 +190,33 @@ function varargout = solplot(obj,DYN,options)
             legend([LegStr_old,LegStr],'Interpreter','latex');          % Set the legend
 
             % Output
-            varargout = cell(1,4);
-            varargout{1,1} = time;
-            varargout{1,2} = z;
-            varargout{1,3} = mu;
-            varargout{1,4} = [];
+            output.z    = z;
+            output.time = time;
+            output.mu   = mu;
 
 
         case 'trajectory'                       % If case trajectroy is chosen: axis are always function_handles automatically
 
             solget_options.space = 'time';      % Trajectory is a time solution plotted in state space
             solget_options.eval = 'all';        % Tell solget what to evaluate (function handles apllied later)
-            [s_traj,mu,~,solget_options] = obj.solget(DYN,solget_options);      % Get the solution(s)
+            solget_output = obj.solget(DYN,solget_options);                     % Get the solution(s)
+            s              = solget_output.solution_eval;                       % Extract the fields from solget_output which are needed
+            mu             = solget_output.mu;
+            solget_options = solget_output.options;
             LegStr_old = cell(get(findobj(gcf,'type','Legend'),'String'));      % Get existing legend
+            idx_mu = zeros(numel(solget_options.index),2);                      % Preallocate
+            x = zeros(size(s,1),1,numel(solget_options.index));                 % Preallocate
+            z = zeros(size(s,1),1,numel(solget_options.index));                 % Preallocate
 
             % 3D Plot
             if isfield(options,'yaxis')                     
 
                 % Plot
-                idx_mu = zeros(numel(solget_options.index),2);            % Preallocate
-                x = zeros(size(s_traj,1),1,numel(solget_options.index));
-                z = zeros(size(s_traj,1),1,numel(solget_options.index));
-                y = zeros(size(s_traj,1),1,numel(solget_options.index));
+                y = zeros(size(s,1),1,numel(solget_options.index));             % Preallocate
                 for k = 1:numel(solget_options.index)           % k loop: through the indices (no j loop needed since there is only one plot per solution)
-                    x(:,1,k) = options.xaxis(s_traj(:,:,k));    % The function_handle is applied at this stage - otherwise solget would need to be called 3 times
-                    z(:,1,k) = options.zaxis(s_traj(:,:,k));
-                    y(:,1,k) = options.yaxis(s_traj(:,:,k));
+                    x(:,1,k) = options.xaxis(s(:,:,k));         % The function_handle is applied at this stage - otherwise solget would need to be called 3 times
+                    z(:,1,k) = options.zaxis(s(:,:,k));
+                    y(:,1,k) = options.yaxis(s(:,:,k));
                     counter = counter + 1;
                     idx_mu(counter,:) = [solget_options.index(k),round(mu(k)*100)/100];   % Round mu to 2 decimals
                     plot3(x(:,1,k),z(:,1,k),y(:,1,k),'Color',obj.custom_color(options));
@@ -240,33 +226,27 @@ function varargout = solplot(obj,DYN,options)
                 zlabel('State $z_i$','Interpreter','latex');
 
                 % Output
-                varargout = cell(1,4);
-                varargout{1,1} = x;
-                varargout{1,2} = z;
-                varargout{1,3} = y;
-                varargout{1,4} = mu;
+                output.x  = x;
+                output.z  = z;
+                output.y  = y;
+                output.mu = mu;
 
             % 2D Plot
             else    
                 
                 % Plot
-                idx_mu = zeros(numel(solget_options.index),2);                      % Preallocate
-                x = zeros(size(s_traj,1),1,numel(solget_options.index));
-                z = zeros(size(s_traj,1),1,numel(solget_options.index));
-                for k = 1:numel(solget_options.index)           % k loop: through the indices (no j loop needed since there is only one plot per solution)
-                    x(:,1,k) = options.xaxis(s_traj(:,:,k));    % The function_handle is applied at this stage - otherwise solget would need to be called 2 times
-                    z(:,1,k) = options.zaxis(s_traj(:,:,k));
+                for k = 1:numel(solget_options.index)       % k loop: through the indices (no j loop needed since there is only one plot per solution)
+                    x(:,1,k) = options.xaxis(s(:,:,k));     % The function_handle is applied at this stage - otherwise solget would need to be called 2 times
+                    z(:,1,k) = options.zaxis(s(:,:,k));
                     counter = counter + 1;
                     idx_mu(counter,:) = [solget_options.index(k),round(mu(k)*100)/100];     % Round mu to 2 decimals
                     plot(x(:,1,k),z(:,1,k),'Color',obj.custom_color(options),'linestyle',linestyle);
                 end
 
                 % Output
-                varargout = cell(1,4);
-                varargout{1,1} = x;
-                varargout{1,2} = z;
-                varargout{1,3} = mu;
-                varargout{1,4} = [];
+                output.x  = x;
+                output.z  = z;
+                output.mu = mu;
 
             end
 
@@ -283,8 +263,12 @@ function varargout = solplot(obj,DYN,options)
 
         case 'hypertime'
 
-            solget_options.eval = options.zaxis;                                % Tell solget what to evaluate
-            [z,mu,hypertime,solget_options] = obj.solget(DYN,solget_options);   % Get the solution(s)
+            solget_options.eval = options.zaxis;                            % Tell solget what to evaluate
+            solget_output = obj.solget(DYN,solget_options);                 % Get the solution(s)
+            z              = solget_output.solution_eval;                   % Extract the fields from solget_output which are needed
+            hypertime      = solget_output.hypertime;
+            mu             = solget_output.mu;
+            solget_options = solget_output.options;
 
             % Periodic solutions (solplot is not available for equilibrium solutions)
             if DYN.n_freq == 1
@@ -352,17 +336,19 @@ function varargout = solplot(obj,DYN,options)
             end
 
             % Output
-            varargout = cell(1,4);
-            varargout{1,1} = hypertime;
-            varargout{1,2} = z;
-            varargout{1,3} = mu;
-            varargout{1,4} = [];
+            output.z         = z;
+            output.hypertime = hypertime;
+            output.mu        = mu;
 
 
         case 'frequency'
 
             solget_options.eval = options.zaxis;                            % Tell solget what to evaluate
-            [z,mu,f,solget_options] = obj.solget(DYN,solget_options);       % Get the solution(s)
+            solget_output = obj.solget(DYN,solget_options);                 % Get the solution(s)
+            z              = solget_output.solution_eval;                   % Extract the fields from solget_output which are needed
+            f              = solget_output.frequency;
+            mu             = solget_output.mu;
+            solget_options = solget_output.options;
 
             % Plot
             LegStr_old = cell(get(findobj(gcf,'type','Legend'),'String'));  % Get existing legend
@@ -386,11 +372,9 @@ function varargout = solplot(obj,DYN,options)
             legend([LegStr_old,LegStr],'Interpreter','latex');          % Set the legend
 
             % Output -> TODO: Implement for 3D
-            varargout = cell(1,4);
-            varargout{1,1} = f;
-            varargout{1,2} = z;
-            varargout{1,3} = mu;
-            varargout{1,4} = [];
+            output.amplitude = z;
+            output.frequency = f;
+            output.mu        = mu;
 
     end
 

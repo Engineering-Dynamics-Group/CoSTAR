@@ -119,9 +119,9 @@ Z = permute(Z,idx);                         % Make sure that Z is a column vecto
 % end
 
 if rem(length(T),2) == 1
-    Ti = linspace(0,max(T)-min(T),length(T)-1);     % Make sure Zi has even number of elements by interpolating on even number of query points
+    Ti = linspace(0,max(T)-min(T),length(T)-1)';    % Make sure Zi has even number of elements by interpolating on even number of query points
 else
-    Ti = linspace(0,max(T)-min(T),length(T));       % T already has even number of elements
+    Ti = linspace(0,max(T)-min(T),length(T))';      % T already has even number of elements
 end
 t_step = (max(Ti)-min(Ti))/(length(Ti)-1);          % Time step of input signal for FFT
 
