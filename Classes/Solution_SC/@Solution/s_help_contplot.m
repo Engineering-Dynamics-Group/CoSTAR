@@ -20,7 +20,7 @@ function help_struct = s_help_contplot()
     help_struct.optional.index.text  = 'Vector of increasing indices specifying the solutions of the continuation to be plotted. \n ''all'' plots all computed solutions.';
 
 
-    help_struct.optional.resolution.value = 'scalar or [1x2] array \n (positive integers) \n e.g.: 100 or [40,50] \n Default: 200 or [200,200]';
+    help_struct.optional.resolution.value = 'scalar or [1x2] array \n (positive integers) \n e.g.: 100 or [40,50] \n Default: \n - 200 for periodic solutions\n - 50 or [50,50] for quasi-\n periodic solutions';
     help_struct.optional.resolution.text  = ['Defines the resolution, i.e. the number of points along each of the hypertime axes (periodic: 1 axis, quasi-periodic: 2 axes) ' ...
                                              'which are used for the postprocessing evaluation (see field ''zaxis'' above). This affects the accuracy of the continuation curve except for equilibrium solutions.\n' ...
                                              'For quasi-periodic solutions, a [1x2] array can be specified to define individual resolutions for each axis. However, this is currently only available when using the finite difference method.'];

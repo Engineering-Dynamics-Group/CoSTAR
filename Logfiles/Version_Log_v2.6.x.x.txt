@@ -265,6 +265,46 @@ Version compatibility fix: cell of empty array returned error in version R2021 o
 --------------------------------------------
 ------------------ v2.6.4 ------------------
 --------------------------------------------
+  
+The postprocessing methods contplot, solget and solplot now return a struct instead of multiple output arguments.
+Changes affect:
+
+    @Continuation:
+        - plot_contplot:
+            --> Output arguments of contplot adapted (lines 23, 32, 44, 53, 56, 61, 64, 69 and 72)
+            --> Setting of obj.p_axes_values_old and of tmp adapted to fit output structure of contplot (lines 24, 33, 45, 54, 57, 62, 65, 70, 73 and 79)
+
+    @Solution:
+        - contplot:
+            --> Explanation text adapted (lines 5 - 56)
+            --> Output argument changed from "varargout" to struct "output" (lines 59, 316 and 317, former line 65 removed)
+            --> Output argument of solget as well as section "Get the data" adapted (lines 98 - 103)
+        - solget:
+            --> Explanation text adapted (lines 4 - 85)
+            --> Output arguments changed to struct "output" (lines 88, 116, 120, 124 and 181 - 183, former line 105 removed)
+            --> Output arguments of evalsol_...-methods adapted (lines 115, 119 and 123)
+            --> Initialisation of s_out added (lines 146, 151 and 156)
+        - solplot:
+            --> Explanation text adapted (lines 2 - 110)
+            --> Output argument changed from "varargout" to struct "output" (lines 113, 193 - 195, 229 - 232, 247 - 249, 339 - 341 and 375 - 377)
+            --> Output argument of solget methods adapted (lines 164 - 168, 202 - 205, 267 - 271 and 347 - 251)
+            --> case 'trajectory': Preallocation of idx_mu, x and z is now done before if...else condition,  (lines 207 - 209)
+            --> case 'trajectory': s_traj renamed to s (lines 203, 208 - 209, 215, 217 - 219 and 239 - 240)
+
+    test:
+        - test_EQ_pitchfork:
+            --> Output arguments of contplot and name of corresponding options struct adapted (lines 40 - 43)
+
+    test\01postprocessing:
+        - benchmark_postprocess_equilibrium:
+            --> Output arguments of contplot and name of corresponding options struct adapted (lines 5 - 15)
+        - benchmark_postprocess_periodic:
+            --> Output arguments of solget, contplot and solplot as well as names of corresponding options structs adapted (lines 8 - 74)
+        - benchmark_postprocess_quasiperiodic:
+            --> Output arguments of solget, contplot and solplot as well as names of corresponding options structs adapted (lines 8 - 80)
+
+          
+----------  
 
 Default resolution of 50 for quasi-periodic solutions and of 200 for periodic solutions now affects continuation as well as postprocessing.
 
@@ -274,6 +314,12 @@ Default resolution of 50 for quasi-periodic solutions and of 200 for periodic so
             --> Field 'resolution' in option structs removed (lines 22, 31, 43, 52, 55, 60, 63, 68, 71)
 
     @Solution:
+        - s_help_contplot:
+            --> Description of default value adapted (line 23)
+        - s_help_solget:
+            --> Description of default value adapted (line 42)
+        - s_help_solplot:
+            --> Description of default value adapted (line 51)
         - solget:
             --> Definition of default resolution added/modified (lines 102 - 106)
   
@@ -287,6 +333,19 @@ It is now prohibited for the user to use solget for equilibrium solutions (call 
             --> Field 'call_from_contplot' is added to solget_options to tell solget that it was called from contplot (line 77)
         - solget_gatekeeper:
             --> Lines 26 - 31 added
+
+    @SOL_EQ:
+        - evalsol_frequency:
+            --> Deleted since this method has no use anymore
+        - evalsol_time:
+            --> Deleted since this method has no use anymore
+        - SOL_EQ:
+            --> Postprocessing methods evalsol_time and evalsol_frequency removed from protected methods as they have been deleted (former lines 78 and 80)
+        
+
+    test\01postprocessing:
+        - benchmark_postprocess_equilibrium:
+            --> Variables n and index as well as section for solget removed (former lines 3 - 17)
 
 
 ----------  
@@ -331,7 +390,7 @@ Test:
 @costarhelp:
 
     - solget: 
-        --> Ssolution space "solution" in description removed (lines 14 and 15)
+        --> Solution space "solution" in description removed (lines 14 and 15)
 
 
 @Solution:
