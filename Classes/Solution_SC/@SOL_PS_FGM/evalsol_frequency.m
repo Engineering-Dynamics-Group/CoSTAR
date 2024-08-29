@@ -5,20 +5,22 @@
 % @DYN:     DynamicalSystem object
 % @options: options structure for postprocessing solutions
 %
-% @P:       Frequency solution array: This must(!) be a [options.resolution x state_space_dimension x n_evals] dimensional array !!!
+% @P:       Frequency solution array: This must(!) be a [options.resolution/2 x state_space_dimension x n_evals] dimensional array !!!
+% @a:       Phase angle array: This must(!) be a [options.resolution/2 x state_space_dimension x n_evals] dimensional array !!!
 % @mu:      Vector of the evaluated continuation parameters: This must(!) be a [1 x n_evals] dimensional array !!!
-% @f:       Array of the frequency points: This must(!) be a [options.resolution x 1 x n_evals]  dimensional array !!!
+% @f:       Array of the frequency points: This must(!) be a [options.resolution/2 x 1 x n_evals]  dimensional array !!!
 % n_evals:  Number of curve points to be evaluated 
 
-function [P,mu,f] = evalsol_frequency(obj,DYN,options)
+function [P,a,mu,f] = evalsol_frequency(obj,DYN,options)
 
     index   =   options.index;
     N       =   numel(index);                       %Number of solutions asked for
     counter = 0;
-    dim = DYN.dim;                          %dimension of the state space
+    dim     = DYN.dim;                          %dimension of the state space
 
     %Initialise:
     P = zeros(options.resolution,dim,N);
+    a = zeros(options.resolution,dim,N);
     f = zeros(options.resolution,1,N);
 
     %Task: define a frequency vector with the demanded resolution, which

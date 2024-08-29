@@ -88,12 +88,12 @@
 %                           output.time: time values
 %                           output.mu:   mu values
 %                        - options.space = 'trajectory' (2D)
-%                           output.x:  xaxis values
 %                           output.z:  zaxis values
+%                           output.x:  xaxis values
 %                           output.mu: mu values
 %                        - options.space = 'trajectory' (3D)
-%                           output.x:  xaxis values
 %                           output.z:  zaxis values
+%                           output.x:  xaxis values                           
 %                           output.y:  yaxis values
 %                           output.mu: mu values
 %                        - options.space = 'hypertime'
@@ -102,6 +102,7 @@
 %                           output.mu:        mu values
 %                        - options.space = 'frequency'
 %                           output.amplitude: absolute amplitude values
+%                           output.angle:     phase angle values
 %                           output.frequency: angular frequency values
 %                           output.mu:        mu values
 %
@@ -226,8 +227,8 @@ function output = solplot(obj,DYN,options)
                 zlabel('State $z_i$','Interpreter','latex');
 
                 % Output
-                output.x  = x;
                 output.z  = z;
+                output.x  = x;
                 output.y  = y;
                 output.mu = mu;
 
@@ -244,8 +245,8 @@ function output = solplot(obj,DYN,options)
                 end
 
                 % Output
-                output.x  = x;
                 output.z  = z;
+                output.x  = x;                
                 output.mu = mu;
 
             end
@@ -346,6 +347,7 @@ function output = solplot(obj,DYN,options)
             solget_options.eval = options.zaxis;                            % Tell solget what to evaluate
             solget_output = obj.solget(DYN,solget_options);                 % Get the solution(s)
             z              = solget_output.solution_eval;                   % Extract the fields from solget_output which are needed
+            alpha          = solget_output.angle;
             f              = solget_output.frequency;
             mu             = solget_output.mu;
             solget_options = solget_output.options;
@@ -373,6 +375,7 @@ function output = solplot(obj,DYN,options)
 
             % Output -> TODO: Implement for 3D
             output.amplitude = z;
+            output.angle     = alpha;
             output.frequency = f;
             output.mu        = mu;
 

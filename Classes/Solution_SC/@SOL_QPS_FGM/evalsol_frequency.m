@@ -5,21 +5,23 @@
 % @DYN:     DynamicalSystem object
 % @options: options structure for postprocessing solutions
 %
-% @P:       Amplitude array: This must(!) be a [options.resolution x state_space_dimension x n_evals] dimensional array !!!
+% @P:       Amplitude array: This must(!) be a [options.resolution/2 x state_space_dimension x n_evals] dimensional array !!!
+% @a:       Phase angle array: This must(!) be a [options.resolution/2 x state_space_dimension x n_evals] dimensional array !!!
 % @mu:      Vector of the evaluated continuation parameters: This must(!) be a [1 x n_evals] dimensional array !!!
-% @f:       Array of the frequency points: This must(!) be a [options.resolution x 1 x n_evals]  dimensional array !!!
+% @f:       Array of the frequency points: This must(!) be a [options.resolution/2 x 1 x n_evals]  dimensional array !!!
 % n_evals:  Number of curve points to be evaluated 
 
 function [P,mu,f] = evalsol_frequency(obj,DYN,options)
 
     index   =   options.index;
     N       =   numel(index);                       %Number of solutions asked for  
-    dim = DYN.dim;                          %dimension of the state space
+    dim     = DYN.dim;                          %dimension of the state space
     counter = 0;
 
     %%% THESE LINES MUST BE CHANGED IF HMATRIX IS ADAPTED IN FUTURE RELEASE
     %Initialise:
     P = zeros(options.resolution,dim,N);
+    a = zeros(options.resolution,dim,N);
     f = zeros(options.resolution,1,N);
     
 

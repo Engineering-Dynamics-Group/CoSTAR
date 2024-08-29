@@ -120,8 +120,9 @@ function output = solget(obj,DYN,options)
             output.hypertime = hypertime;
 
         case 'frequency'
-            [s,mu,frequency] = obj.evalsol_frequency(DYN,options);
+            [s,alpha,mu,frequency] = obj.evalsol_frequency(DYN,options);
             output.frequency = frequency;
+            output.angle = alpha;
 
     end
 
@@ -166,7 +167,7 @@ function output = solget(obj,DYN,options)
             case 'euclidean'
 
                s_out = vecnorm(s,2,s_array_dim-idx_assist);  % s_array_dim-idx_assist is important since it assures that the norm is calculated within the correct dimension of s
-        
+
             case 'all'    
 
                s_out = s;

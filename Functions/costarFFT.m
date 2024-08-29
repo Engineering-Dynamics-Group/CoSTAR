@@ -1,7 +1,8 @@
 % This function interpolates time integration data from an ODE Solver and makes a FFT
 %
-% @T: Timesteps from ODE solver
-% @Z: Integration data from ODE solver
+% Input arguments:
+% @T:        Timesteps from ODE solver
+% @Z:        Integration data from ODE solver
 % @varargin: optional strings indicating window function (used to minimize leckage) and format of return
 %             - Can be empty. Default window is 'rectangular' and default output format is 'polar'
 %             - Available strings for output:
@@ -15,19 +16,24 @@
 %                * kaiser-bessel: Tries a compromise between accuary and compression. Similar to the blackmann window: for the same main ...
 %                                 lobe width, higher first side lobes but smaller remaining lobes. Often reveals signals covered by noise.
 %
-% Example: costarFFT(T,Z,'window',name,'output',name);
-%          costarFFT(T,Z,'window','hann','output','cartesian');
+% Output arguments:
+% @f:  Frequency values
+% @S1: Absolute amplitude values ('output' = 'polar') OR cosine amplitude values ('output' = 'cartesian')
+% @S2: Phase angle values ('output' = 'polar') OR sine amplitude values ('output' = 'cartesian')
+%
+% Example: [f,S1,S2] = costarFFT(T,Z,'window',name,'output',name);
+%          [f,S1,S2] = costarFFT(T,Z,'window','hann','output','cartesian');
 %
 %
 % Further explanations:
 %
-% Factor of 2 in S(2:end) = 2*S(2:end); (line 168):     CHECK LINES LATER ON
+% Factor of 2 in S(2:end) = 2*S(2:end); (line 190):
 % The integral  F(y) = \int_(-\infty)^\infty f(x)exp(-2 \pi i x y)dx  can be
 % rewritten as  F(y) = 2 \int_(0)^\infty f(x)exp(-2 \pi i x y)dx ,    which is the fourier signal we want, since we are only interested ...
 % in the single sided spectrum. S(1) does not need to be multiplied by 2 because it is the amplitude of the constant part of the signal ...
 % (frequency = 0), which does not have a complex conjugate pair.
 %
-% The "-" at -imag(S) (lines 172 and 176):       CHECK LINES LATER ON
+% The "-" at -imag(S) (lines 194 and 198):
 % The Fourier Transform is defined as
 % F(y) = \int_(-\infty)^\infty f(x)exp(-2 \pi i x y)dx = \int_(-\infty)^\infty f(x)[cos(2\pi x y)-i sin(2 \pi x y)]dx .
 % The "-" in the exponent of the exponential function makes it necessary to multiply the result with a minus to get the correct sine amplitude.
@@ -38,7 +44,7 @@
 % V2: 02-2022: Bug-Fix: Z can now be a matrix and is correctly fast-fourier transformed.
 
 
-function [f,varargout] = costarFFT(T,Z,varargin)
+function [f,S1,S2] = costarFFT(T,Z,varargin)
 
 error_msg = ['Options must either be empty (default, output format polar, window rectangular) or contain the information of "window" (return '...
              'output polar) or and the information of "output" (default window: rectangular). Syntax is costarFFT(T,Z,"window",name,"output",name)'];
@@ -119,9 +125,9 @@ Z = permute(Z,idx);                         % Make sure that Z is a column vecto
 % end
 
 if rem(length(T),2) == 1
-    Ti = linspace(0,max(T)-min(T),length(T)-1)';    % Make sure Zi has even number of elements by interpolating on even number of query points
+    Ti = linspace(0,max(T)-min(T),length(T)-1).';   % Make sure Zi has even number of elements by interpolating on even number of query points
 else
-    Ti = linspace(0,max(T)-min(T),length(T))';      % T already has even number of elements
+    Ti = linspace(0,max(T)-min(T),length(T)).';     % T already has even number of elements
 end
 t_step = (max(Ti)-min(Ti))/(length(Ti)-1);          % Time step of input signal for FFT
 
@@ -178,18 +184,18 @@ end
     Y = fft(Zi);
     L = length(Y);
     Y = Y/L;                        
-    f = Fs/L*(0:(L/2-1));           % f starts at 0 and goes up to Fs/2 - Fs/L (Fs/2: Nyquist frequency)
+    f = Fs/L*(0:(L/2-1)).';         % f starts at 0 and goes up to Fs/2 - Fs/L (Fs/2: Nyquist frequency)
    
     S = Y(1:L/2,:);                 % Y(1:L/2+1,:) is the amplitude at the Nyquist frequency
     S(2:end,:) = 2*S(2:end,:);      % Formerly, it was "2:end-1", but end-1 is only correct when f(end) is the Nyquist frequency (not included here)
     
     if strcmpi(output,'polar')
-        varargout{1} = abs(S);
-        varargout{2} = atan2(-imag(S),real(S));
+        S1 = abs(S);
+        S2 = atan2(-imag(S),real(S));
 
     elseif  strcmpi(output,'cartesian')
-        varargout{1} =  real(S);
-        varargout{2} = -imag(S);
+        S1 =  real(S);
+        S2 = -imag(S);
 
     else 
         error('Identifier for output format of the return argument is not known. Possible formats are ''polar'' or ''cartesian''.');
