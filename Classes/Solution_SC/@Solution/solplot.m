@@ -346,7 +346,7 @@ function output = solplot(obj,DYN,options)
 
             solget_options.eval = options.zaxis;                            % Tell solget what to evaluate
             solget_output = obj.solget(DYN,solget_options);                 % Get the solution(s)
-            z              = solget_output.solution_eval;                   % Extract the fields from solget_output which are needed
+            z              = solget_output.amplitude;                       % Extract the fields from solget_output which are needed
             alpha          = solget_output.angle;
             f              = solget_output.frequency;
             mu             = solget_output.mu;

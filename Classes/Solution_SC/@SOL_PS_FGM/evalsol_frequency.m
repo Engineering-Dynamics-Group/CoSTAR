@@ -13,8 +13,8 @@
 
 function [P,a,mu,f] = evalsol_frequency(obj,DYN,options)
 
-    index   =   options.index;
-    N       =   numel(index);       % Number of solutions asked for
+    index   = options.index;
+    N       = numel(index);         % Number of solutions asked for
     dim     = DYN.dim;              % Dimension of the state space
     res     = options.resolution;   % Resolution 
     counter = 0;
@@ -55,7 +55,7 @@ function [P,a,mu,f] = evalsol_frequency(obj,DYN,options)
             % Finally, we add n_overshoot points for frequency values > (max(hmatrix)+1) using the spacing of f_val to ensure that ...
             % the  frequency domain has exactly res/2 elements.
             n_overshoot = mod(res/2-1,max(hmatrix)+1);
-            f_val = round(linspace(0,freq*(max(hmatrix)+1),res/2-n_overshoot),15);  % We need round() due to numerical inaccuracies of linspace
+            f_val = linspace(0,freq*(max(hmatrix)+1),res/2-n_overshoot);            % Create (most of) the frequency values
             spacing = f_val(end)-f_val(end-1);                                      % Spacing of f_val
             f(:,1,counter) = [f_val, max(f_val) + (1:n_overshoot)*spacing];         % Add n_overshoot frequency values to ensure that size(f,1) = res/2
             % OLD CODE: 
@@ -80,8 +80,8 @@ function [P,a,mu,f] = evalsol_frequency(obj,DYN,options)
             end
             % [~,idx] = intersect(f(:,1,counter),freq.*hmatrix);        % OLD CODE: Find the indices of the contained frequencies (can't be used anymore due to floating point errors of linspace)
             %}
-            P(idx,:,counter) = A.';                                     % Write the value
-            a(idx,:,counter) = alpha.';                                 % Write the value
+            P(idx,:,counter) = A.';                                     % Write the values
+            a(idx,:,counter) = alpha.';                                 % Write the values
 
         else
 

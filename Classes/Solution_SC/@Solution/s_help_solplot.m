@@ -48,11 +48,11 @@ function help_struct = s_help_solplot()
     help_struct.optional.interval.value = '[1x2] array (non-negativ\n double)\n e.g.: [0,10]\n Default:\n - Periodic: [0,T]\n - Quasi-Periodic: [0,2*pi]';
     help_struct.optional.interval.text  = 'Defines the starting time and end time of the evaluation time interval in which the solution is evaluated (and displayed).\n Not allowed for ''hypertime'' solution space.\n T: Periodic time';
 
-    help_struct.optional.resolution.value = 'scalar or [1x2] array \n (positive integers) \n e.g.: 100 or [40,50] \n Default: \n - 200 for periodic solutions\n - 50 or [50,50] for quasi-\n periodic solutions';
+    help_struct.optional.resolution.value = 'scalar or [1x2] array \n (positive integers) \n e.g.: 100 or [40,50] \n Default: 200, except \n 50 or [50,50] for quasi-\n periodic ''hypertime'' \n solution space';
     help_struct.optional.resolution.text  = ['Defines the resolution, i.e. the number of points along each of the time or hypertime axes within the evaluation interval. ' ...
                                              'This determines the discretization of the plot and affects the accuracy of the plot in frequency solution space, where the resolution must be an even number.\n' ...
-                                             'NOTE: [1x2] array only allowed for hypertime plots of quasi-periodic solutions '...
-                                             'approximated by finite-differences (to define individual resolutions for each of the two hypertime axes)! Scalars are accepted as well.'];
+                                             'NOTE: [1x2] array is only allowed for hypertime plots of quasi-periodic solutions which were '...
+                                             'approximated using the Finite Difference Method. This can be used to define individual resolutions for each of the two hypertime axes. Scalars are accepted as well.'];
 
     help_struct.optional.figure.value = 'figure handle \n e.g.: gcf \n Default: (no value)';
     help_struct.optional.figure.text  = 'Specifies the figure in which to plot the solution. Can be used to plot multiple solution curves into the same figure.\n When this field is not defined, a new figure is opened.';

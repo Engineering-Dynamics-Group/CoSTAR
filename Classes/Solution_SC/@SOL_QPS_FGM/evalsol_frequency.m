@@ -13,8 +13,8 @@
 
 function [P,a,mu,f] = evalsol_frequency(obj,DYN,options)
 
-    index   =   options.index;
-    N       =   numel(index);       % Number of solutions asked for
+    index   = options.index;
+    N       = numel(index);         % Number of solutions asked for
     dim     = DYN.dim;              % Dimension of the state space
     res     = options.resolution;   % Resolution 
     counter = 0;
@@ -42,14 +42,14 @@ function [P,a,mu,f] = evalsol_frequency(obj,DYN,options)
         freq        = obj.freq(:,k);
         hmatrix     = obj.hmatrix{1,k};             % Harmonics
 
-        [frq_sort,idx_sort] = sort(abs(freq.'*hmatrix));    % Some frequency combination might be negative. frq_sort thus must be sorted in ascending order
-        A = abs(FC(:,idx_sort));                            % Order the fourier-coefficients accordingly to the frequencies and compute the absolute amplitudes
-        alpha = atan2(-imag(FC),real(FC));                  % Order the fourier-coefficients accordingly to the frequencies and compute the phase angles
+        [frq_sort,idx_sort] = sort(abs(freq.'*hmatrix));            % Some frequency combination might be negative. frq_sort thus must be sorted in ascending order
+        A = abs(FC(:,idx_sort));                                    % Order the fourier-coefficients accordingly to the frequencies and compute the absolute amplitudes
+        alpha = atan2(-imag(FC(:,idx_sort)),real(FC(:,idx_sort)));  % Order the fourier-coefficients accordingly to the frequencies and compute the phase angles
 
         if res > n_hh
 
             f_val = sort([frq_sort(2:end),linspace(0,1.1*max(frq_sort),res/2-numel(frq_sort(2:end)))]);   % Add as many zeros as are needed for the the vector to have the length resolution  
-            f_val_u = unique(f_val);                        % Remove the doubled frequencies (in most cases, there should be none since it is very unlikely that linspace hits a value of frq_sort(2:end-1))
+            f_val_u = unique(f_val);                % Remove the doubled frequencies (in most cases, there should be not more than one since it is very unlikely that linspace hits a value of frq_sort(2:end-1))
             % Most of the values of f_val_u are equidistantly distributed within [0,max(frq_sort)]. However, the frequencies ...
             % frq_sort are placed somewhere in between, which can lead to ugly plots. That is why the frequency values between ...
             % the frq_values (overall numel(frq_values)-1 sections) are distributed equidistantly within each section again.
@@ -65,8 +65,8 @@ function [P,a,mu,f] = evalsol_frequency(obj,DYN,options)
             % Now add the amplitude and angle values at the appropiate positions. 
             % We can use idx(1:end-1) for that (f(idx(end)) = 1.1*max(frq_sort))
             % [~,idx] = intersect(f(:,1,counter),frq_sort); % OLD CODE: Find the indices of the contained frequencies    
-            P(idx(1:end-1),:,counter) = A.';                % Write the value
-            a(idx(1:end-1),:,counter) = alpha.';            % Write the value
+            P(idx(1:end-1),:,counter) = A.';                % Write the values
+            a(idx(1:end-1),:,counter) = alpha.';            % Write the values
             
         else
 

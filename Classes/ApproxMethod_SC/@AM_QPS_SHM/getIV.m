@@ -139,7 +139,7 @@ else
         [f,S,psi] = costarFFT(T,Z(:,1));                                                        % Do a fourier-transformation
         ind_u = find(2.*pi.*f>0.95.*Omega(1,2),1);                                              % Find the frequency which is 5% lower than the estimated value for the autonomous frequency
         ind_o = find(2.*pi.*f>1.05.*Omega(1,2),1);                                              % Find the frequency which is 5% larger than the estimated value for the autonomous frequency
-        f_reduced = f(1,ind_u:ind_o);                                                           % Make a window in the frequency domain
+        f_reduced = f(ind_u:ind_o,1);                                                           % Make a window in the frequency domain
         S_reduced = S(ind_u:ind_o,1);
         [A,B] = sort(S_reduced,1,'descend');                                                    % Sort the frequencies in desceding order of amplitude
         freq = 2.*pi.*f_reduced(B(1,1));                                                        % Find the frequency to the largest amplitude
@@ -150,7 +150,7 @@ else
         % Find first autonomous frequency
         ind_u1 = find(2.*pi.*f>0.95.*Omega(1,1),1);                                             % Find the frequency which is 5% lower than the estimated value for the autonomous frequency
         ind_o1 = find(2.*pi.*f>1.05.*Omega(1,1),1);                                             % Find the frequency which is 5% larger than the estimated value for the autonomous frequency
-        f_reduced1 = f(1,ind_u1:ind_o1);                                                        % Make a window in the frequency domain
+        f_reduced1 = f(ind_u1:ind_o1,1);                                                        % Make a window in the frequency domain
         S_reduced1 = S(ind_u1:ind_o1,1);
         [~,B1] = sort(S_reduced1,1,'descend');                                                  % Sort the frequencies in desceding order of amplitude
         freq1 = 2.*pi.*f_reduced1(B1(1,1));                                                     % Find the frequency to the largest amplitude
@@ -159,7 +159,7 @@ else
         % Find second autonomous frequency
         ind_u2 = find(2.*pi.*f>0.95.*Omega(1,2),1);                                             % Find the frequency which is 5% lower than the estimated value for the autonomous frequency
         ind_o2 = find(2.*pi.*f>1.05.*Omega(1,2),1);                                             % Find the frequency which is 5% larger than the estimated value for the autonomous frequency
-        f_reduced2 = f(1,ind_u2:ind_o2);                                                        % Make a window in the frequency domain
+        f_reduced2 = f(ind_u2:ind_o2,1);                                                        % Make a window in the frequency domain
         S_reduced2 = S(ind_u2:ind_o2,1);
         [~,B2] = sort(S_reduced2,1,'descend');                                                  % Sort the frequencies in desceding order of amplitude
         freq2 = 2.*pi.*f_reduced2(B2(1,1));                                                     % Find the frequency to the largest amplitude

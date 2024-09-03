@@ -99,10 +99,10 @@ function output = solget(obj,DYN,options)
 
     % Set resolution default, if not defined
     if ~isfield(options,'resolution')
-        if strcmpi(DYN.sol_type,'periodic')
-            options.resolution = 200;
-        elseif strcmpi(DYN.sol_type,'quasiperiodic')
+        if strcmpi(DYN.sol_type,'quasiperiodic') && strcmpi(options.space,'hypertime')
             options.resolution = 50;
+        elseif ~strcmpi(DYN.sol_type,'equilibrium')
+            options.resolution = 200;
         end
     end
 
@@ -112,17 +112,13 @@ function output = solget(obj,DYN,options)
     switch options.space
 
         case 'time'
-            [s,mu,time] = obj.evalsol_time(DYN,options);
-            output.time = time;
+            [s,mu,t] = obj.evalsol_time(DYN,options);
 
         case 'hypertime'
-            [s,mu,hypertime] = obj.evalsol_hypertime(DYN,options);
-            output.hypertime = hypertime;
+            [s,mu,theta] = obj.evalsol_hypertime(DYN,options);
 
         case 'frequency'
-            [s,alpha,mu,frequency] = obj.evalsol_frequency(DYN,options);
-            output.frequency = frequency;
-            output.angle = alpha;
+            [s,alpha,mu,f] = obj.evalsol_frequency(DYN,options);
 
     end
 
@@ -179,7 +175,18 @@ function output = solget(obj,DYN,options)
     
     %% Output
 
-    output.solution_eval = s_out;
+    switch options.space                    % The domain values could also be assigned within the switch...case in lines 112 - 123, ...
+        case 'time'                         % bit it is done here so that the output struct fields of all postprocessing methods ...
+            output.solution_eval = s_out;   % (contplot, solplot and solget) exhibit a common ordering
+            output.time = t;                
+        case 'hypertime'
+            output.solution_eval = s_out;
+            output.hypertime = theta;
+        case 'frequency'
+            output.amplitude = s_out;
+            output.angle = alpha;
+            output.frequency = f;
+    end
     output.mu = mu;
     output.options = options;
 

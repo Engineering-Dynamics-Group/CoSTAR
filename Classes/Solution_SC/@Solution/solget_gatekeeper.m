@@ -21,6 +21,8 @@ function options = solget_gatekeeper(obj,DYN,options)
     % Check if option struct was generated using the costaropts function
     if ~isfield(options,'costaropts')
         GC.error_msg{1,end+1} = append('The contplot options structure was not created using the costaropts function, which is mandatory.');
+    else
+        options = rmfield(options,'costaropts');                % Remove the field costaropts (not needed anymore and not desired in output options struct)
     end
 
     % Check that solget is not called for an equilibrium solution by the user (ATTENTION: solget can be called from contplot even for EQ, which is why options.call_from_contplot is needed)

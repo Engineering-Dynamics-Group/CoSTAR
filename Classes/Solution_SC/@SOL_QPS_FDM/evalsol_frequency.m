@@ -24,7 +24,7 @@ function [s,a,mu,omega] = evalsol_frequency(obj,DYN,options)
     n_evals = length(options.index);                                    % Number of evaluations
     
 
-    % Preallocating f and s
+    % Preallocating f, s and a
     omega = zeros(floor(options.resolution/2), 1, n_evals);             % floor(options.resolution/2) due to output of costarFFT
     s = zeros(floor(options.resolution/2), dim, n_evals);               % floor(options.resolution/2) due to output of costarFFT
     a = zeros(floor(options.resolution/2), dim, n_evals);               % floor(options.resolution/2) due to output of costarFFT

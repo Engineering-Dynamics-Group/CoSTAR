@@ -452,8 +452,7 @@ Test:
 @AM_QPS_SHM:
 
     - getIV:
-        --> Access to variable f adapted since f is a column vector now after modifications of costarFFT (lines 142, 153 and 162)
-
+        --> Access to variable f adapted to fit f being a column vect (lines
 
 @Solution:
 

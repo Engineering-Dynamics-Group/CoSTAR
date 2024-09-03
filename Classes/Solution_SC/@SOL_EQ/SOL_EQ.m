@@ -75,7 +75,9 @@ classdef SOL_EQ < Solution
     methods(Access = protected) %Can only be called by within class and superclass objects
 
         %Postprocessing
-        [s,mu,time]                             = evalsol_hypertime(obj,DYN,options);           %Function gives back the solution in hypertime domain
+        [s,mu,time]                             = evalsol_time(obj,DYN,options);                %Function gives back the solution in time domain
+        [s,mu,hypertime]                        = evalsol_hypertime(obj,DYN,options);           %Function gives back the solution in hypertime domain
+        [s,mu,frequency]                        = evalsol_frequency(obj,DYN,options);           %Function gives back the solution in frequency domain
 
     end
 

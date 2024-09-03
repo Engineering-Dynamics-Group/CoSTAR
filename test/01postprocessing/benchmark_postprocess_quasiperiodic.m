@@ -8,7 +8,7 @@ index = [round(n/4,0),round(n/2,0),round(3*n/4,0)];                             
 solget_options = costaropts('eval',@(z)z(:,1),'space','time','resolution',1e3,'index',1);
 solget_output  = S.solget(DYN,solget_options);
 
-solget_options = costaropts('eval',@(z)z(:,:,1),'space','hypertime','index',index);
+solget_options = costaropts('eval',@(z)max(z,[],[1 2]),'space','hypertime','index',index);
 solget_output  = S.solget(DYN,solget_options);
 
 
