@@ -74,7 +74,7 @@
 
         methods(Access = protected, Sealed) %Only accessed by methods of the class Solution
     
-            check_fcn_handle(obj,GC,fcn_handle,name_handle,d_in,d_out)                                  %Small function checking, if the function_handle is correct
+            check_fcn_handle(obj,DYN,GC,fcn_handle_options,name_handle,d_in,d_out)                      %Small function checking, if the function_handle is correct
     
             options = solget_gatekeeper(obj,DYN,options);                                               %Checks the options structure entries for solget
             options = solplot_gatekeeper(obj,DYN,options);                                              %Checks the options structure entries for solplot

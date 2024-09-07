@@ -267,7 +267,6 @@ Version compatibility fix: cell of empty array returned error in version R2021 o
 --------------------------------------------
   
 The postprocessing methods contplot, solget and solplot now return a struct instead of multiple output arguments.
-Changes affect:
 
     @Continuation:
         - plot_contplot:
@@ -307,7 +306,6 @@ Changes affect:
 ---------- 
 
 When the frequency content of a solution is requested via solplot or solget, the phase angles are returned as well now.
-Changes affect:
 
     @SOL_PS_FDM:
         - evalsol_frequency:
@@ -403,6 +401,37 @@ It is now prohibited for the user to use solget for equilibrium solutions (call 
 
 
 ----------  
+ 
+Overhaul of check_fcn_handle method: Bugs fixed, function handle check improved and check added for solget calls.
+Its is now possible for solplot calls to request multiple state variables, similar to solget.
+
+    @Solution:
+        - check_fcn_handle:
+            --> Complete overhaul with many adaptions
+            --> Resolution and dimension of system is now used for function check
+            --> Individual check for calls from solget_gatekeeper added
+            --> Check for calls from solplot_gatekeeper and contplot_gatekeeper improved, case 'matrix_or_vector' added for d_out
+        - contplot_gatekeeper:
+            --> Check of options.zaxis moved from former lines 47 - 55 to lines 102 - 110
+            --> Comments adapted (lines 48 - 50)
+            --> Check for field 'resolution' added (lines 75 - 90)
+        - s_help_solget:
+            --> Description of function handle of field 'eval' adapted (line 23)
+        - s_help_solplot:
+            --> Description of function handle of field 'zaxis' adapted (line 26 - 27)
+        - solget_gatekeeper:
+            --> Data check for options.eval removed from former lines 54 - 57
+            --> Comments and error messages improved (lines 52, 58, 72, 82, 117, 126, 143, 160 and 167)
+            --> Check for options.eval added for each solution space (lines 128 - 134, 145 - 151 and 169 - 175)
+        - solplot_gatekeeper:
+            --> Method description,m comments and error messages improved (lines 1 - 8, 52, 57 - 59, 63, 111, 119, 133, 139, 148, 161, 170 and 185)
+            --> Checks for field 'resolution' added (lines 84 - 99 and 172 - 177)
+            --> Calls of check_fcn_handle adapted (input arguments modified) (lines 117, 136 - 138, 154 and 183)
+        - Solution:
+            --> Definition (input arguments) of method check_fcn_handle adapted (line 77)
+
+
+----------  
     
 Functions:
 
@@ -434,11 +463,11 @@ Test:
 
     - benchmark_postprocess_periodic: 
         --> Various adjustments of the option structures
-        --> Field 'eval' of second solget call adapted (line 11)
+        --> solget section adapted and test calls added (line 7 - 27)
 
     - benchmark_postprocess_quasiperiodic: 
         --> Various adjustments of the option structures
-        --> Field 'eval' of second solget call adapted (line 11)
+        --> solget section adapted and test calls added (line 7 - 27)
 
 
 ----------
@@ -449,6 +478,11 @@ Test:
         --> Solution space "solution" in description removed (lines 14 and 15)
 
 
+@Gatekeeper:
+
+    - m_gatekeeper:
+        --> Fieldvalues of options.system are not changed to lower case anymore so that field system.info is not changed (line 60 commented)
+
 @AM_QPS_SHM:
 
     - getIV:
@@ -456,6 +490,12 @@ Test:
 
 
 @Solution:
+
+     - contplot:
+        --> The solution type is now mentioned in the title. When info is provided by the user, the info is set as title 
+            (lines 116, 133, 147 and 161 removed, lines 308 - 313 added)
+        --> ylabel improved. It is now dependent on the field 'zaxis' and the solution type 
+            (former lines 117, 134, 148 and 162 removed, lines 115 - 116, 126, 129, 132, 140, 143, 146, 154, 157 and 160 added)
 
     - contplot_gatekeeper 
         --> Gatekeeper texts for field 'color' adapted (lines 70 and 73)
@@ -475,6 +515,7 @@ Test:
         --> Field 'resolution' must be even number now when frequency solution space is selected (lines 136 - 141)
 
     - solplot: 
+        --> The solution type is now mentioned in the title of a plot (lines 153, 184, 256, 290 and 368)
         --> Solutions in trajectory solution space are now returned for all indices 
             (lines 227 - 229 and 254 - 255 added, lines 231 - 233, 236, 257 - 258 and 261 adapted)
         --> ylabel of frequency plots "\mathcal{F} (z_i)" replaced by "\mathcal{F}_i (\omega)" (line 381)

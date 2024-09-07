@@ -44,18 +44,10 @@ function options = contplot_gatekeeper(obj,DYN,options)
     GC.speak('Error while using postprocessing method "contplot":');
 
 
-    %% Check the mandatory values
-    GC.check_data(options.zaxis,'options.zaxis',{'function_handle','char'}, [] ,[]);
-    if ~isa(options.zaxis,'function_handle') %zaxis is a string
-        GC.check_data(options.zaxis,'options.zaxis','char',[],allowed_axis_values);
-    else %zaxis is a function handle
-        obj.check_fcn_handle(GC,options.zaxis,'options.zaxis','solution_argument','scalar');
-    end
-
-    GC.speak('Error while using postprocessing method "contplot":');
-
            
-    %% Check the optional field values  ->  'resolution' and 'index' are checked in solget_gatekeeper, but there is an additional check for 'index'
+    %% Check the optional field values  
+    % -> 'resolution' is checked here and in solget_gatekeeper. However, we need the check here for check_fcn_handle and the check needs to be BEFORE check_fcn_handle is called
+    % ->  'index' is checked in solget_gatekeeper, but there is an additional check for 'index' here
     if isfield(options,'figure')
         GC.check_data(options.figure,'options.figure','matlab.ui.Figure',[],[]); 
         GC.speak('Error while using postprocessing method "contplot":');
@@ -80,6 +72,23 @@ function options = contplot_gatekeeper(obj,DYN,options)
         GC.speak('Error while using postprocessing method "contplot":');
     end
 
+    if isfield(options,'resolution')    % 'resolution' has to be checked here because it is needed for check_fcn_handle
+        % Check data type and dimension. Scalar AND [1x2] array only possible for quasi-periodic hypertime plots using FDM currently
+        if strcmpi(DYN.sol_type,'quasiperiodic') && strcmpi(DYN.approx_method,'finite-difference')
+            GC.check_data(options.resolution,'options.resolution','double',{'scalar','vector'},[]);
+            if ~isscalar(options.resolution) && ~isequal(size(options.resolution),[1 2])            % If options.resolution is not a scalar: Check that is a [1x2] array
+                GC.error_msg{1,end+1} = append('The data size of options.resolution is [', num2str(size(options.resolution)), ']. However, only scalars and [1x2] arrays are allowed.');
+            end
+        else
+            GC.check_data(options.resolution,'options.resolution','double','scalar',[]); 
+        end 
+        % Check if value(s) are positive integer(s)
+        if (any(mod(options.resolution,1)) || ~isempty(find(options.resolution<=0,1)))
+            GC.error_msg{1,end+1} = append('The data value of options.resolution is [', num2str(options.resolution), ']. However, only positive integer value(s) are allowed.');
+        end
+        GC.speak('Error while using postprocessing method "contplot":');
+    end 
+
     if isfield(options,'index')     % Additional check for 'index': Cannot be checked in solget_gatekeeper since this check is only required for contplot to work correctly 
         if ~ischar(options.index)
             if ~isempty(find(diff(options.index) ~= 1,1))   % Check that all elements are adjacent integers in increasing numbering, i.e. options.index(k+1) - options.index(k) = 1 for all k = 1,...,numel(options.index)-1
@@ -88,6 +97,17 @@ function options = contplot_gatekeeper(obj,DYN,options)
         end
         GC.speak('Error while using postprocessing method "contplot":'); 
     end
+
+
+    %% Check the mandatory values
+    GC.check_data(options.zaxis,'options.zaxis',{'function_handle','char'}, [] ,[]);
+    if ~isa(options.zaxis,'function_handle') %zaxis is a string
+        GC.check_data(options.zaxis,'options.zaxis','char',[],allowed_axis_values);
+    else %zaxis is a function handle
+        obj.check_fcn_handle(DYN,GC,options,'options.zaxis','solution_argument','scalar');
+    end
+
+    GC.speak('Error while using postprocessing method "contplot":');
 
 
     clear GC;

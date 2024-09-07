@@ -112,9 +112,8 @@ if isa(options.zaxis,'function_handle')                 % In this case, contplot
     else
         s_out = permute(s,[3,4,1,2]);
     end
-
-    TtlStr = 'User Function Handle Applied to Hypertime Manifold';
-    ystr = 'f(z)';
+    fcn_handle_char = func2str(options.zaxis);                                  % Convert function handle to char
+    ystr = append('$f(\texttt{z}) = \texttt{',fcn_handle_char(5:end),'}$');     % 5:end to exclude the @(z)
 
 
 else
@@ -124,42 +123,44 @@ else
 
             if DYN.n_freq  == 0 
                 s_out = s;                                  % There is no minimum value for a point in state space
+                ystr = '$\min \Vert \mathbf z \Vert$';
             elseif DYN.n_freq ==1 
                 s_out = permute(min(s,[],1),[2,3,1]);       % Minimum on hypertime domain [0,2*pi]. Third array dim of s indicates solution point (index)
+                ystr = '$\min \Vert \mathbf z (\theta) \Vert$';
             else
                 s_out = min(reshape(s,size(s,1)*size(s,2),size(s,4)),[],1);     % Minimum on hypertime domain [0,2*pi]^2. Fourth array dim of s indicates solution point (index)
+                ystr = '$\min \Vert \mathbf z (\mathbf\theta) \Vert$';
             end
-
-            TtlStr = 'Minimum of Euclidean Norm of Hypertime Manifold';
-            ystr = 'min(norm(z,2))';
             
 
         case 'mean2'
 
             if DYN.n_freq  == 0 
                 s_out = s;                                  % There is no mean value for a point in state space
+                ystr = 'mean $\! \Vert \mathbf z \Vert$';
             elseif DYN.n_freq == 1
                 s_out = permute(mean(s,1),[2,3,1]);         % Mean on hypertime domain [0,2*pi]. Third array dim of s indicates solution point (index)
+                ystr = 'mean $\! \Vert \mathbf z (\theta) \Vert$';
             else
                 s_out = mean(reshape(s,size(s,1)*size(s,2),size(s,4)),1);    % Mean on hypertime domain [0,2*pi]^2. Fourth array dim of s indicates solution point (index)
+                ystr = 'mean $\! \Vert \mathbf z (\mathbf\theta) \Vert$';
             end
-
-            TtlStr = 'Mean Value of Euclidean Norm of Hypertime Manifold';
-            ystr = 'mean(norm(z,2))';
 
             
         case 'max2'
                 
             if DYN.n_freq  == 0
                 s_out = s;                                  % There is no maximum value for a point in state space
+                ystr = '$\max \Vert \mathbf z \Vert$';
             elseif DYN.n_freq == 1
                 s_out = permute(max(s,[],1),[2,3,1]);       % Maximum on hypertime domain [0,2*pi]. Third array dim of s indicates solution point (index)
+                ystr = '$\max \Vert \mathbf z (\theta) \Vert$';
             else
                 s_out = max(reshape(s,size(s,1)*size(s,2),size(s,4)),[],1);     % Maximum on hypertime domain [0,2*pi]^2. Fourth array dim of s indicates solution point (index)
+                ystr = '$\max \Vert \mathbf z (\mathbf\theta) \Vert$';
             end
 
-            TtlStr = 'Maximum of Euclidean Norm of Hypertime Manifold';
-            ystr = 'max(norm(z,2))';
+            
             
     end
     
@@ -304,6 +305,12 @@ end
 
 
 % Title, labels and x-limits
+if ~isempty(DYN.info)
+    TtlStr = DYN.info;
+else
+    sol_type = char(DYN.sol_type);      % DYN.sol_type is a string
+    TtlStr = append('Continuation of ', upper(sol_type(1)), sol_type(2:end),' Solutions');
+end
 title(TtlStr,'Interpreter','latex');
 xlabel('Continuation parameter $\mu$','Interpreter','latex');
 ylabel(ystr,'Interpreter','latex');

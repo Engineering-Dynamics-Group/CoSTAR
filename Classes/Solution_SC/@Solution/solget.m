@@ -93,11 +93,10 @@ function output = solget(obj,DYN,options)
         options = obj.solget_up_index(DYN,options);     % Updates options.index: options.mu (if present) is replaced by options.index in this function. 
     end
 
-    % The index is now unique, if mu leads to doubled values. options.index
-    % can be used without caution for doubled indices or indices not
-    % occurring in the SOLUTION subclass object
+    % The index is now unique, if mu leads to doubled values 
+    % options.index can be used without caution for doubled indices or indices not occurring in the SOLUTION subclass object
 
-    % Set resolution default, if not defined
+    % Set resolution default, if not defined 
     if ~isfield(options,'resolution')
         if strcmpi(DYN.sol_type,'quasiperiodic') && strcmpi(options.space,'hypertime')
             options.resolution = 50;

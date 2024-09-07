@@ -150,6 +150,7 @@ function output = solplot(obj,DYN,options)
 
     hold on;                                        % Allow multiple lines to be plotted and enable grid
     counter = 0;                                    % Counter needed for legend
+    sol_type = char(DYN.sol_type);                  % DYN.sol_type is a string -> char is needed to create title
     %Set all interpreters globally to Latex... what does groot mean?
     % set(groot,'TickLabelInterpreter','latex');
     % set(groot,'defaulttextinterpreter','latex');
@@ -180,7 +181,7 @@ function output = solplot(obj,DYN,options)
             end
 
             % Set title, labels, limits and legend
-            title('Time Domain','Interpreter','latex');
+            title(append('Time Domain of ', upper(sol_type(1)), sol_type(2:end),' Solution'),'Interpreter','latex');
             xlabel('Time $t$','Interpreter','latex');
             xlim([min(time,[],'all'),max(time,[],'all')]);
             ylabel('State $z_i (t)$','Interpreter','latex');
@@ -252,7 +253,7 @@ function output = solplot(obj,DYN,options)
             end
 
             % Set title, labels and legend
-            title('Trajectory','Interpreter','latex');
+            title(append('Trajectory of ', upper(sol_type(1)), sol_type(2:end),' Solution'),'Interpreter','latex');
             xlabel('State $z_j$','Interpreter','latex');
             ylabel('State $z_k$','Interpreter','latex');
             LegStr = cell(1,size(idx_mu,1));                            % Allocate cell memory
@@ -286,7 +287,7 @@ function output = solplot(obj,DYN,options)
                 end
 
                 % Set title, labels, ticks and legend
-                title('Hypertime Domain','Interpreter','latex');
+                title(append('Hypertime Domain of ', upper(sol_type(1)), sol_type(2:end),' Solution'),'Interpreter','latex');
                 xlabel('Hypertime $\theta$','Interpreter','latex')
                 xlim([0,2*pi]);
                 xticks([0,pi/2, pi,3/2*pi, 2.*pi])
@@ -364,7 +365,7 @@ function output = solplot(obj,DYN,options)
             end
 
             % Set title, labels and legend
-            title('Frequency Domain','Interpreter','latex');
+            title(append('Frequency Domain of ', upper(sol_type(1)), sol_type(2:end),' Solution'),'Interpreter','latex');
             xlabel('Angular Frequency $\omega$','Interpreter','latex');
             ylabel('Absolute Amplitude $|\mathcal{F}_i (\omega)|$','Interpreter','latex');
             LegStr = cell(1,size(idx_mu,1));                            % Allocate cell memory

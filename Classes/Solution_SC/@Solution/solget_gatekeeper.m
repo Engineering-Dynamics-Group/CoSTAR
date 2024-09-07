@@ -49,18 +49,13 @@ function options = solget_gatekeeper(obj,DYN,options)
     GC.speak('Error while using postprocessing method "solget":');
 
 
-    %% Check the mandatory values
-    
-    GC.check_data(options.eval,'options.eval',{'function_handle','char'}, [] ,[]);
-    if ~strcmpi(class(options.eval),'function_handle')
-        GC.check_data(options.eval,'options.eval','char',[],allowed_eval_values); 
-    end
+    %% Check the mandatory values -> 'eval' is checked for each solution space individually (see below)
     GC.check_data(options.space,'options.space','char', [] ,allowed_space_values);
     GC.speak('Error while using postprocessing method "solget":');
 
 
     %% Check the optional field values
-    if isfield(options,'resolution')
+    if isfield(options,'resolution')        % This check here is only for solget since resolution is checked in solplot_gatekeeper and contplot_gatekeeper as well
         % Check data type and dimension. Scalar AND [1x2] array only possible for quasi-periodic hypertime plots using FDM currently
         if strcmpi(DYN.sol_type,'quasiperiodic') && strcmpi(options.space,'hypertime') && strcmpi(DYN.approx_method,'finite-difference')
             GC.check_data(options.resolution,'options.resolution','double',{'scalar','vector'},[]);
@@ -74,7 +69,7 @@ function options = solget_gatekeeper(obj,DYN,options)
         if (any(mod(options.resolution,1)) || ~isempty(find(options.resolution<=0,1)))
             GC.error_msg{1,end+1} = append('The data value of options.resolution is [', num2str(options.resolution), ']. However, only positive integer value(s) are allowed.');
         end
-        GC.speak('Error while using postprocessing method "solget", "solplot" or "contplot":');
+        GC.speak('Error while using postprocessing method "solget":');
     end 
     
     if isfield(options,'interval') 
@@ -84,7 +79,7 @@ function options = solget_gatekeeper(obj,DYN,options)
         GC.speak('Error while using postprocessing method "solget" or "solplot":');
     end
 
-    %Check that only mu or index has been set
+    % Check that only mu or index has been set
     if isfield(options,'index') && isfield(options,'mu')
         GC.error_msg{1,end+1} = 'You provided options.index (the index of the continuation parameter) and options.mu (the continuation parameter itself). However, only either of the options is allowed.'; 
         GC.speak('Error while using postprocessing method "solget" or "solplot":'); 
@@ -119,33 +114,65 @@ function options = solget_gatekeeper(obj,DYN,options)
     end
 
 
-    %Check for the individual spaces
+    % Check the individual spaces
     switch options.space 
         
         case 'time'
+
                 time_mandatory_fieldnames  = {'eval','space'};                                                  %mandatory fieldsnames in the options super structure
                 time_allowed_fieldnames    = {'eval','space','resolution','index','mu','interval'};             %allowed fieldsnames in the options super structure
+
                 GC.check_fields(options,'options',time_mandatory_fieldnames,time_allowed_fieldnames);           %updates the error_msg property of the gatekeeper        
-                GC.speak('Error while using postprocessing method "solget" with solution space "time":');
+                GC.speak('Error while using postprocessing method "solget" with solution space ''time'':');
+
+                GC.check_data(options.eval,'options.eval',{'function_handle','char'}, [] ,[]);
+                if ischar(options.eval)     % eval is a char
+                    GC.check_data(options.eval,'options.eval','char',[],allowed_eval_values);
+                else                        % eval is a function handle
+                    obj.check_fcn_handle(DYN,GC,options,'options.eval','matrix','matrix_or_vector');
+                end
+                GC.speak('Error while using postprocessing method "solget" with solution space ''time'':');
+
 
         case 'hypertime'
+
                 hypertime_mandatory_fieldnames  = {'eval','space'};                                                 %mandatory fieldsnames in the options super structure
                 hypertime_allowed_fieldnames    = {'eval','space','resolution','index','mu'};                       %allowed fieldsnames in the options super structure
+
                 GC.check_fields(options,'options',hypertime_mandatory_fieldnames,hypertime_allowed_fieldnames);     %updates the error_msg property of the gatekeeper        
-                GC.speak('Error while using postprocessing method "solget" with solution space "hypertime":');
+                GC.speak('Error while using postprocessing method "solget" with solution space ''hypertime'':');
+
+                GC.check_data(options.eval,'options.eval',{'function_handle','char'}, [] ,[]);
+                if ischar(options.eval)     % eval is a char
+                    GC.check_data(options.eval,'options.eval','char',[],allowed_eval_values);
+                else                        % eval is a function handle
+                    obj.check_fcn_handle(DYN,GC,options,'options.eval','solution_argument','solution_argument');
+                end
+                GC.speak('Error while using postprocessing method "solget" with solution space ''hypertime'':');
 
 
         case 'frequency'
+
                 frequency_mandatory_fieldnames  = {'eval','space'};                                                     %mandatory fieldsnames in the options super structure
                 frequency_allowed_fieldnames    = {'eval','space','resolution','index','mu','interval'};                %allowed fieldsnames in the options super structure
+
                 GC.check_fields(options,'options',frequency_mandatory_fieldnames,frequency_allowed_fieldnames);         %updates the error_msg property of the gatekeeper        
-                GC.speak('Error while using postprocessing method "solget" with solution space "frequency":');
+                GC.speak('Error while using postprocessing method "solget" with solution space ''frequency'':');
+
                 if isfield(options,'resolution')            % Make sure that 'resolution' is an even number (everything else has already been checked above)
                     if mod(options.resolution,2) ~= 0       % ('resolution' is a scalar in solution space frequency)
                         GC.error_msg{1,end+1} = append('The data value of options.resolution is ', num2str(options.resolution), '. However, the resolution must be a positive even integer in solution space "frequency".');
                     end
                 end
-                GC.speak('Error while using postprocessing method "solget" or "solplot" with solution space "frequency":'); 
+                GC.speak('Error while using postprocessing method "solget" or "solplot" with solution space ''frequency'':'); 
+
+                GC.check_data(options.eval,'options.eval',{'function_handle','char'}, [] ,[]);
+                if ischar(options.eval)     % eval is a char
+                    GC.check_data(options.eval,'options.eval','char',[],allowed_eval_values);
+                else                        % eval is a function handle
+                    obj.check_fcn_handle(DYN,GC,options,'options.eval','matrix','matrix_or_vector');
+                end
+                GC.speak('Error while using postprocessing method "solget" with solution space ''frequency'':'); 
 
     end
 
