@@ -123,7 +123,7 @@ else
 
             if DYN.n_freq  == 0 
                 s_out = s;                                  % There is no minimum value for a point in state space
-                ystr = '$\min \Vert \mathbf z \Vert$';
+                ystr = '$\Vert \mathbf z \Vert$';
             elseif DYN.n_freq ==1 
                 s_out = permute(min(s,[],1),[2,3,1]);       % Minimum on hypertime domain [0,2*pi]. Third array dim of s indicates solution point (index)
                 ystr = '$\min \Vert \mathbf z (\theta) \Vert$';
@@ -137,7 +137,7 @@ else
 
             if DYN.n_freq  == 0 
                 s_out = s;                                  % There is no mean value for a point in state space
-                ystr = 'mean $\! \Vert \mathbf z \Vert$';
+                ystr = '\Vert \mathbf z \Vert$';
             elseif DYN.n_freq == 1
                 s_out = permute(mean(s,1),[2,3,1]);         % Mean on hypertime domain [0,2*pi]. Third array dim of s indicates solution point (index)
                 ystr = 'mean $\! \Vert \mathbf z (\theta) \Vert$';
@@ -151,7 +151,7 @@ else
                 
             if DYN.n_freq  == 0
                 s_out = s;                                  % There is no maximum value for a point in state space
-                ystr = '$\max \Vert \mathbf z \Vert$';
+                ystr = '$\Vert \mathbf z \Vert$';
             elseif DYN.n_freq == 1
                 s_out = permute(max(s,[],1),[2,3,1]);       % Maximum on hypertime domain [0,2*pi]. Third array dim of s indicates solution point (index)
                 ystr = '$\max \Vert \mathbf z (\theta) \Vert$';
