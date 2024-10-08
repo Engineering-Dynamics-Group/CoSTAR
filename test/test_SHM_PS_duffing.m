@@ -22,7 +22,7 @@ Fcn = @(t,z,param)duffing_ap(t,z,param);                                        
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);                                                                                               %Properties of the System
 options.opt_sol  = costaropts('stability','on','cont','off','non_auto_freq',non_auto_freq,'sol_type','periodic','approx_method','shm','act_param',active_parameter);       %Properties of the solution
 options.opt_init = costaropts('ic',IC);
-options.opt_approx_method = costaropts('solver','ode45');                                                                                                %Properties for approx_method (e.g. Shoot)
+options.opt_approx_method = costaropts('solver','ode45','n_shoot',6);                                                                                                %Properties for approx_method (e.g. Shoot)
 options.opt_stability     = costaropts('iterate_bfp','on');
 
 
