@@ -243,3 +243,172 @@ Changes affect:
 		--> Bugfix: "~isempty" in line 22 changed to "isfield"
 		--> if...else condition for n_int_2 added (similar to evalsol_hypertime, see above) (lines 27 - 31)
 
+
+
+--------------------------------------------
+--------------- v2.6.3.1.1 -----------------
+--------------------------------------------
+
+@DynamicalSystem:
+    - s_DYN_gatekeeper
+        --> line 111 'mshm' added to p_approx_method_allowed_fieldvalues
+
+@ApproxMethod
+    - s_method_selection
+        --> lines 25-32 added
+        --> lines 28,30 changed (methods renamed)
+
+@AM_PS_MSHM
+    - properties
+        --> line 9 added n_shoot (number of shooting points)
+
+    - Constructor
+        --> renamed AM_PS_MSHM
+        --> lines 28 and 29 switched to ensure that solver_function is set before getIV is called
+    
+    - MSHM_auto_fun 
+        --> renamed
+        --> Multiple changes to repurpose this file for multiple shooting
+
+    - MSHM_fun       
+        --> renamed
+        --> multiple changes to repurpose this file for multiple shooting
+
+    - getIV
+        --> if-statement added (lines 29-47) (autonomous case)
+            => checks whether there is more than one shooting point
+            => If n_shoot>1, do time integration from supplied ic
+            => Extract values from shooting points
+            => Set iv for multiple shooting
+
+        --> if-statement added (lines 29-47) (non-autonomous case)
+            => checks whether there is more than one shooting point
+            => If n_shoot>1, do time integration from supplied ic
+            => Extract values from shooting points
+            => Set iv for multiple shooting
+         
+        
+@ST_PS_SHM
+    - PS_SHM_calc_stability_non_auto
+        --> line 23 added (comment)
+
+- intial_solution
+    --> line 115 additional or statement to if added (&& 'mshm')
+    
+@Solution
+    - s_solution_selection
+        --> lines 22-24 added (if-statement for multiple shooting)
+
+@SOL_PS_MSHM (new subclass) Solution subclass for multiple shooting
+    - evalsol_time
+        --> line 16 added (fetch dimension of state-space)
+        --> line 38 s0 changed to s0(1:dim,1) to choose only the first shooting point
+        --> line 44 s1 changed to s1(1:dim,1) to choose only the first shooting point
+
+
+------------------------------------------------
+------- Feature_Stability_Multiple_Shoot -------
+------------------------------------------------
+
+@Stability
+    - s_stability_selection
+        --> lines 25-31 commented (Stability of single shooting disabled)
+        --> lines 33-42 added (Stability now with multiple shooting)
+
+@ST_PS_MSHM     (New Subclass) Calculates stability using multiple shooting
+    - Subclass renamed
+
+    - Properties
+        --> n_shoot (line 11) added, to define number of shooting points for stability calculation
+    
+    - methods renamed
+        --> MSHM_fun
+        --> MSHM_auto_fun
+        --> PS_MSHM_calc_stability_auto
+        --> PS_MSHM_calc_stability_nonauto
+
+    - new methods
+        --> MSHM_fun
+        --> MSHM_auto_fun
+
+    - PS_MSHM_calc_stability_non_auto
+        --> lines 20-27 added
+        --> lines 29-32 commented
+        --> line 19 if statement changed from 'mshm' to 'shooting'
+    
+    - PS_MSHM_calc_stability_auto
+        --> Name of method changed
+        --> Multiple changes for switch to multiple shoot
+        --> line 18 if statement changed from 'mshm' to 'shooting'
+
+    - getIV
+        --> Line 33 changed, extract initial mu from DYN.non_auto_freq instead of y(end,1)
+
+    - s_PS_SHM_gatekeeper
+        --> Line 14 new allowed field value 'n_shoot'
+        --> Lines 28-31 added
+
+ST_PS_SHM
+    - subclass removed, tasks now performed by ST_PS_MSHM
+
+@ApproxMethod_SC
+    - s_AM_gatekeeper
+        --> line 24 method call changed from 'AM_PS_SHM.s_PS_SHM_gatekeeper' to 'AM_PS_MSHM.s_PS_SHM_gatekeeper'
+    
+    - s_method_selection
+        --> if statement for old shooting removed (lines 16-23), if statement 'mshm' renamed to 'shooting'
+
+@AM_PS_FDM
+    - getIC
+        --> Additional argument n_shoot added to be able to use multiple shooting to determine stability
+        --> Multiple changes to interpolate solution over period and extract shooting points
+        --> Lines 14-20 added. If statement to check whether system is autonomous or not, fetch frequency accordingly and reshape Z accordingly
+
+@AM_PS_FGM
+    - getIC
+        --> Additional argument n_shoot added to be able to use multiple shooting to determine stability
+        --> Multiple changes to interpolate solution over period and extract shooting points
+        --> Lines 15-19 added choose either autonomous or non-autonomous frequency
+
+@AM_PS_SHM
+    - subclass removed, no single shooter needed, task is now performed by AM_PS_MSHM
+
+@Solution_SC
+    - s_solution_selection
+        --> Lines 18-20 removed, if statement 'mshm' renamed to 'shooting'
+
+@SOL_PS_SHM
+    - subclass removed, no single shooter needed, task is now performed by SOL_PS_MSHM
+
+@test
+    Multiple files regardind SHM changed to mshm 
+    - test_SHM_PS_fvdP 
+        --> approx_method now 'mshm', opt_approx_method.n_shoot = 5 added
+        --> approx_method now 'shm'
+    - test_SHM_PS_langford
+        --> approx_method now 'mshm', opt_approx_method.n_shoot = 5 added
+        --> approx_method now 'shm'
+    - test_SHM_PS_laval
+        --> approx_method now 'mshm', opt_approx_method.n_shoot = 5 added
+        --> approx_method now 'shm'
+    - test_SHM_PS_vdP 
+        --> approx_method now 'mshm', opt_approx_method.n_shoot = 5 added
+        --> approx_method now 'shm'
+
+@functions
+    - inital solution
+        --> line 115 if statement changed now if(quasiperiodic and (shooting or mshm)) instead of if(quasiperiodic and shooting and mshm)
+
+
+@DynamicalSystem
+    - s_DYN_gatekeeper
+        --> line 111 'mshm' and 'shooting' removed from allowed field values for approx_method
+    
+    
+
+
+
+
+
+
+

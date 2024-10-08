@@ -21,7 +21,7 @@ if strcmpi(opt_sol.sol_type,'equilibrium') || strcmpi(opt_sol.sol_type,'eq')
 elseif strcmpi(opt_sol.sol_type,'periodic') || strcmpi(opt_sol.sol_type,'ps')
     
     if strcmpi(opt_sol.approx_method,'shooting') || strcmpi(opt_sol.approx_method,'shm')
-        AM_PS_SHM.s_PS_SHM_gatekeeper(GC,system,opt_approx_method,opt_init);
+        AM_PS_MSHM.s_PS_SHM_gatekeeper(GC,system,opt_approx_method,opt_init);
     end
 
     if strcmpi(opt_sol.approx_method,'fourier-galerkin') || strcmpi(opt_sol.approx_method,'fgm')

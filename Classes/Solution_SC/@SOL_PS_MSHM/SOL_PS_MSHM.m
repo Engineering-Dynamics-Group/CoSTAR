@@ -1,7 +1,7 @@
 %The subclass SOL_PS_SHM inherits from Solution and adapts the class for
 %periodic  specific solutions
 
-classdef SOL_PS_SHM < Solution
+classdef SOL_PS_MSHM < Solution
 
     properties
 
@@ -11,7 +11,7 @@ classdef SOL_PS_SHM < Solution
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%
     methods 
-        function obj = SOL_PS_SHM(AM)
+        function obj = SOL_PS_MSHM(AM)
            obj.solver_function = AM.solver_function;
            obj.odeOpts = AM.odeOpts;
         end

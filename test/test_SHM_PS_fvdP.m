@@ -23,9 +23,9 @@ Fcn = @(t,z,param)vdP_qp(t,z,param);                                        %Rig
 
 %% Properties
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);                                                                                %Properties of the System
-options.opt_sol  = costaropts('cont','on','non_auto_freq',non_auto_freq,'sol_type','periodic','approx_method','shooting','act_param',active_parameter,'stability','on'); %Properties of the solution
+options.opt_sol  = costaropts('cont','on','non_auto_freq',non_auto_freq,'sol_type','periodic','approx_method','shm','act_param',active_parameter,'stability','on'); %Properties of the solution
 options.opt_cont = costaropts('direction',dir,'step_width',0.01,'pred','tangent','subspace','pseudo-arc','mu_limit',mu_limit,'step_control','on','plot','on','display','on');                                           %Properties for continuation
-options.opt_approx_method = costaropts('solver','ode45');                                                                             %Properties for sol_method (e.g. Shoot)
+options.opt_approx_method = costaropts('solver','ode45','n_shoot',5);                                                                             %Properties for sol_method (e.g. Shoot)
 options.opt_init = costaropts('ic',IC);
 options.opt_stability = costaropts('iterate_bfp','on');
 

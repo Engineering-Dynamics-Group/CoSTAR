@@ -32,8 +32,8 @@ opt_contplot = costaropts('zaxis','max2','resolution',200);                % Plo
 
 
 %% Solplot
-opt_solplot = costaropts('zaxis',@(z) z(:,1),'space','hypertime','resolution',200,'index',index(3),'Color','r');        % Plot solution z_1 in hyper-time
-[hypertime_val,z_val,mu_val,empty] = S.solplot(DYN,opt_solplot);
+% opt_solplot = costaropts('zaxis',@(z) z(:,1),'space','hypertime','resolution',200,'index',index(3),'Color','r');        % Plot solution z_1 in hyper-time
+% [hypertime_val,z_val,mu_val,empty] = S.solplot(DYN,opt_solplot);
 
 %{
 opt_solplot = costaropts('zaxis','all','space','hypertime','resolution',200,'index',index(2:3));

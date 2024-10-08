@@ -75,7 +75,7 @@ classdef AM_PS_FDM < ApproxMethod
         [res,J_res] = PS_FDM_residuum(obj,y,DYN);   % Method that builds the residuum of the finite-difference equation system and its Jacobian matrix
         
         obj = IF_up_res_data(obj,CON);          % Interface method: Used to pass information between continuation algorithm an this subclass
-        IC  = getIC(obj,y,DYN);                 % Method that extracts the state space vector z(theta=0), which is needed for stability calculation via the shooting method
+        IC  = getIC(obj,y,DYN,n_shoot);         % Method that extracts the state space vector z(theta=0), which is needed for stability calculation via the shooting method
 
     end
 
