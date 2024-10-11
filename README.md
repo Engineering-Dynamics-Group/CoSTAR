@@ -1,6 +1,9 @@
 # CoSTAR
 
+## Setting up Git Hooks
+After cloning the repository, run the following command to install the Git hooks:
 
+setup-hooks.bat
 
 ## Getting started
 
