@@ -14,6 +14,7 @@
 function check_costar(varargin)
   
     clearvars -except varargin
+    exit_code = 0; %Inititalize exit code to 0 (success)
 
     %% Add the path to the costar version of the current folder or the path to the costar version given in varargin to the system path
     [filepath,~,~] = fileparts(mfilename('fullpath'));
@@ -79,18 +80,20 @@ function check_costar(varargin)
         try
             lastwarn(''); %Prepare for checking warning. Clear last warning message
             tmp0 = evalc(script);    %evalc catches any output by the function and does not display it
-            clearvars -except ii files tmp script
+            clearvars -except ii files tmp script exit_code
             close all; %If some figure get opened anyway
     
             [warnMsg, ~] = lastwarn;
             if ~isempty(warnMsg)
                 cprintf('SystemCommands',' %s \n',append('warning: ',warnMsg));   %orange
+                %exit_code = 1; %Set exit code to 1 if there is a warning
             else
                 cprintf('green',' %s \n','passed'); %green
             end
     
         catch ME
             cprintf('Errors',' %s \n',append('error: ',ME.message));    %red
+            exit_code = 1; %Set exit code to 1 if there is an error
         end
     
     
@@ -101,7 +104,8 @@ function check_costar(varargin)
     set(0,'DefaultFigureWindowStyle','normal')
 
     beep;
-    
+
+    exit(exit_code); % Exit MATLAB with the appropriate exit code
 
 
 end
