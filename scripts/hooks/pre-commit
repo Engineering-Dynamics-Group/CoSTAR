@@ -1,0 +1,39 @@
+#!/bin/sh
+# Git pre-commit hook script
+
+echo "Running pre-commit hook..."
+
+# Get the list of changed files in the last commit affecting specific directories (Classes, Functions, test)
+changed=0
+for file in $(git diff --cached --name-only)
+do
+    # Check if the changed file is in the relevant folder (Classes, Functions, test)
+    echo "$file" | grep -E "^Classes/|^Functions/|^test/" > /dev/null
+    if [ $? -eq 0 ]; then
+        changed=1
+    fi
+done
+
+# If no relevant files have changed, skip the tests
+if [ $changed -eq 0 ]; then
+    echo "No relevant files changed, skipping tests."
+    exit 0
+fi
+
+echo "Relevant files changed, running MATLAB tests..."
+
+# Change directory to where the MATLAB function is located (relative path)
+cd test
+
+# Call MATLAB and run the check_costar function
+matlab -batch "check_costar;"
+
+# Check if MATLAB returned an error (non-zero exit code)
+if [ $? -ne 0 ]; then
+    echo "MATLAB tests failed. Commit aborted."
+    exit 1
+fi
+
+# If the tests pass, allow the commit to proceed
+echo "All MATLAB tests passed. Proceeding with commit."
+
