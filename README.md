@@ -3,7 +3,9 @@
 ## Setting up Git Hooks
 After cloning the repository, run the following command to install the Git hooks:
 
-setup-hooks.bat
+setup-hooks.bat # For Windows users
+
+setup-hooks.sh # For Linux or macOS users
 
 ## Getting started
 
