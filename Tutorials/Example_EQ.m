@@ -8,14 +8,17 @@
 
 %          Welcome to the CoSTAR Examples!          %
 %
-% The purpose of the examples is to give a short example on how a certain type of ...
-% solution (using a particular approximation method) can be calculated in CoSTAR.
+% The examples provide sample code to briefly show how the toolbox can be set up and how a certain CoSTAR module can be used.
+% This can be helpful if you have already used the CoSTAR toolbox. 
 %
-% The following code is identical to the code of the Equilibrium Solutions Tutorial.
-% However, most of the explanations have been omitted in order to keep this as short as possible and to reduce it to the essentials.
-% It is advised to run the sections of this script separately and to not run the complete script. ...
+% If you are not yet familiar with CoSTAR, it is highly recommended that you work with the CoSTAR tutorials instead of the example scripts.
+% The tutorials comprehensively explain certain CoSTAR modules, which is why they are the perfect starting point for CoSTAR beginners.
+% There is a corresponding tutorial for each example and the code of both of them is identical.
+%
+% This example covers the computation of equilibrium solutions (associated tutorial: Tutorial_EQ).
+% It is advised to run the sections of this example script separately and to not run the complete script.
 % To do this, place the cursor in the desired section to run and click "Run Section".
-%
+
 % addpath(genpath('..\'))                           % Add CoSTAR to MATLAB's search path
 
 
@@ -34,7 +37,7 @@ param = {mu0, a, b};    active_parameter = 1;       % Parameter array and locati
 Fcn =  @(z,param) parable(z,param);                 % Right-hand side of 0 = f(z,mu)
 
 % Options
-options.system   = costaropts('order',0,'dim',1,'rhs',Fcn,'param',param,'info','continuation of parable equation');     % Properties of the system
+options.system   = costaropts('order',0,'dim',1,'rhs',Fcn,'param',param,'info','Continuation of Parable Equation');     % Properties of the system
 options.opt_sol  = costaropts('sol_type','equilibrium','cont','on','stability','off','act_param',active_parameter);     % Properties of the solution
 options.opt_init = costaropts('ic',IC);                                                                                 % Property for initial solution
 options.opt_cont = costaropts('mu_limit',mu_limit,'step_control','off');                                                % Properties for continuation
@@ -43,8 +46,8 @@ options.opt_cont = costaropts('mu_limit',mu_limit,'step_control','off');        
 [S,DYN] = costar(options);                          % CoSTAR is called by costar(options)
 
 % Postprocessing
-opt_contplot = costaropts('zaxis', @(z) max(z(:,1)));   % Option structure needed to plot z (and not norm(z)) against mu
-[z,mu] = S.contplot(DYN,opt_contplot);                  % Create a new continuation plot
+contplot_options = costaropts('zaxis', @(z) max(z(:,1)));       % Option structure needed to plot z (and not norm(z)) against mu
+contplot_output  = S.contplot(DYN,contplot_options);            % Create a new continuation plot
 
 
 
@@ -62,7 +65,7 @@ param = {mu0, gamma};       active_parameter = 1;   % Parameter array and locati
 Fcn =  @(z,param) pitchfork_ap(z,param);            % Right hand side of 0 = f(z,mu)
 
 % Options for continuation 1
-options1.system   = costaropts('order',0,'dim',1,'rhs',Fcn,'param',param,'info','continuation of pitchfork bifurcation - part 1');  % Properties of the system
+options1.system   = costaropts('order',0,'dim',1,'rhs',Fcn,'param',param,'info','Continuation of Pitchfork Bifurcation - Part 1');  % Properties of the system
 options1.opt_sol  = costaropts('sol_type','equilibrium','cont','on','stability','on','act_param',active_parameter);                 % Properties of the solution
 options1.opt_init = costaropts('ic',IC);                                                                                            % Property for initial solution 
 options1.opt_cont = costaropts('mu_limit',mu_limit,'step_control','off');                                                           % Properties for continuation
@@ -76,7 +79,7 @@ mu0 = mu_limit(2);                                  % Continuation starts at upp
 param = {mu0, gamma};                               % Parameter array needs to be updated
 
 % Options for continuation 2
-options2.system   = costaropts('order',0,'dim',1,'rhs',Fcn,'param',param,'info','continuation of pitchfork bifurcation - part 2');  
+options2.system   = costaropts('order',0,'dim',1,'rhs',Fcn,'param',param,'info','Continuation of Pitchfork Bifurcation - Part 2');  
 options2.opt_sol  = costaropts('sol_type','equilibrium','cont','on','stability','on','act_param',active_parameter);
 options2.opt_init = costaropts('ic',IC);
 options2.opt_cont = costaropts('mu_limit',mu_limit,'step_control','off','step_width',0.05,'direction',-1);
@@ -85,8 +88,8 @@ options2.opt_cont = costaropts('mu_limit',mu_limit,'step_control','off','step_wi
 [S2,DYN2] = costar(options2);                       % Calling CoSTAR and performing the second continuation
 
 % Postprocessing
-opt_contplot1 = costaropts('zaxis', @(z) max(z(:,1)));                  % Option structure needed to plot z (and not norm(z)) against mu
-[z1,mu1] = S1.contplot(DYN1,opt_contplot1);                             % Create a new continuation plot of continuation 1
-opt_contplot2 = costaropts('zaxis', @(z) max(z(:,1)), 'figure', gcf);   % Option structure needed to plot z against mu and to plot continutaion 2 into already existing figure
-[z2,mu2] = S2.contplot(DYN2,opt_contplot2);                             % Plot continuation 2 into figure of continuation plot 1
-xlim(mu_limit)                                                          % Rescale horizontal axis to limits of continuation parameter
+contplot_options_1 = costaropts('zaxis', @(z) max(z(:,1)));                 % Option structure needed to plot z (and not norm(z)) against mu
+contplot_output_1  = S1.contplot(DYN1,contplot_options_1);                  % Create a new continuation plot of continuation 1
+contplot_options_2 = costaropts('zaxis', @(z) max(z(:,1)), 'figure', gcf);  % Option structure needed to plot z against mu and to plot continuation 2 into already existing figure
+contplot_output_2  = S2.contplot(DYN2,contplot_options_2);                  % Plot continuation 2 into figure of continuation plot 1
+xlim(mu_limit)                                                              % Rescale horizontal axis to limits of continuation parameter

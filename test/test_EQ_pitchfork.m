@@ -1,8 +1,12 @@
+%%   Example: Pitchfork Bifurcation (equilibrium)   %%
 
-%clear variables;
+% clear variables; clc; close all;              % clear workspace; clear command window; close all figures
+% addpath(genpath('..\'))                       % Add main folder of CoSTAR and all subfolders to search path
+
 
 %% Parameters
 gamma = 0.1;
+
 
 %% Pitchfork Example
 IC = 0;     mu_limit = [-1.5,1.5];       mu0 = mu_limit(1);
@@ -10,6 +14,7 @@ IC = 0;     mu_limit = [-1.5,1.5];       mu0 = mu_limit(1);
 param = {mu0,gamma};
 active_parameter = 1;
 Fcn =  @(x,param)pitchfork_ap(x,param);
+
 
 %% Properties
 options.system              = costaropts('order',0,'rhs',Fcn,'param',param,'info','continuation of pitchfork equation','dim',1);                                                                        %Properties of the System
@@ -32,28 +37,13 @@ options.opt_cont.direction = -1;
 [S2,DYN2] = costar(options);
 
 % Plot both solution branches in one diagram
-opt_contplot1 = costaropts('zaxis', @(z) max(z(:,1)));                  % Option structure needed to plot z (and not norm(z)) against mu
-[z1,mu1] = S1.contplot(DYN1,opt_contplot1);                             % Create a new continuation plot of continuation 1
-opt_contplot2 = costaropts('zaxis', @(z) max(z(:,1)), 'figure', gcf);   % Option structure needed to plot z against mu and to plot continutaion 2 into already existing figure
-[z2,mu2] = S2.contplot(DYN2,opt_contplot2);                             % Plot continuation 2 into figure of continuation plot 1
+contplot_options_1 = costaropts('zaxis', @(z) max(z(:,1)));                     % Option structure needed to plot z (and not norm(z)) against mu
+contplot_output_1  = S1.contplot(DYN1,contplot_options_1);                      % Create a new continuation plot of continuation 1
+contplot_options_2 = costaropts('zaxis', @(z) max(z(:,1)), 'figure', gcf);      % Option structure needed to plot z against mu and to plot continutaion 2 into already existing figure
+contplot_output_2  = S2.contplot(DYN2,contplot_options_2);                      % Plot continuation 2 into figure of continuation plot 1
 xlim(mu_limit)    
 
-% Test Postprocessing
+
+%% Test Postprocessing
 benchmark_postprocess_equilibrium(DYN1,S1);
 benchmark_postprocess_equilibrium(DYN2,S2);
-
-% opts = costaropts('zaxis','max2');
-% S2.contplot(DYN2,opts);
-
-% figure;
-% plot(S2.arclength,S2.multipliers)
-
-
-
-
-
-
-
-
-
-

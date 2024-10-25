@@ -2,7 +2,7 @@
 % solution curve points contained in SOLUTION subclass object based on the
 % hypertime depiction of the solution object
 %
-% Input Arguments
+% Input Arguments:
 % @obj:                 Object of Solution class
 % @DYN:                 Object of DynamicalSystem class
 % @options:             struct contain options for calculating solution
@@ -45,24 +45,24 @@
 %                                       providing an rgb array or a char 
 %                                       'r','g','b','c','m','y' or 'k'
 %
-% Output Arguments:
 %
-% @varargout:           Contains the data, which is plotted
-%                           varargout{1,1}: zaxis
-%                           varargout{1,2}: mu
+% Output Arguments:
+% @output:              Struct containing the plotted data with the fields
+%                        - output.z: zaxis-values
+%                        - output.mu: values of continuation parameter mu
+%
+%
+% Example:  options = costaropts('zaxis',@(z)z(:,1));
+%           output = S.contplot(DYN,options);
 
-%Example:   options = struct('zaxis',@(z)z(:,1));
-%           [x,y] = S.contplot(DYN,options);
 
-
-function varargout = contplot(obj,DYN,options)
+function output = contplot(obj,DYN,options)
 
 %% Gatekeeper check of input: Only the input not checked by solget_gatekeeper is checked here
-if ~isfield(options,'axes_values_old')                  % When this field is present, contplot is called from the plot_contplot method during a continuation
+if ~isfield(options,'axes_values_old')                  % When this field is present, contplot is called from the plot_contplot method during a continuation (first call: field is not present yet!)
     options = obj.contplot_gatekeeper(DYN,options);     % The gatekeeper can be skipped in this case since the developers make sure that the options struct is fine
 end
 
-varargout = cell(1,2);                          % Needed
 
 % Add the complete index array, if none or 'all' is specified (this is easier for the plotting and the bifurcations below)
 if ~isfield(options,'index') || strcmpi(options.index,'all')
@@ -74,6 +74,7 @@ end
 %% Set the solget options structure
 solget_options = options;                       % solget_options is a subset of solplot options.
 solget_options.space = 'hypertime';
+solget_options.call_from_contplot = true;       % This field is important for solget to know that it was called from contplot
 
 
 % Remove fields that are not allowed in solget options structure
@@ -94,15 +95,15 @@ end
 
 
 %% Get the data
-if isfield(options,'axes_values_old')                   % When this field is present, contplot is called from the plot_contplot method during a continuation
-    solget_options.index = options.index(2);            % First index can be skipped since this point has already been evaluated 
-    [s,mu] = obj.solget(DYN,solget_options);            % Only the new solution has to be evaluated
-else
-    [s,mu] = obj.solget(DYN,solget_options);            % contplot is called by the user
+if isfield(options,'axes_values_old')                   % When this field is present, contplot is called from the plot_contplot method during a continuation (first call: field is not present yet!)
+    solget_options.index = options.index(2);            % First index can be skipped since this point has already been evaluated
 end
+solget_output = obj.solget(DYN,solget_options);         % Evaluate the solution(s)
+s = solget_output.solution_eval;                        % This is done to avoid the long term "solget_output.solution_eval" in the code below
+mu = solget_output.mu;                                  % This is done to avoid the long term "solget_output.mu" in the code below
 
 
-if isa(options.zaxis,'function_handle')         % In this case, contplot_gatekeeper has checked the correct output dimension of the function handle
+if isa(options.zaxis,'function_handle')                 % In this case, contplot_gatekeeper has checked the correct output dimension of the function handle
     
     if DYN.n_freq == 0
         s_out = s; 
@@ -111,9 +112,8 @@ if isa(options.zaxis,'function_handle')         % In this case, contplot_gatekee
     else
         s_out = permute(s,[3,4,1,2]);
     end
-
-    TtlStr = 'User Function Handle Applied to Hypertime Manifold';
-    ystr = 'f(z)';
+    fcn_handle_char = func2str(options.zaxis);                                  % Convert function handle to char
+    ystr = append('$f(\texttt{z}) = \texttt{',fcn_handle_char(5:end),'}$');     % 5:end to exclude the @(z)
 
 
 else
@@ -123,49 +123,52 @@ else
 
             if DYN.n_freq  == 0 
                 s_out = s;                                  % There is no minimum value for a point in state space
+                ystr = '$\Vert \mathbf z \Vert$';
             elseif DYN.n_freq ==1 
                 s_out = permute(min(s,[],1),[2,3,1]);       % Minimum on hypertime domain [0,2*pi]. Third array dim of s indicates solution point (index)
+                ystr = '$\min \Vert \mathbf z (\theta) \Vert$';
             else
                 s_out = min(reshape(s,size(s,1)*size(s,2),size(s,4)),[],1);     % Minimum on hypertime domain [0,2*pi]^2. Fourth array dim of s indicates solution point (index)
+                ystr = '$\min \Vert \mathbf z (\mathbf\theta) \Vert$';
             end
-
-            TtlStr = 'Minimum of Euclidean Norm of Hypertime Manifold';
-            ystr = 'min(norm(z,2))';
             
 
         case 'mean2'
 
             if DYN.n_freq  == 0 
                 s_out = s;                                  % There is no mean value for a point in state space
+                ystr = '\Vert \mathbf z \Vert$';
             elseif DYN.n_freq == 1
                 s_out = permute(mean(s,1),[2,3,1]);         % Mean on hypertime domain [0,2*pi]. Third array dim of s indicates solution point (index)
+                ystr = 'mean $\! \Vert \mathbf z (\theta) \Vert$';
             else
                 s_out = mean(reshape(s,size(s,1)*size(s,2),size(s,4)),1);    % Mean on hypertime domain [0,2*pi]^2. Fourth array dim of s indicates solution point (index)
+                ystr = 'mean $\! \Vert \mathbf z (\mathbf\theta) \Vert$';
             end
-
-            TtlStr = 'Mean Value of Euclidean Norm of Hypertime Manifold';
-            ystr = 'mean(norm(z,2))';
 
             
         case 'max2'
                 
             if DYN.n_freq  == 0
                 s_out = s;                                  % There is no maximum value for a point in state space
+                ystr = '$\Vert \mathbf z \Vert$';
             elseif DYN.n_freq == 1
                 s_out = permute(max(s,[],1),[2,3,1]);       % Maximum on hypertime domain [0,2*pi]. Third array dim of s indicates solution point (index)
+                ystr = '$\max \Vert \mathbf z (\theta) \Vert$';
             else
                 s_out = max(reshape(s,size(s,1)*size(s,2),size(s,4)),[],1);     % Maximum on hypertime domain [0,2*pi]^2. Fourth array dim of s indicates solution point (index)
+                ystr = '$\max \Vert \mathbf z (\mathbf\theta) \Vert$';
             end
 
-            TtlStr = 'Maximum of Euclidean Norm of Hypertime Manifold';
-            ystr = 'max(norm(z,2))';
+            
             
     end
     
 end
 
 
-if isfield(options,'axes_values_old')               % When this field is present: mu and s_out are scalars (latest solution), but we need them to be a [1x2] vector of the latest two solutions for the plot
+% When options.axes_values_old is present: mu and s_out are scalars (latest solution), but we need them to be a [1x2] vector of the latest two solutions for the plot
+if isfield(options,'axes_values_old')
     mu = [options.axes_values_old(1),mu];           % Build the correct mu vector for the plot
     s_out = [options.axes_values_old(2),s_out];     % Build the correct s_out vector for the plot
 end
@@ -302,6 +305,12 @@ end
 
 
 % Title, labels and x-limits
+if ~isempty(DYN.info)
+    TtlStr = DYN.info;
+else
+    sol_type = char(DYN.sol_type);      % DYN.sol_type is a string
+    TtlStr = append('Continuation of ', upper(sol_type(1)), sol_type(2:end),' Solutions');
+end
 title(TtlStr,'Interpreter','latex');
 xlabel('Continuation parameter $\mu$','Interpreter','latex');
 ylabel(ystr,'Interpreter','latex');
@@ -310,8 +319,9 @@ xlim(DYN.opt_cont.mu_limit)
 
 
 %% Output
-varargout{1,1} = s_out;
-varargout{1,2} = mu;
+
+output.z = s_out;
+output.mu = mu;
 
 
 end

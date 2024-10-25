@@ -9,14 +9,17 @@
 
 %          Welcome to the CoSTAR Examples!          %
 %
-% The purpose of the examples is to give a short example on how a certain type of ...
-% solution (using a particular approximation method) can be calculated in CoSTAR.
+% The examples provide sample code to briefly show how the toolbox can be set up and how a certain CoSTAR module can be used.
+% This can be helpful if you have already used the CoSTAR toolbox. 
 %
-% The following code is identical to the code of the Quasi-Periodic Solutions - Fourier-Galerkin Method - Tutorial.
-% However, most of the explanations have been omitted in order to keep this as short as possible and to reduce it to the essentials.
-% It is advised to run the sections of this script separately and to not run the complete script. ...
+% If you are not yet familiar with CoSTAR, it is highly recommended that you work with the CoSTAR tutorials instead of the example scripts.
+% The tutorials comprehensively explain certain CoSTAR modules, which is why they are the perfect starting point for CoSTAR beginners.
+% There is a corresponding tutorial for each example and both of them contain the same code.
+%
+% This example covers the computation of quasi-periodic solutions using the Fourier-Galerkin Method (associated tutorial: Tutorial_QPS_FGM).
+% It is advised to run the sections of this example script separately and to not run the complete script.
 % To do this, place the cursor in the desired section to run and click "Run Section".
-%
+
 % addpath(genpath('..\'))                           % Add CoSTAR to MATLAB's search path
 
 
@@ -47,7 +50,7 @@ non_auto_freq = @(mu) [mu, ratio*mu];               % Non-autonomous excitation 
 Fcn =  @(t,z,param) duffing_ap_qp(t,z,param);       % Right-hand side of dz/dtau = f(tau,z,D,kappa,f1,f2,eta,ratio)
 
 % Options
-options.system = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','continuation of quasi-periodic Duffing equation');    % Properties of the system
+options.system = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','Continuation of Quasi-Periodic Duffing Equation');    % Properties of the system
 options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','fourier-galerkin','cont','on','stability','off', ...       % Properties of the solution
                              'non_auto_freq',non_auto_freq,'act_param',active_parameter);                                           % Properties of the solution
 options.opt_init = costaropts('hmatrix',Hmatrix,'c0',C0,'cmatrix',Cmatrix,'smatrix',Smatrix);                                       % Property for initial solution
@@ -58,8 +61,8 @@ options.opt_cont = costaropts('mu_limit',mu_limit);                             
 [S,DYN] = costar(options);                          % CoSTAR is called by costar(options)
 
 % Postprocessing
-opt_solplot = costaropts('zaxis',@(z) z(:,:,1),'space','hypertime','resolution',30,'index',[25,200]);   % "options" structure for the solplot function
-[t_Duff,z1_Duff,mu_Duff] = S.solplot(DYN,opt_solplot);                                                  % Plot hyper-time surfaces Z1(theta1,theta2,mu) at desired index
+solplot_options_1 = costaropts('zaxis',@(z) z(:,:,1),'space','hypertime','resolution',30,'index',[25,200]);     % "options" structure for the solplot function
+solplot_output_1  = S.solplot(DYN,solplot_options_1);                                                           % Plot hyper-time surfaces Z1(theta1,theta2,mu) at desired index
 
 
 % Change of the continuation parameter eta -> kappa %
@@ -77,7 +80,7 @@ Hmatrix_kappa = S.hmatrix{1};                           % Get the corresponding 
 non_auto_freq_kappa = @(mu) [eta_kappa, ratio*eta_kappa];              % New non-autonomous excitation frequency
 
 % New options
-options_kappa.system = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param_kappa,'info','continuation of Duffing equation - kappa');       % Properties of the system
+options_kappa.system = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param_kappa,'info','Continuation of Quasi-Periodic Duffing Equation - kappa');       % Properties of the system
 options_kappa.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','fourier-galerkin','cont','on','stability','off', ...         % Properties of the solution
                                    'non_auto_freq',non_auto_freq_kappa,'act_param',active_parameter_kappa);                                 % Properties of the solution
 options_kappa.opt_init = costaropts('hmatrix',Hmatrix_kappa,'fc0',Fc0);                                                                     % Property for initial solution
@@ -119,7 +122,7 @@ non_auto_freq = @(mu) mu;                           % Non-autonomous excitation 
 Fcn =  @(t,z,param) laval_qp(t,z,param);            % Right-hand side of dz/dtau = f(tau,z,eta,Di,delta,e,d3,Fg)
 
 % Options
-options.system = costaropts('order',1,'dim',4,'rhs',Fcn,'param',param,'info','continuation of Jeffcott-Laval rotor');               % Properties of the system
+options.system = costaropts('order',1,'dim',4,'rhs',Fcn,'param',param,'info','Continuation of Jeffcott-Laval Rotor');               % Properties of the system
 options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','fourier-galerkin','cont','on','stability','off', ...       % Properties of the solution
                              'non_auto_freq',non_auto_freq,'auto_freq',auto_freq,'act_param',active_parameter);                     % Properties of the solution
 options.opt_init = costaropts('hmatrix',Hmatrix,'c0',C0,'cmatrix',Cmatrix,'smatrix',Smatrix);                                       % Property for initial solution
@@ -131,8 +134,8 @@ options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.01,'direction',
 [S,DYN] = costar(options);                          % CoSTAR is called by costar(options)
 
 % Postprocessing
-opt_solplot = costaropts('zaxis',@(z) z(:,:,1),'space','hypertime','resolution',30,'index',[5,50]);     % "options" structure for the solplot function
-[t_JLR,z1_JLR,mu_JLR] = S.solplot(DYN,opt_solplot);                                                     % Plot hyper-time surfaces Z1(theta1,theta2,mu) at desired index
+solplot_options_2 = costaropts('zaxis',@(z) z(:,:,1),'space','hypertime','resolution',30,'index',[5,50]);   % "options" structure for the solplot function
+solplot_output_2  = S.solplot(DYN,solplot_options_2);                                                       % Plot hyper-time surfaces Z1(theta1,theta2,mu) at desired index
 
 
 
@@ -164,7 +167,7 @@ Smatrix = [ 2,   -0.1;                              % Fourier coefficients S_1 a
 Fcn = @(t,z,param) coupledvdp(t,z,param);           % Right-hand side of dz/dtau = f(z,epsilon,alpha,beta)
 
 % Options
-options.system   = costaropts('order',1,'dim',4,'rhs',Fcn,'param',param,'info','continuation of coupled van der Pol oscillator');   % Properties of the system
+options.system   = costaropts('order',1,'dim',4,'rhs',Fcn,'param',param,'info','Continuation of Coupled van der Pol Oscillator');   % Properties of the system
 options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','fourier-galerkin','cont','on','stability','off', ...       % Properties of the solution
                              'auto_freq',auto_freq,'act_param',active_parameter);                                                   % Properties of the solution
 options.opt_init = costaropts('hmatrix',Hmatrix,'c0',C0,'cmatrix',Cmatrix,'smatrix',Smatrix);                                       % Property for initial solution
@@ -176,5 +179,5 @@ options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.01);           
 [S,DYN] = costar(options);                          % CoSTAR is called by costar(options)
 
 % Postprocessing
-opt_solplot = costaropts('zaxis',@(z) z(:,:,1),'space','hypertime','resolution',40,'index',[5,55]);     % "options" structure for the solplot function
-[t_cvdP,z1_cvdP,mu_cvdP] = S.solplot(DYN,opt_solplot);                                                  % Plot hyper-time surfaces Z1(theta1,theta2,mu) at desired index
+solplot_options_3 = costaropts('zaxis',@(z) z(:,:,1),'space','hypertime','resolution',40,'index',[5,55]);   % "options" structure for the solplot function
+solplot_output_3  = S.solplot(DYN,solplot_options_3);                                                       % Plot hyper-time surfaces Z1(theta1,theta2,mu) at desired index

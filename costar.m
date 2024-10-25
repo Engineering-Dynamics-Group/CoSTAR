@@ -110,31 +110,33 @@
 %
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 function [S,DYN] = costar(options)
 
     %% Gatekeeper
-    GC = Gatekeeper();                                                         %Create the gatekeeper.
-    options = GC.m_gatekeeper(options);                                        %This main function initially controls all input data by calling various static methods of the classes DynamicalSystem, SolutionType and Cotinuation    
-
-    clear GC;                                                                  %Gatekeeper has done it's job.
-    %% Dynamical System
-    DYN = DynamicalSystem(options);
-
-    %% Approximation Methods
-    AM = ApproxMethod.s_method_selection(DYN);                                  %Calls the static method_selection methods of the SuperClass SolutionType, which creates the appropriate object of a subclass (Shoot, etc.)
+    GC = Gatekeeper();                                      % Create the gatekeeper
+    options = GC.m_gatekeeper(options);                     % This main function initially controls all input data by calling various static methods of the classes DynamicalSystem, ApproxMethod and Continuation    
+    clear GC;                                               % Gatekeeper has done it's job
     
-    %% Create object of Solution
-    S = Solution.s_solution_selection(DYN,AM);                                  %Calls the static solution_selection method of the SuperClass Solution, which creates the appropriate object of a subclass (EQ_Sol, PS_Shoot_Sol etc.)
+    %% Dynamical System class
+    DYN = DynamicalSystem(options);                         % Save options to DynamicalSystem object DYN
+
+    %% Approximation Method class
+    AM = ApproxMethod.s_method_selection(DYN);              % Calls the static s_method_selection methods of the SuperClass ApproxMethod, which creates the appropriate object of a subclass (AM_PS_SHM, etc.)
+    
+    %% Solution class
+    S = Solution.s_solution_selection(DYN,AM);              % Calls the static s_solution_selection method of the SuperClass Solution, which creates the appropriate object of a subclass (SOL_PS_SHM etc.)
     
     %% Stability class                                                          
-    ST = Stability.s_stability_selection(DYN,AM);                           %Calls the static method_selection method of the SuperClass Stability,   which creates the approriate object of a subclass
+    ST = Stability.s_stability_selection(DYN,AM);           % Calls the static s_method_selection method of the SuperClass Stability, which creates the appropriate object of a subclass
+        
     %% Calculate initial solution
     [S,AM,DYN] = initial_solution(DYN,S,AM,ST);
 
     %% Continuation
     if strcmpi(DYN.cont,'on')
-        CON = Continuation(options.opt_cont);
-        S = CON.m_continuation(DYN,S,AM,ST);
+        CON = Continuation(options.opt_cont);               % Create Continuation object CON
+        S = CON.m_continuation(DYN,S,AM,ST);                % Calls the method where the continuation loop is carried out
     end
 
 end

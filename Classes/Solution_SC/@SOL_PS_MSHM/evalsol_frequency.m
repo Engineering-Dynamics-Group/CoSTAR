@@ -8,20 +8,34 @@
 % @DYN:     DynamicalSystem object
 % @options: options structure for postprocessing solutions
 %
-% @s:       Amplitude array: This must(!) be a [options.resolution x state_space_dimension x n_evals] dimensional array !!!
+% @s:       Amplitude array: This must(!) be a [options.resolution/2 x state_space_dimension x n_evals] dimensional array !!!
+% @a:       Phase angle array: This must(!) be a [options.resolution/2 x state_space_dimension x n_evals] dimensional array !!!
 % @mu:      Vector of the evaluated continuation parameters: This must(!) be a [1 x n_evals] dimensional array !!!
-% @f:       Array of the frequency points: This must(!) be a [options.resolution x 1 x n_evals]  dimensional array !!!
+% @f:       Array of the frequency points: This must(!) be a [options.resolution/2 x 1 x n_evals]  dimensional array !!!
 % n_evals:  Number of curve points to be evaluated 
 
-function [s,mu,f] = evalsol_frequency(obj,DYN,options)
+function [s,a,mu,omega] = evalsol_frequency(obj,DYN,options)
 
     [s_time,mu,time] = obj.evalsol_time(DYN,options);
     
+    % Parameters
+    dim = DYN.system.dim;                                               % Dimension of state space
+    n_evals = length(options.index);                                    % Number of evaluations
+
+    % Preallocating f, s and a
+    omega = zeros(floor(options.resolution/2), 1, n_evals);             % floor(options.resolution/2) due to output of costarFFT
+    s = zeros(floor(options.resolution/2), dim, n_evals);
+    a = zeros(floor(options.resolution/2), dim, n_evals);
+
     %Compute the Fourier-Transform
     for k = 1:numel(mu)
-        [f_tmp,s_tmp]   =  costarFFT(time(:,1,k),s_time(:,:,k));
-        f(:,1,k) = 2.*pi.*f_tmp.';
-        s(:,:,k) = s_tmp;
+
+        [f,s_amp,s_angle]   =  costarFFT(time(:,1,k),s_time(:,:,k));
+
+        omega(:,1,k) = 2.*pi.*f;
+        s(:,:,k) = s_amp;
+        a(:,:,k) = s_angle;
+
     end
 
 end

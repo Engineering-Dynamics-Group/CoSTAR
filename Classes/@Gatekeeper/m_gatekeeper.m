@@ -57,7 +57,7 @@ function options = m_gatekeeper(obj,options)
 
 
     %Convert all string fields to lower case
-    options.system =            obj.fieldvalues_to_lower(options.system);                                   %set string fieldvalues to lower case 
+    % options.system =          obj.fieldvalues_to_lower(options.system);                                   %no need to set fields of options.system to lower case since only relevant field is 'info'
     options.opt_sol =           obj.fieldvalues_to_lower(options.opt_sol);                                  %set string fieldvalues  to lower case 
     options.opt_init =          obj.fieldvalues_to_lower(options.opt_init);                                 %set string fieldvalues  to lower case
     options.opt_approx_method = obj.fieldvalues_to_lower(options.opt_approx_method);                        %set string fieldvalues  to lower case 

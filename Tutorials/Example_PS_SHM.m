@@ -9,14 +9,17 @@
 
 %          Welcome to the CoSTAR Examples!          %
 %
-% The purpose of the examples is to give a short example on how a certain type of ...
-% solution (using a particular approximation method) can be calculated in CoSTAR.
+% The examples provide sample code to briefly show how the toolbox can be set up and how a certain CoSTAR module can be used.
+% This can be helpful if you have already used the CoSTAR toolbox. 
 %
-% The following code is identical to the code of the Periodic Solutions - Shooting Method - Tutorial.
-% However, most of the explanations have been omitted in order to keep this as short as possible and to reduce it to the essentials.
-% It is advised to run the sections of this script separately and to not run the complete script. ...
+% If you are not yet familiar with CoSTAR, it is highly recommended that you work with the CoSTAR tutorials instead of the example scripts.
+% The tutorials comprehensively explain certain CoSTAR modules, which is why they are the perfect starting point for CoSTAR beginners.
+% There is a corresponding tutorial for each example and both of them contain the same code.
+%
+% This example covers the computation of periodic solutions using the Shooting Method (associated tutorial: Tutorial_PS_SHM).
+% It is advised to run the sections of this example script separately and to not run the complete script.
 % To do this, place the cursor in the desired section to run and click "Run Section".
-%
+
 % addpath(genpath('..\'))                           % Add CoSTAR to MATLAB's search path
 
 
@@ -39,19 +42,19 @@ non_auto_freq = @(mu) mu;                           % Non-autonomous excitation 
 Fcn =  @(t,z,param) duffing_ap(t,z,param);          % Right-hand side of dz/dtau = f(tau,z,kappa,D,eta,g)
 
 % Options
-options.system = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','continuation of Duffing equation');   % Properties of the system
+options.system = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','Continuation of Duffing Equation');   % Properties of the system
 options.opt_sol = costaropts('sol_type','periodic','approx_method','shooting','cont','on','stability','on', ...     % Properties of the solution
                              'non_auto_freq',non_auto_freq,'act_param',active_parameter);                           % Properties of the solution
 options.opt_init = costaropts('ic',IC);                                                                             % Property for initial solution
 options.opt_approx_method = costaropts('solver','ode45');                                                           % Properties of approximation method
-options.opt_cont = costaropts('mu_limit',mu_limit);                                                                 % Properties for continuation
+options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.05);                                               % Properties for continuation
 
 % Continuation
 [S,DYN] = costar(options);                          % CoSTAR is called by costar(options)
 
 % Postprocessing
-opt_solplot = costaropts('zaxis',@(z) z(:,1),'space','time','mu',[0.5,1,2]);    % "options" structure for the solplot function
-[t_Duff,z1_Duff,mu_Duff] = S.solplot(DYN,opt_solplot);                          % Plot time-dependent approximate solution z(tau,mu) for desired mu-values
+solplot_options_1 = costaropts('zaxis',@(z) z(:,1),'space','time','mu',[0.5,1,2]);      % "options" structure for the solplot function
+solplot_output_1  = S.solplot(DYN,solplot_options_1);                                   % Plot time-dependent approximate solution z(tau,mu) for desired mu-values
 
 
 % Change of the continuation parameter eta -> kappa %
@@ -95,7 +98,7 @@ IC = [2; 0];                                        % Initial condition (point i
 Fcn = @(t,z,param) vdP_auto_ap(t,z,param);          % Right-hand side of dz/dtau = f(z,epsilon)
 
 % Options
-options.system   = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','continuation of van der Pol oscillator');   % Properties of the system
+options.system   = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','Continuation of van der Pol Oscillator');   % Properties of the system
 options.opt_sol = costaropts('sol_type','periodic','approx_method','shooting','cont','on','stability','off', ...            % Properties of the solution
                              'auto_freq',auto_freq,'act_param',active_parameter);                                           % Properties of the solution
 options.opt_init = costaropts('ic',IC);                                                                                     % Property for initial solution
@@ -106,5 +109,5 @@ options.opt_cont = costaropts('mu_limit',mu_limit);                             
 [S,DYN] = costar(options);                          % CoSTAR is called by costar(options)
 
 % Postprocessing
-opt_solplot = costaropts('zaxis',@(z) z(:,1),'space','time','mu',[1,2]);    % "options" structure for the solplot function
-[t_vdP,z1_vdP,mu_vdP] = S.solplot(DYN,opt_solplot);                         % Plot time-dependent approximate solution z(tau,mu) for desired mu-values
+solplot_options_2 = costaropts('zaxis',@(z) z(:,1),'space','time','mu',[1,2]);      % "options" structure for the solplot function
+solplot_output_2  = S.solplot(DYN,solplot_options_2);                               % Plot time-dependent approximate solution z(tau,mu) for desired mu-values

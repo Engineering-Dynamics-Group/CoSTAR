@@ -51,6 +51,7 @@ elseif  strcmpi(obj.pred,'cubic')
 
     % Same problem as when using parable predictor (see lines 30 - 34 above) 
     % -> When using secant as direction vector: deactivate lines 30 - 32 in continuation method "predictor"      
+    % obj.dy0 = (obj.y0 - obj.p_y0_old{3}) / norm(obj.y0 - obj.p_y0_old{3});   % Use secant as direction vector
     sp_pre = obj.direction.*obj.step_width; 
     yp_pre = obj.y0 + obj.p_C(:,1).*sp_pre + obj.p_C(:,2).*(sp_pre)^2 + obj.p_C(:,3).*(sp_pre)^3;      % Guessed predictor point
     

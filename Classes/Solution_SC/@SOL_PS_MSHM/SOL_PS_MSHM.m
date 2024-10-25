@@ -103,7 +103,7 @@ classdef SOL_PS_MSHM < Solution
         %Postprocessing
         [s_time,mu,time]                        = evalsol_time(obj,DYN,options);                %Function gives back the solution in time domain
         [s_hypertime,mu,hypertimes]             = evalsol_hypertime(obj,DYN,options);           %Function gives back the solution in hypertime domain
-        [s_frequency,mu,frequency]              = evalsol_frequency(obj,DYN,options);           %Function gives back the solution in frequency domain
+        [s_amplitude,s_angle,mu,frequency]      = evalsol_frequency(obj,DYN,options);           %Function gives back the solution in frequency domain
 
     end
 

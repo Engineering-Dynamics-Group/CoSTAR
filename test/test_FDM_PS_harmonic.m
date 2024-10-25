@@ -90,4 +90,3 @@ plot(theta, sol_z2, 'r--')
 
 % Postprocessing
 benchmark_postprocess_periodic(DYN,S)
-
