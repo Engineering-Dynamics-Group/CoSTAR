@@ -4,7 +4,7 @@
 %                                                   %
 %                     Example:                      %
 %                  Postprocessing                   %
-%                   - contplot -                    %
+%                   - solplot -                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %          Welcome to the CoSTAR Examples!          %
@@ -16,7 +16,7 @@
 % The tutorials comprehensively explain certain CoSTAR modules, which is why they are the perfect starting point for CoSTAR beginners.
 % There is a corresponding tutorial for each example and both of them contain the same code.
 %
-% This example covers the postprocessing method contplot (associated tutorial: Tutorial_Postprocessing_contplot).
+% This example covers the postprocessing method solplot (associated tutorial: Tutorial_Postprocessing_solplot).
 % It is advised to run the sections of this example script separately and to not run the complete script.
 % To do this, place the cursor in the desired section to run and click "Run Section".
 
@@ -53,28 +53,46 @@ options.opt_cont = costaropts('mu_limit',mu_limit);                             
 
 
 
-%% Example 1: Continuation Plot
+%% Example 1: Solution curves of all state variables
 
-contplot_options_1 = costaropts('zaxis','max2');                % Define the options to recreate the continuation plot
-contplot_output_1  = S.contplot(DYN,contplot_options_1);        % CoSTAR postprocessing for continuation plots
-
-
-
-%% Example 2: Maximum absolute value of the state variables
-
-% Plot the maximum absolute value of x(theta) = z_1(theta) in green:
-contplot_options_2 = costaropts('zaxis',@(z) max(abs(z(:,1))),'color','g');
-contplot_output_2  = S.contplot(DYN,contplot_options_2);
-
-% Plot the maximum absolute value of x'(theta) = z_2(theta) in cyan (using rgb code [0,0.8,0.8]) and as dashed line into the same figure:
-contplot_options_3 = costaropts('zaxis',@(z) max(abs(z(:,2))),'color',[0,0.8,0.8],'linestyle','--','figure',gcf);     
-contplot_output_3  = S.contplot(DYN,contplot_options_3);
+solplot_options_1 = costaropts('space','hypertime','zaxis','all','index',100);      % Define the options
+solplot_output_1  = S.solplot(DYN,solplot_options_1);                               % CoSTAR postprocessing for individual solutions
 
 
 
-%% Example 3: Section of continuation curve using different resolution
+%% Example 2: Solutions parametrised in time (including trajectories)
 
-contplot_options_4 = costaropts('zaxis','max2','index',155:170,'resolution',500);     
-contplot_output_4  = S.contplot(DYN,contplot_options_4);
+% Plot the first state variable z_1 = x of two different solutions (at index 50 and at index 100) with respect to time t for t in [0, 25]
+solplot_options_2 = costaropts('space','time','zaxis',@(z) z(:,1),'index',[50,100],'interval',[0,25],'resolution',500);
+solplot_output_2  = S.solplot(DYN,solplot_options_2);
 
-xlim([min(contplot_output_4.mu) max(contplot_output_4.mu)])     % Adapt the abscissa limits to the plotted curve
+
+% Display the trajectory of the solution at index 100:
+solplot_options_3 = costaropts('space','trajectory','xaxis',@(z) z(:,1),'zaxis',@(z) z(:,2),'index',100);
+solplot_output_3  = S.solplot(DYN,solplot_options_3);
+
+% Display the trajectory of the solution at index 50 for t in [0, 12.5] in red and as a dashed line into the same figure:
+solplot_options_4 = costaropts('space','trajectory','xaxis',@(z) z(:,1),'zaxis',@(z) z(:,2),'index',50,'interval',[0,12.5],...
+                               'color','r','linestyle','--','figure',gcf);
+solplot_output_4  = S.solplot(DYN,solplot_options_4);
+
+
+
+%% Example 3: Frequency content of a solution
+
+% Compute the end time of the intervals
+res = 2^13;                                                                         % resolution
+T_50 = 2*pi/S.freq(50);                 T_100 = 2*pi/S.freq(100);                   % periods of the solutions
+Delta_t_50 = 100*T_50 / res;            Delta_t_100 = 100*T_100 / res;              % time steps between two consecutive points
+int_end_50 = 100*T_50 - Delta_t_50;     int_end_100 = 100*T_100 - Delta_t_100;      % end time of the intervals
+
+% Compute the frequency content of the solution x(t) at index 50
+solplot_options_5 = costaropts('space','frequency','zaxis',@(z) z(:,1),'index',50,'interval',[0 int_end_50],'resolution',res);
+solplot_output_5  = S.solplot(DYN,solplot_options_5);
+
+% Compute the frequency content of the solution x(t) at index 100 and plot the results into the same figure
+solplot_options_6 = costaropts('space','frequency','zaxis',@(z) z(:,1),'index',100,'interval',[0 int_end_100],'resolution',res,'figure',gcf);
+solplot_output_6  = S.solplot(DYN,solplot_options_6);
+
+% Adjust the limits of the frequency (horizontal) axis to see the interesting part of the frequency content more clearly
+xlim([0 5])
