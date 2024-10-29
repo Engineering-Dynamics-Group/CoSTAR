@@ -4,7 +4,7 @@
 %                                                   %
 %                    Tutorial:                      %
 %               Periodic Solutions                  %
-%               - Shooting Method -                 %
+%         - (Multiple) Shooting Method -            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %           Welcome to the CoSTAR Tutorials!        %
@@ -16,7 +16,7 @@
 % These provide example code to briefly show how the toolbox can be set up and how a certain CoSTAR module can be used.
 % There is a corresponding example for each tutorial and the code of both of them is identical.
 %
-% In this tutorial, we will look at how to compute periodic solutions using the Shooting Method (SHM) to approximate the ...           
+% In this tutorial, we will look at how to compute periodic solutions using the (Multiple) Shooting Method (SHM) to approximate the ...           
 % solution (associated example: Example_PS_SHM). We will learn how to set up CoSTAR and how to correctly define all the required ...
 % settings on the basis of two different examples:
 %
@@ -198,19 +198,25 @@ options.opt_sol = costaropts('sol_type','periodic','approx_method','shooting','c
 options.opt_init = costaropts('ic',IC);
 % Mandatory fields: - 'ic':  Defines a point in state space where fsolve starts to iterate towards a point on the periodic orbit ... 
 %                            of sought solution z(tau,mu). 'ic' should be as close as possible to the periodic orbit.
-%                            -> Allowed values: [dim x 1] (double) array            (no default value)
+%                            -> Allowed values: [dim x 1] (double) array
+%                            -> Default value:  (no default value)
 %
 % So far we have defined all "options" structures which CoSTAR always needs. Since we want to calculate a periodic solution and ...
 % execute a continuation, we also have to set the "options.opt_approx_method" as well as the "options.opt_cont" structures.
 % The fields of the "options.opt_approx_method" structure depend on the solution type as well as the chosen approximation method. ...
-% For periodic solutions using the SHM, there are no mandatory fields and only one optional field.
-options.opt_approx_method = costaropts('solver','ode45');
-% Optional fields: - 'solver':  Sets the solver for time integration in order to obtain the time-dependent solution z(tau,mu). ...
-%                               Use specialised solvers for stiff ODEs, e.g. ode15s. ...
-%                               -> Allowed values: 'ode45', 'ode78', 'ode89', 'ode23', 'ode113', 'ode15s', 'ode23s', 'ode23t', 'ode23tb'
-%                               -> Default value:  'ode45'
-% NOTE: It is not necessary to set the field 'solver' since the default value is used. However, it is demonstrated here in order ...
-%       to show the field and a possible value.
+% For periodic solutions using the SHM, there are no mandatory fields and only two optional fields.
+options.opt_approx_method = costaropts('solver','ode45','n_shoot',2);
+% Optional fields: - 'solver':   Sets the Matlab-proprietary numerical integration algorithm to obtain the time-dependent solution ...
+%                                z(tau,mu). Use specialised solvers for stiff ODEs, e.g. ode15s. ...
+%                                -> Allowed values: 'ode45', 'ode78', 'ode89', 'ode23', 'ode113', 'ode15s', 'ode23s', 'ode23t', 'ode23tb'
+%                                -> Default value:  'ode45'
+%                   - 'n_shoot': Defines the number of intervals into which the period of a solution is divided for multiple shooting. ...
+%                                This means that n_shoot points on the periodic solution in state space are computed. ...
+%                                n_shoot = 1 is denoted as single shooting method, while n_shoot > 1 represents multiple shooting.
+%                                -> Allowed values: Positive integer
+%                                -> Default value:  2
+% NOTE: It is not necessary to set the fields 'solver' and 'n_shoot' since the default values are used. However, it is demonstrated here ...
+%       in order to show the fields and possible values.
 %
 options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.05);
 % Mandatory fields: - 'mu_limit':  Sets the limits of the continuation. For this purpose, we defined the "mu_limit" variable.
@@ -450,19 +456,25 @@ options.opt_sol = costaropts('sol_type','periodic','approx_method','shooting','c
 options.opt_init = costaropts('ic',IC);
 % Mandatory fields: - 'ic':  Defines a point in state space where fsolve starts to iterate towards a point on the periodic orbit ... 
 %                            of sought solution z(tau,mu). 'ic' should be as close as possible to the periodic orbit.
-%                            -> Allowed values: [dim x 1] (double) array            (no default value)
+%                            -> Allowed values: [dim x 1] (double) array
+%                            -> Default value:  (no default value)
 %
 % So far we have defined all "options" structures which CoSTAR always needs. Since we want to calculate a periodic solution and ...
 % execute a continuation, we also have to set the "options.opt_approx_method" as well as the "options.opt_cont" structures.
 % The fields of the "options.opt_approx_method" structure depend on the solution type as well as the chosen approximation method. ...
-% For periodic solutions using the SHM, there are no mandatory fields and only one optional field.
-options.opt_approx_method = costaropts('solver','ode45');
-% Optional fields: - 'solver':  Sets the solver for time integration in order to obtain the time-dependent solution z(tau,mu). ...
-%                               Use specialised solvers for stiff ODEs, e.g. ode15s. ...
-%                               -> Allowed values: 'ode45', 'ode78', 'ode89', 'ode23', 'ode113', 'ode15s', 'ode23s', 'ode23t', 'ode23tb'
-%                               -> Default value:  'ode45'
-% NOTE: It is not necessary to set the field 'solver' since the default value is used. However, it is demonstrated here in order ...
-%       to show the field and a possible value.
+% For periodic solutions using the SHM, there are no mandatory fields and only two optional fields.
+options.opt_approx_method = costaropts('solver','ode45','n_shoot',2);
+% Optional fields: - 'solver':   Sets the Matlab-proprietary numerical integration algorithm to obtain the time-dependent solution ...
+%                                z(tau,mu). Use specialised solvers for stiff ODEs, e.g. ode15s. ...
+%                                -> Allowed values: 'ode45', 'ode78', 'ode89', 'ode23', 'ode113', 'ode15s', 'ode23s', 'ode23t', 'ode23tb'
+%                                -> Default value:  'ode45'
+%                   - 'n_shoot': Defines the number of intervals into which the period of a solution is divided for multiple shooting. ...
+%                                This means that n_shoot points on the periodic solution in state space are computed. ...
+%                                n_shoot = 1 is denoted as single shooting method, while n_shoot > 1 represents multiple shooting.
+%                                -> Allowed values: Positive integer
+%                                -> Default value:  2
+% NOTE: It is not necessary to set the fields 'solver' and 'n_shoot' since the default values are used. However, it is demonstrated here ...
+%       in order to show the fields and possible values.
 %
 options.opt_cont = costaropts('mu_limit',mu_limit);
 % Mandatory fields: - 'mu_limit':  Sets the limits of the continuation. For this purpose, we defined the "mu_limit" variable.
@@ -534,7 +546,7 @@ solplot_output_2 = S.solplot(DYN,solplot_options_2);
 %%                  Final Words                    %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% The CoSTAR tutorial on calculating periodic solutions using the Shooting Method is now finished.
+% The CoSTAR tutorial on calculating periodic solutions using the (Multiple) Shooting Method is now finished.
 % For additional information, please use the "costarhelp" function and/or the CoSTAR manual.
 
 % If you are interested in learning about further capabilities of CoSTAR, you are invited to have a look at the other tutorials as well.

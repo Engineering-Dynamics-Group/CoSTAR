@@ -4,7 +4,7 @@
 %                                                   %
 %                     Example:                      %
 %               Periodic Solutions                  %
-%               - Shooting Method -                 %
+%         - (Multiple) Shooting Method -            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %          Welcome to the CoSTAR Examples!          %
@@ -16,7 +16,7 @@
 % The tutorials comprehensively explain certain CoSTAR modules, which is why they are the perfect starting point for CoSTAR beginners.
 % There is a corresponding tutorial for each example and both of them contain the same code.
 %
-% This example covers the computation of periodic solutions using the Shooting Method (associated tutorial: Tutorial_PS_SHM).
+% This example covers the computation of periodic solutions using the (Multiple) Shooting Method (associated tutorial: Tutorial_PS_SHM).
 % It is advised to run the sections of this example script separately and to not run the complete script.
 % To do this, place the cursor in the desired section to run and click "Run Section".
 
@@ -46,7 +46,7 @@ options.system = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','Co
 options.opt_sol = costaropts('sol_type','periodic','approx_method','shooting','cont','on','stability','on', ...     % Properties of the solution
                              'non_auto_freq',non_auto_freq,'act_param',active_parameter);                           % Properties of the solution
 options.opt_init = costaropts('ic',IC);                                                                             % Property for initial solution
-options.opt_approx_method = costaropts('solver','ode45');                                                           % Properties of approximation method
+options.opt_approx_method = costaropts('solver','ode45','n_shoot',2);                                               % Properties of approximation method
 options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.05);                                               % Properties for continuation
 
 % Continuation
@@ -102,7 +102,7 @@ options.system   = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','
 options.opt_sol = costaropts('sol_type','periodic','approx_method','shooting','cont','on','stability','off', ...            % Properties of the solution
                              'auto_freq',auto_freq,'act_param',active_parameter);                                           % Properties of the solution
 options.opt_init = costaropts('ic',IC);                                                                                     % Property for initial solution
-options.opt_approx_method = costaropts('solver','ode45');                                                                   % Properties of approximation method
+options.opt_approx_method = costaropts('solver','ode45','n_shoot',2);                                                       % Properties of approximation method
 options.opt_cont = costaropts('mu_limit',mu_limit);                                                                         % Properties for continuation
 
 % Continuation
