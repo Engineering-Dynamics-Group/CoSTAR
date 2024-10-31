@@ -1,0 +1,515 @@
+--------------------------------------------
+------------------ v2.7.0 ------------------
+--------------------------------------------
+
+@DynamicalSystem:
+    - s_DYN_gatekeeper
+        --> line 111 'mshm' added to p_approx_method_allowed_fieldvalues
+
+@ApproxMethod
+    - s_method_selection
+        --> lines 25-32 added
+        --> lines 28,30 changed (methods renamed)
+
+@AM_PS_MSHM
+    - properties
+        --> line 9 added n_shoot (number of shooting points)
+
+    - Constructor
+        --> renamed AM_PS_MSHM
+        --> lines 28 and 29 switched to ensure that solver_function is set before getIV is called
+    
+    - MSHM_auto_fun 
+        --> renamed
+        --> Multiple changes to repurpose this file for multiple shooting
+
+    - MSHM_fun       
+        --> renamed
+        --> multiple changes to repurpose this file for multiple shooting
+
+    - getIV
+        --> if-statement added (lines 29-47) (autonomous case)
+            => checks whether there is more than one shooting point
+            => If n_shoot>1, do time integration from supplied ic
+            => Extract values from shooting points
+            => Set iv for multiple shooting
+
+        --> if-statement added (lines 29-47) (non-autonomous case)
+            => checks whether there is more than one shooting point
+            => If n_shoot>1, do time integration from supplied ic
+            => Extract values from shooting points
+            => Set iv for multiple shooting
+         
+        
+@ST_PS_SHM
+    - PS_SHM_calc_stability_non_auto
+        --> line 23 added (comment)
+
+- intial_solution
+    --> line 115 additional or statement to if added (&& 'mshm')
+    
+@Solution
+    - s_solution_selection
+        --> lines 22-24 added (if-statement for multiple shooting)
+
+@SOL_PS_MSHM (new subclass) Solution subclass for multiple shooting
+    - evalsol_time
+        --> line 16 added (fetch dimension of state-space)
+        --> line 38 s0 changed to s0(1:dim,1) to choose only the first shooting point
+        --> line 44 s1 changed to s1(1:dim,1) to choose only the first shooting point
+
+
+----------
+
+Feature_Stability_Multiple_Shoot:
+
+
+@Stability
+    - s_stability_selection
+        --> lines 25-31 commented (Stability of single shooting disabled)
+        --> lines 33-42 added (Stability now with multiple shooting)
+
+@ST_PS_MSHM     (New Subclass) Calculates stability using multiple shooting
+    - Subclass renamed
+
+    - Properties
+        --> n_shoot (line 11) added, to define number of shooting points for stability calculation
+    
+    - methods renamed
+        --> MSHM_fun
+        --> MSHM_auto_fun
+        --> PS_MSHM_calc_stability_auto
+        --> PS_MSHM_calc_stability_nonauto
+
+    - new methods
+        --> MSHM_fun
+        --> MSHM_auto_fun
+
+    - PS_MSHM_calc_stability_non_auto
+        --> lines 20-27 added
+        --> lines 29-32 commented
+        --> line 19 if statement changed from 'mshm' to 'shooting'
+    
+    - PS_MSHM_calc_stability_auto
+        --> Name of method changed
+        --> Multiple changes for switch to multiple shoot
+        --> line 18 if statement changed from 'mshm' to 'shooting'
+
+    - getIV
+        --> Line 33 changed, extract initial mu from DYN.non_auto_freq instead of y(end,1)
+
+    - s_PS_SHM_gatekeeper
+        --> Line 14 new allowed field value 'n_shoot'
+        --> Lines 28-31 added
+
+ST_PS_SHM
+    - subclass removed, tasks now performed by ST_PS_MSHM
+
+@ApproxMethod_SC
+    - s_AM_gatekeeper
+        --> line 24 method call changed from 'AM_PS_SHM.s_PS_SHM_gatekeeper' to 'AM_PS_MSHM.s_PS_SHM_gatekeeper'
+    
+    - s_method_selection
+        --> if statement for old shooting removed (lines 16-23), if statement 'mshm' renamed to 'shooting'
+
+@AM_PS_FDM
+    - getIC
+        --> Additional argument n_shoot added to be able to use multiple shooting to determine stability
+        --> Multiple changes to interpolate solution over period and extract shooting points
+        --> Lines 14-20 added. If statement to check whether system is autonomous or not, fetch frequency accordingly and reshape Z accordingly
+
+@AM_PS_FGM
+    - getIC
+        --> Additional argument n_shoot added to be able to use multiple shooting to determine stability
+        --> Multiple changes to interpolate solution over period and extract shooting points
+        --> Lines 15-19 added choose either autonomous or non-autonomous frequency
+
+@AM_PS_SHM
+    - subclass removed, no single shooter needed, task is now performed by AM_PS_MSHM
+
+@Solution_SC
+    - s_solution_selection
+        --> Lines 18-20 removed, if statement 'mshm' renamed to 'shooting'
+
+@SOL_PS_SHM
+    - subclass removed, no single shooter needed, task is now performed by SOL_PS_MSHM
+
+@test
+    Multiple files regardind SHM changed to mshm 
+    - test_SHM_PS_fvdP 
+        --> approx_method now 'mshm', opt_approx_method.n_shoot = 5 added
+        --> approx_method now 'shm'
+    - test_SHM_PS_langford
+        --> approx_method now 'mshm', opt_approx_method.n_shoot = 5 added
+        --> approx_method now 'shm'
+    - test_SHM_PS_laval
+        --> approx_method now 'mshm', opt_approx_method.n_shoot = 5 added
+        --> approx_method now 'shm'
+    - test_SHM_PS_vdP 
+        --> approx_method now 'mshm', opt_approx_method.n_shoot = 5 added
+        --> approx_method now 'shm'
+
+@functions
+    - inital solution
+        --> line 115 if statement changed now if(quasiperiodic and (shooting or mshm)) instead of if(quasiperiodic and shooting and mshm)
+
+
+@DynamicalSystem
+    - s_DYN_gatekeeper
+        --> line 111 'mshm' and 'shooting' removed from allowed field values for approx_method
+    
+
+
+--------------------------------------------
+------------------ v2.7.1 ------------------
+--------------------------------------------
+  
+The postprocessing methods contplot, solget and solplot now return a struct instead of multiple output arguments.
+
+    @Continuation:
+        - plot_contplot:
+            --> Output arguments of contplot adapted (lines 23, 32, 44, 53, 56, 61, 64, 69 and 72)
+            --> Setting of obj.p_axes_values_old and of tmp adapted to fit output structure of contplot (lines 24, 33, 45, 54, 57, 62, 65, 70, 73 and 79)
+
+    @Solution:
+        - contplot:
+            --> Explanation text adapted (lines 5 - 56)
+            --> Output argument changed from "varargout" to struct "output" (lines 59, 316 and 317, former line 65 removed)
+            --> Output argument of solget as well as section "Get the data" adapted (lines 98 - 103)
+        - solget:
+            --> Explanation text adapted (lines 4 - 85)
+            --> Output arguments changed to struct "output" (lines 88 and 178 - 191, former line 105 removed)
+            --> Output arguments of evalsol_...-methods adapted (lines 115, 119 and 123)
+            --> Initialisation of s_out added (lines 146, 151 and 156)
+        - solplot:
+            --> Explanation text adapted (lines 2 - 110)
+            --> Output argument changed from "varargout" to struct "output" (lines 113, 193 - 195, 229 - 232, 247 - 249, 339 - 341 and 375 - 377)
+            --> Output argument of solget methods adapted (lines 164 - 168, 202 - 205, 267 - 271 and 347 - 251)
+            --> case 'trajectory': Preallocation of idx_mu, x and z is now done before if...else condition,  (lines 207 - 209)
+            --> case 'trajectory': s_traj renamed to s (lines 203, 208 - 209, 215, 217 - 219 and 239 - 240)
+
+    test:
+        - test_EQ_pitchfork:
+            --> Output arguments of contplot and name of corresponding options struct adapted (lines 40 - 43)
+
+    test\01postprocessing:
+        - benchmark_postprocess_equilibrium:
+            --> Output arguments of contplot and name of corresponding options struct adapted (lines 5 - 15)
+        - benchmark_postprocess_periodic:
+            --> Output arguments of solget, contplot and solplot as well as names of corresponding options structs adapted (lines 8 - 74)
+        - benchmark_postprocess_quasiperiodic:
+            --> Output arguments of solget, contplot and solplot as well as names of corresponding options structs adapted (lines 8 - 80)
+
+
+---------- 
+
+When the frequency content of a solution is requested via solplot or solget, the phase angles are returned as well now.
+
+    @SOL_PS_FDM:
+        - evalsol_frequency:
+            --> Description adapted, variables a and s_angle added to store the phase angles returned by costarFFT (lines 2, 11, 12, 19, 30, 31, 33, 39 and 41 - 43)
+        - SOL_PS_FDM:
+            --> Output argument s_angle added to method evalsol_frequency (lines 129)
+
+    @SOL_PS_FGM:
+        - evalsol_frequency:
+            --> Description adapted, variable a added to store the phase angles returned by costarFFT (lines 8, 9, 11, 14 and 23)
+            --> Computation of the phase angles added (line 43)
+            --> Overhaul of building the frequency vector and the amplitude matrix. The frequency values are distributed in a better way now
+        - SOL_PS_FGM:
+            --> Output argument s_angle added to method evalsol_frequency (lines 158)
+
+    @SOL_PS_SHM:
+        - evalsol_frequency:
+            --> Description adapted, variables a and s_angle added to store the phase angles returned by costarFFT (lines 11, 12, 14, 17 and 33 - 37)
+            --> Sections for parameters and preallocation added (lines 21 - 28)
+        - SOL_PS_SHM:
+            --> Output argument s_angle added to method evalsol_frequency (lines 106)
+
+    @SOL_QPS_FDM:
+        - evalsol_frequency:
+            --> Description adapted, variables a and s_angle added to store the phase angles returned by costarFFT (lines 10, 11, 13, 16, 27, 28, 30, 36 and 38 - 40)
+        - SOL_QPS_FDM:
+            --> Output argument s_angle added to method evalsol_frequency (lines 130)
+
+    @SOL_QPS_FGM:
+        - evalsol_frequency:
+            --> Description adapted, variable a added to store the phase angles returned by costarFFT (lines 2, 8, 9, 11, 14 and 24)
+            --> Computation of the phase angles added (line 47)
+            --> Overhaul of building the frequency vector and the amplitude matrix. The frequency values are distributed in a better way now
+        - SOL_QPS_FGM:
+            --> Output argument s_angle added to method evalsol_frequency (lines 121)
+
+    @SOL_QPS_SHM:
+        - evalsol_frequency:
+            --> Description adapted, variables a and s_angle added to store the phase angles returned by costarFFT (lines 1 - 4, 10, 11, 13, 16 and 31 - 35)
+            --> Sections for parameters and preallocation added (lines 20 - 27)
+        - SOL_QPS_SHM:
+            --> Output argument s_angle added to method evalsol_frequency (lines 114)
+
+    @Solution:
+        - solget:
+            --> Output argument alpha of evalsol_frequency and output structure field 'angle' added (lines 121 and 187)
+        - solplot:
+            --> Output structure field 'angle' added (lines 105, 350, 378)
+
+
+----------  
+
+Default resolution of 200 (50 for quasi-periodic hypertime solutions) now affects continuation as well as postprocessing.
+
+    @Continuation:
+        - plot_contplot:
+            --> Definition of default resolution removed (former lines 10 - 15)
+            --> Field 'resolution' in option structs removed (lines 22, 31, 43, 52, 55, 60, 63, 68, 71)
+
+    @Solution:
+        - s_help_contplot:
+            --> Description of default value adapted (line 23)
+        - s_help_solget:
+            --> Description of default value adapted (line 42)
+        - s_help_solplot:
+            --> Description of default value adapted (line 51)
+        - solget:
+            --> Definition of default resolution added/modified (lines 101 - 107)
+  
+          
+----------  
+
+It is now prohibited for the user to use solget for equilibrium solutions (call of solget from contplot is still available).
+
+    @Solution:
+        - contplot:
+            --> Field 'call_from_contplot' is added to solget_options to tell solget that it was called from contplot (line 77)
+        - s_help_solget:
+            --> Description of field 'eval' adapted (line 23, former line 24 removed)
+        - solget_gatekeeper:
+            --> Lines 26 - 31 added
+
+    @SOL_EQ:
+        - evalsol_frequency:
+            --> Deleted since this method has no use anymore
+        - evalsol_time:
+            --> Deleted since this method has no use anymore
+        
+
+    test\01postprocessing:
+        - benchmark_postprocess_equilibrium:
+            --> Variables n and index as well as section for solget removed (former lines 3 - 17)
+
+
+----------  
+ 
+Overhaul of check_fcn_handle method: Bugs fixed, function handle check improved and check added for solget calls.
+Its is now possible for solplot calls to request multiple state variables, similar to solget.
+
+    @Solution:
+        - check_fcn_handle:
+            --> Complete overhaul with many adaptions
+            --> Resolution and dimension of system is now used for function check
+            --> Individual check for calls from solget_gatekeeper added
+            --> Check for calls from solplot_gatekeeper and contplot_gatekeeper improved, case 'matrix_or_vector' added for d_out
+        - contplot_gatekeeper:
+            --> Check of options.zaxis moved from former lines 47 - 55 to lines 102 - 110
+            --> Comments adapted (lines 48 - 50)
+            --> Check for field 'resolution' added (lines 75 - 90)
+        - s_help_solget:
+            --> Description of function handle of field 'eval' adapted (line 23)
+        - s_help_solplot:
+            --> Description of function handle of field 'zaxis' adapted (line 26 - 27)
+        - solget_gatekeeper:
+            --> Data check for options.eval removed from former lines 54 - 57
+            --> Comments and error messages improved (lines 52, 58, 72, 82, 117, 126, 143, 160 and 167)
+            --> Check for options.eval added for each solution space (lines 128 - 134, 145 - 151 and 169 - 175)
+        - solplot_gatekeeper:
+            --> Method description,m comments and error messages improved (lines 1 - 8, 52, 57 - 59, 63, 111, 119, 133, 139, 148, 161, 170 and 185)
+            --> Checks for field 'resolution' added (lines 84 - 99 and 172 - 177)
+            --> Calls of check_fcn_handle adapted (input arguments modified) (lines 117, 136 - 138, 154 and 183)
+        - Solution:
+            --> Definition (input arguments) of method check_fcn_handle adapted (line 77)
+
+
+----------  
+    
+Functions:
+
+    - costarFFT:
+        --> Description, error message, comments and names of output arguments adapted and improved
+        --> Section "Interpolation of ODE data" adapted. Last element of Zi is not removed anymore when Zi has uneven number of elements
+  
+          
+----------  
+
+Tutorials:
+
+    - Tutorial_Postprocessing:
+        --> Split into Tutorial_contplot, Tutorial_solget and Tutorial_solplot
+
+    - Tutorial_Postprocessing_contplot:
+        --> Tutorial added and finished
+
+    - Tutorial_Postprocessing_solget:
+        --> Tutorial added and finished
+
+    - Tutorial_Postprocessing_solplot:
+        --> Tutorial added and finished  
+
+
+---------- 
+
+Test:
+
+    - benchmark_postprocess_periodic: 
+        --> Various adjustments of the option structures
+        --> solget section adapted and test calls added (line 7 - 27)
+
+    - benchmark_postprocess_quasiperiodic: 
+        --> Various adjustments of the option structures
+        --> solget section adapted and test calls added (line 7 - 27)
+
+
+----------
+
+@costarhelp:
+
+    - solget: 
+        --> Solution space "solution" in description removed (lines 14 and 15)
+
+
+@Gatekeeper:
+
+    - m_gatekeeper:
+        --> Fieldvalues of options.system are not changed to lower case anymore so that field system.info is not changed (line 60 commented)
+
+@AM_QPS_SHM:
+
+    - getIV:
+        --> Access to variable f adapted since f is a column vector now after modifications of costarFFT (lines 142, 153 and 162)
+
+
+@Solution:
+
+     - contplot:
+        --> The solution type is now mentioned in the title. When info is provided by the user, the info is set as title 
+            (lines 116, 133, 147 and 161 removed, lines 308 - 313 added)
+        --> ylabel improved. It is now dependent on the field 'zaxis' and the solution type 
+            (former lines 117, 134, 148 and 162 removed, lines 115 - 116, 126, 129, 132, 140, 143, 146, 154, 157 and 160 added)
+
+    - contplot_gatekeeper 
+        --> Gatekeeper texts for field 'color' adapted (lines 70 and 73)
+
+    - s_help_contplot:
+        --> Variously improved and updated
+
+    - s_help_solplot:
+        --> Variously improved and updated
+
+    - solget: 
+        --> Method output arguments adapted and varargout code lines commented (lines 87, 105 ,112, 117, 123, 174 and 175)
+
+    - solget_gatekeeper: 
+        --> Options field 'costaropts' is removed now when present (lines 24 - 25)
+        --> Renamed trajectory_[...]_fieldnames to hypertime_[...]_fieldnames (lines 125 - 127)
+        --> Field 'resolution' must be even number now when frequency solution space is selected (lines 136 - 141)
+
+    - solplot: 
+        --> The solution type is now mentioned in the title of a plot (lines 153, 184, 256, 290 and 368)
+        --> Solutions in trajectory solution space are now returned for all indices 
+            (lines 227 - 229 and 254 - 255 added, lines 231 - 233, 236, 257 - 258 and 261 adapted)
+        --> ylabel of frequency plots "\mathcal{F} (z_i)" replaced by "\mathcal{F}_i (\omega)" (line 381)
+
+    - solplot_gatekeeper:
+        --> Array size of field 'color' is now checked when data type is double (line 68)
+        --> Gatekeeper texts for field 'color' adapted (lines 70, 73 and 141)
+
+
+@SOL_EQ:
+
+    - evalsol_hypertime: 
+        --> Returned hypertime array is empty now (line 20) 
+        --> Method does not call evalsol_time anymore (lines 18 and 19)
+    
+
+
+--------------------------------------------
+----------------- v2.7.1.1 -----------------
+--------------------------------------------
+
+Approximation Method AM_Equilibrium renamed to AM_EQ.
+
+    @AM_EQ (former @AM_Equilibrium)
+        - AM_EQ (line 4 and 25)
+
+    @ApproxMethod:
+        - s_AM_gatekeeper (line 16)
+        - s_method_selection (line 9)
+
+
+----------
+
+Multiple Shooting Method:
+
+
+    * All classes and function containing "MSHM" renamed to "SHM" and removed methods SHM_single_fun and SHM_single_auto_fun.
+
+    
+    * Readded key word 'shooting' to allowed field values of options.opt_sol.approx_method
+
+        @DynamicalSystem:
+            - s_DYN_gatekeeper:
+                --> Readded key word 'shooting' to allowed field values of options.opt_sol.approx_method (line 111)
+
+
+    * Bugfixes: Definition of options.opt_approx_method.n_shoot = 0 and options.opt_stability.n_shoot = 0 by user is not possible anymore.
+                Furthermore, the field options.opt_stability.n_shoot is forbidden now for periodic solutions when shooting is already used as approximation method.
+                Moreover, the gatekeeper now also reports that options.opt_stability.solver is not allowed for quasi-periodic solutions when opt_sol.approx_method = 'shm' was defined by the user.
+
+        @AM_PS_SHM:
+            - s_PS_SHM_gatekeeper:
+                --> Added if-condition to catch 'n_shoot' = 0 (lines 37 - 39)
+
+        @ST_PS_SHM:
+            - s_ST_PS_SHM_gatekeeper:
+                --> Reworked check for field 'solver' and added or-condition for "if" to catch opt_sol.approx_method = 'shm' (lines 36 - 44)
+                --> Added if-condition to catch 'n_shoot' = 0 (lines 60 - 62)
+                --> Usage of 'n_shoot' is forbidden now when shooting is already used as approximation method (lines 50 - 55)
+
+        @ST_QPS_SHM:
+            - s_ST_PS_SHM_gatekeeper:
+                --> Reworked check for field 'solver' and added or-condition for "if" to catch opt_sol.approx_method = 'shm' (lines 36 - 44)
+
+
+    * Adaptions of tutorials, examples and help files to periodic multiple shooting method.
+
+        @AM_PS_SHM:
+            - s_help_opt_approx_method_PS_SHM
+                --> Help for field 'n_shoot' added (lines 18 and 19)
+
+        @ST_PS_SHM:
+            - s_help_opt_stability_PS_SHM
+                --> Help for field 'n_shoot' added (lines 27 to 30)
+
+        Tutorials:
+            - Tutorial_PS_SHM:
+                --> Changed Shooting Method to (Multiple) Shooting Method (line 7, 19 and 549)
+                --> Added field 'n_shoot' to example and added explanation plus reworked explanation of field 'solver' (lines 207 - 219 and 465 - 477)
+            - Example_PS_SHM:
+                --> Changed Shooting Method to (Multiple) Shooting Method (line 7 and 19)
+                 --> Added field 'n_shoot' to example (lines 49 and 105)
+
+
+----------
+
+Bugfix: Computation of eigenvalues and eigenvectors of monodromy matrix or Jacobian matrix is now possible when fsolve uses trust region algorithm and parallel computing.
+
+    @ST_EQ:
+        - EQ_calc_stability:
+            --> eig(J(1:end-1,1:end-1)) replaced by eig(full(J(1:end-1,1:end-1))) (line 20)
+
+    @ST_PS_SHM:
+        - PS_SHM_calc_stability_auto:
+            --> eig(M) replaced by eig(full(M)) (line 53)
+            --> Code optimised and duplicate code parts removed
+        - PS_SHM_calc_stability_non_auto:
+            --> eig(M) replaced by eig(full(M)) (line 53)
+            --> Code optimised and duplicate code parts removed

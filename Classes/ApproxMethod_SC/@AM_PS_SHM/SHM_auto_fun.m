@@ -4,10 +4,10 @@
 %@y:   solution vector for the continuation (contains continuation parameter)
 %@DYN  DynamicalSystem class object
 %
-%@res: resdiual vector for the newton-type corrector method in Continuation class
+%@res: residual vector for the newton-type corrector method in Continuation class
 
 
-function res = MSHM_auto_fun(obj,y,DYN)
+function res = SHM_auto_fun(obj,y,DYN)
 
     % This preallocation of the variable makes the code for some reasons
     % way faster... don't know why...
@@ -32,6 +32,7 @@ function res = MSHM_auto_fun(obj,y,DYN)
     z0 = reshape(s,[dim,n_shoot]);                                          % reshape y to state-space dimension x number of shooting points 
 
   
+    f_temp = zeros(dim,n_shoot);
     for k=1:n_shoot
         [~,Z{k,1}] = obj.solver_function(@(t,y)FCNwrapper(t,y,@(tau,z)Fcn(tau,z,param)),T0(k,:),[z0(:,k);omega],obj.odeOpts); 
         Zend(:,k) = Z{k,1}(end,1:dim);
@@ -44,22 +45,15 @@ function res = MSHM_auto_fun(obj,y,DYN)
     y_perm(end-dim+1:end,1) = s(1:dim,1);                                   % Shift initial vector y to allow direct subtraction
 
     res = yend-y_perm; 
-    res(end+1,:) = f.'*(s-s0);              %This is the Poincare condition
+    res(end+1,:) = f.'*(s-s0);                                              % This is the Poincare condition
 
 end
 
-%For the autonomous case a function wrapper is needed, which adds the
-%equation T' = 0, which needs to be added to the function and multiplies the right hand side f of
-%the original ODE with T/2*pi
+% For the autonomous case a function wrapper is needed, which adds the equation T' = 0, 
+% which needs to be added to the function and multiplies the right hand side f of the original ODE with T/2*pi
 function dzdt = FCNwrapper(t,y,Fcn)
     z = y(1:(end-1),:);
     base_frqn = y(end,:);       
     dzdt = 1./base_frqn.*Fcn(t,z);
     dzdt(end+1,:) = 0;
 end
-
-
-
-
-
-

@@ -1,13 +1,13 @@
-%Function for generating the residuum by means of a periodic shooting method for autonomous function
+% Function for generating the residuum by means of a periodic shooting method for autonomous function
 %
-%@obj: ApproxMethod subclass AM_PS_SHM object
-%@y:   solution vector for the continuation (contains continuation parameter)
-%@DYN  DynamicalSystem class object
+% @obj: ApproxMethod subclass AM_PS_SHM object
+% @y:   solution vector for the continuation (contains continuation parameter)
+% @DYN  DynamicalSystem class object
 %
-%@res: resdiual vector for the newton-type corrector method in Continuation class
+% @res: residual vector for the newton-type corrector method in Continuation class
 
 
-function res = MSHM_auto_fun(obj,x,x0,mu,DYN)
+function res = SHM_auto_fun(obj,x,x0,mu,DYN)
 
     Fcn     = DYN.rhs;
     n_shoot = obj.n_shoot;                                                  % Number of shooting points
@@ -41,18 +41,12 @@ function res = MSHM_auto_fun(obj,x,x0,mu,DYN)
     
 end
 
-%For the autonomous case a function wrapper is needed, which adds the
-%equation T' = 0, which needs to be added to the function and multiplies the right hand side f of
-%the original ODE with T/2*pi
+
+% For the autonomous case a function wrapper is needed, which adds the equation T' = 0, 
+% which needs to be added to the function and multiplies the right hand side f of the original ODE with T/2*pi
 function dzdt = FCNwrapper(t,y,Fcn)
     z = y(1:(end-1),:);
     base_frqn = y(end,:);       
     dzdt = 1./base_frqn.*Fcn(t,z);
     dzdt(end+1,:) = 0;
 end
-
-
-
-
-
-

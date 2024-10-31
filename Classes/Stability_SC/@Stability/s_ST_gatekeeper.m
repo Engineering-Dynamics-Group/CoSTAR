@@ -20,7 +20,7 @@ function s_ST_gatekeeper(GC,system,opt_sol,opt_stability)
     %%%%%%%%%%%%% PERIODIC %%%%%%%%%%%%%
     elseif strcmpi(opt_sol.sol_type,'periodic') || strcmpi(opt_sol.sol_type,'ps')
 
-            ST_PS_MSHM.s_ST_PS_SHM_gatekeeper(GC,system,opt_sol,opt_stability);
+            ST_PS_SHM.s_ST_PS_SHM_gatekeeper(GC,system,opt_sol,opt_stability);
 
 
     % %%%%%%%%%%%%% QUASIPERIODIC %%%%%%%%%%%%%

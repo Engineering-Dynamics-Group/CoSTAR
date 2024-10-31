@@ -108,7 +108,7 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
         opt_p_sol_mandatory_fieldnames  = {'sol_type','cont','stability','approx_method'};                                              %needed fieldsnames in the options super structure
         opt_p_sol_allowed_fieldnames    = {'sol_type','cont','stability','approx_method','act_param','non_auto_freq','auto_freq'};      %allowed fieldsnames in the options super structure
 
-        p_approx_method_allowed_fieldvalues = {'fourier-galerkin','fgm','shm','finite-difference','fdm'};
+        p_approx_method_allowed_fieldvalues = {'fourier-galerkin','fgm','shooting','shm','finite-difference','fdm'};
 
         %Check them again (mandatory fields changed... it is easier this way)
         GC.check_fields(opt_sol,'opt_sol',opt_p_sol_mandatory_fieldnames,opt_p_sol_allowed_fieldnames);
