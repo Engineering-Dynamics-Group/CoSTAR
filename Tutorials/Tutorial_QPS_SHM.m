@@ -269,12 +269,12 @@ options.opt_approx_method = costaropts('solver','ode45','n_char',40);
 % NOTE: It is not necessary to set 'solver' since the default value is used. However, it is demonstrated here in order to show ...
 %       the field and a possible value.
 %
-options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.25,'step_control_param',[3,5/180*pi]);
+options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.25,'step_control_param',[2,5]);
 % Mandatory fields: - 'mu_limit':            Sets the limits of the continuation. For this purpose, we defined the "mu_limit" variable.
 % Optional fields:  - 'step_width':          Defines the initial step width (default: 0.1). The step width will be altered in the ...
 %                                            range of step_width*[0.2, 5].
 %                   - 'step_control_param':  Sets properties for the step control (default value for step control method 'angle', ...
-%                                            which is used here: [3,3/180*pi]).
+%                                            which is used here: [2,3]).
 % NOTE: The fields belonging to the step control ('step_width' and 'step_control_param') are set in order to reduce the numerical ...
 %       effort. They are explained in a separate step control tutorial so you can ignore them at the moment.
 % 

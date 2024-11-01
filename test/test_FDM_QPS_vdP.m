@@ -1,4 +1,4 @@
-%% Example: Forced van-der-Pol Oscillator (quasi-periodic) %%
+%% Example: Forced van der Pol Oscillator (quasi-periodic) %%
 
 % clear variables; clc; close all;              % clear workspace; clear command window; close all figures
 % addpath(genpath('..\'))                       % Add main folder of CoSTAR and all subfolders to search path
@@ -38,7 +38,7 @@ options.opt_cont = costaropts('mu_limit',mu_limit,'pred','secant','display','ste
 % Available step control methods: 'off', 'on', 'corrector_iterations', 'norm_corrector', 'combination', 'angle', ('pid')
 options.opt_cont.step_width = 0.5;
 options.opt_cont.step_control = 'angle';
-%options.opt_cont.step_control_param = [3, 5/180*pi]; 
+% options.opt_cont.step_control_param = [2, 5]; 
 
 
 % Continuation and postprocessing
@@ -105,7 +105,7 @@ options.opt_cont = costaropts('mu_limit',mu_limit,'pred','secant','direction',-1
 % Available step control methods: 'off', 'on', 'corrector_iterations', 'norm_corrector', 'combination', 'angle', ('pid')
 options.opt_cont.step_width = 0.25;
 options.opt_cont.step_control = 'angle';
-%options.opt_cont.step_control_param = [3, 5/180*pi]; 
+% options.opt_cont.step_control_param = [2, 5]; 
 
 
 % Continuation and postprocessing

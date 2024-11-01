@@ -47,7 +47,7 @@ options.opt_sol = costaropts('sol_type','periodic','approx_method','finite-diffe
                              'non_auto_freq',non_auto_freq,'act_param',active_parameter);                                   % Properties of the solution
 options.opt_init = costaropts('c1',C1,'s1',S1);                                                                             % Property for initial solution
 options.opt_approx_method = costaropts('n_int',100,'scheme','central','approx_order',6);                                    % Properties of approximation method
-options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.25,'step_control_param',[3,7.5/180*pi]);                   % Properties for continuation
+options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.25,'step_control_param',[2,7.5]);                          % Properties for continuation
 
 % Continuation
 [S,DYN] = costar(options);                          % CoSTAR is called by costar(options)
@@ -76,7 +76,7 @@ options_kappa.opt_sol = costaropts('sol_type','periodic','approx_method','finite
                                    'non_auto_freq',non_auto_freq_kappa,'act_param',active_parameter_kappa);                             % Properties of the solution
 options_kappa.opt_init = costaropts('fdm_sol',FDM_sol);                                                                                 % Property for initial solution
 options_kappa.opt_approx_method = costaropts('n_int',150,'points',[-4,-3,-2,-1,0,1,2]);                                                 % Properties of approximation method
-options_kappa.opt_cont = costaropts('mu_limit',mu_limit_kappa,'step_width',0.25,'step_control_param',[3,7.5/180*pi]);                     % Properties for continuation
+options_kappa.opt_cont = costaropts('mu_limit',mu_limit_kappa,'step_width',0.25,'step_control_param',[2,7.5]);                          % Properties for continuation
 
 % Continuation
 [S_kappa,DYN_kappa] = costar(options_kappa);        % CoSTAR is called by costar(options)

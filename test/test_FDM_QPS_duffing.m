@@ -6,7 +6,7 @@
 
 %% Parameters
 D = 0.05;            ratio = sqrt(2);           % Damping factor and ratio of excitation frequencies (Omega_2/Omega_1)
-f1 = 0.25;           f2 = 0.25;                 % Amplitudes of excitations
+f1 = 0.25;           f2 = 0.25;                 % Amplitudes of excitation
 kappa = 1.5;                                    % Coefficient of nonlinear stiffness
 
 mu_limit = [0.8, 2];   mu0 = mu_limit(2);       % Limits of continuation diagram and mu-value at start of continuation
@@ -42,7 +42,7 @@ Fcn = @(t,z,param) duffing_ap_qp(t,z,param);    % Right-hand side of ODE
 
 
 %% Properties
-options.system   = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','continutaion of quasi-periodic Duffing');           % Properties of the system
+options.system   = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','Continuation of Quasi-Periodic Duffing');           % Properties of the system
 options.opt_sol  = costaropts('sol_type','quasiperiodic','approx_method','finite-difference','cont','on','stability','off',...      % Properties of the solution
                               'non_auto_freq',non_auto_freq,'act_param',active_parameter);                                          % Properties of the solution
 options.opt_init = costaropts('c1_matrix',C1_mat,'s1_matrix',S1_mat);                                                               % Properties for initial solution
@@ -53,9 +53,9 @@ options.opt_cont = costaropts('mu_limit',mu_limit,'pred','cubic','direction',-1,
 
 % Step control options
 % Available step control methods: 'off', 'on', 'corrector_iterations', 'norm_corrector', 'combination', 'angle', ('pid')
-options.opt_cont.step_width = 0.5;                              % Difficult Duffing: step_width = 1
+options.opt_cont.step_width = 0.5;                  % Difficult Duffing: step_width = 1
 options.opt_cont.step_control = 'angle';
-% options.opt_cont.step_control_param = [3, 3/180*pi];           % Difficult Duffing: step_control_param = [3, 5/180*pi]
+% options.opt_cont.step_control_param = [2, 3];     % Difficult Duffing: step_control_param = [2, 5]
  
 
 %% Continuation
@@ -64,7 +64,7 @@ tic                                             % Record current time
 toc                                             % Display elapsed time since tic
 
 
-%% Single solution at eta = 1.1: Using calculated solution of continuation as initial value, but different discretization
+%% Single solution at eta = 1.1: Using calculated solution of continuation as initial value, but different discretisation
 options.system.param = {D, kappa, f1, f2, 1.1, ratio};
 options.opt_sol.cont = 'off';
 options.opt_init = costaropts('fdm_sol',S.s(:,129),'n_int_1_fdm_sol',25,'n_int_2_fdm_sol',25);

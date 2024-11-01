@@ -1,4 +1,4 @@
-%%  Example: van-der-Pol Oscillator (periodic) %%
+%%  Example: van der Pol Oscillator (periodic) %%
 
 % clear variables; clc; close all;              % clear workspace; clear command window; close all figures
 % addpath(genpath('..\'))                       % Add main folder of CoSTAR and all subfolders to search path
@@ -29,7 +29,7 @@ options.opt_cont = costaropts('mu_limit',mu_limit,'display','step_control_info')
 % Available step control methods: 'off', 'on', 'corrector_iterations', 'norm_corrector', 'combination', 'angle', ('pid')
 % options.opt_cont.step_width = 0.1;
 % options.opt_cont.step_control = 'off';
-% options.opt_cont.step_control_param = [3, 3/180*pi]; 
+% options.opt_cont.step_control_param = [2, 3]; 
 
 
 %% Continuation

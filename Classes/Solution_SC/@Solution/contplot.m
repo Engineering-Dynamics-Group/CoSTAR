@@ -124,12 +124,12 @@ else
             if DYN.n_freq  == 0 
                 s_out = s;                                  % There is no minimum value for a point in state space
                 ystr = '$\Vert \mathbf z \Vert$';
-            elseif DYN.n_freq ==1 
+            elseif DYN.n_freq == 1 
                 s_out = permute(min(s,[],1),[2,3,1]);       % Minimum on hypertime domain [0,2*pi]. Third array dim of s indicates solution point (index)
                 ystr = '$\min \Vert \mathbf z (\theta) \Vert$';
-            else
+            elseif DYN.n_freq == 2
                 s_out = min(reshape(s,size(s,1)*size(s,2),size(s,4)),[],1);     % Minimum on hypertime domain [0,2*pi]^2. Fourth array dim of s indicates solution point (index)
-                ystr = '$\min \Vert \mathbf z (\mathbf\theta) \Vert$';
+                ystr = '$\min \Vert \mathbf z (\mbox{\boldmath $\theta$}) \Vert$';
             end
             
 
@@ -137,13 +137,13 @@ else
 
             if DYN.n_freq  == 0 
                 s_out = s;                                  % There is no mean value for a point in state space
-                ystr = '\Vert \mathbf z \Vert$';
+                ystr = '$\Vert \mathbf z \Vert$';
             elseif DYN.n_freq == 1
                 s_out = permute(mean(s,1),[2,3,1]);         % Mean on hypertime domain [0,2*pi]. Third array dim of s indicates solution point (index)
                 ystr = 'mean $\! \Vert \mathbf z (\theta) \Vert$';
-            else
+            elseif DYN.n_freq == 2
                 s_out = mean(reshape(s,size(s,1)*size(s,2),size(s,4)),1);    % Mean on hypertime domain [0,2*pi]^2. Fourth array dim of s indicates solution point (index)
-                ystr = 'mean $\! \Vert \mathbf z (\mathbf\theta) \Vert$';
+                ystr = 'mean $\! \Vert \mathbf z (\mbox{\boldmath $\theta$}) \Vert$';
             end
 
             
@@ -155,9 +155,9 @@ else
             elseif DYN.n_freq == 1
                 s_out = permute(max(s,[],1),[2,3,1]);       % Maximum on hypertime domain [0,2*pi]. Third array dim of s indicates solution point (index)
                 ystr = '$\max \Vert \mathbf z (\theta) \Vert$';
-            else
+            elseif DYN.n_freq == 2
                 s_out = max(reshape(s,size(s,1)*size(s,2),size(s,4)),[],1);     % Maximum on hypertime domain [0,2*pi]^2. Fourth array dim of s indicates solution point (index)
-                ystr = '$\max \Vert \mathbf z (\mathbf\theta) \Vert$';
+                ystr = '$\max \Vert \mathbf z (\mbox{\boldmath $\theta$}) \Vert$';
             end
 
             

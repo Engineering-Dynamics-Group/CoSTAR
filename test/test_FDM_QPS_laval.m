@@ -6,7 +6,7 @@
 
 %% Parameters
 Di = 0.2;     Delta = 1/3;     d3 = 0.25;       % Damping parameters
-e = 0.25;                                       % Excentricity
+e = 0.25;                                       % Eccentricity
 Fg = 0.3924;                                    % Weight force
 
 mu_limit = [1.72,2.5];    mu0 = mu_limit(2);    % Limits of continuation diagram and mu-value at start of continuation | NSB at mu = 1.71477
@@ -42,7 +42,7 @@ options.opt_cont = costaropts('mu_limit',mu_limit,'pred','secant','direction',-1
 % Available step control methods: 'off', 'on', 'corrector_iterations', 'norm_corrector', 'combination', 'angle', ('pid')
 options.opt_cont.step_width = 0.5;
 options.opt_cont.step_control = 'angle';
-%options.opt_cont.step_control_param = [3, 5/180*pi]; 
+% options.opt_cont.step_control_param = [2, 5]; 
 
 
 %% Continuation

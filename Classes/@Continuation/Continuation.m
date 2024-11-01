@@ -1,24 +1,24 @@
 % Class continuation provides a path continuation algorithm to continue
-% curves defined by the roots of an algebrai system of equations
+% curves defined by the roots of an algebraic system of equations
 classdef Continuation < handle
 
     properties
-        cont = 'on';                                                        %Continue if cont='on', if cont='off' stop after calculation of initial solution (Eigentlich nicht in continuation selbst genutzt!)
+        cont = 'on';                                                        %Continue if cont='on', if cont='off' stop after calculation of initial solution (actually not used here)
         pred string = 'tangent';                                            %Predictor to be used for the prediction of new curve point
         subspace string = 'pseudo-arc';                                     %Defines the subspace-constraint to close the corrector-equation
-        direction = 1;                                                      %Direction in which the curve shall be continued 1 = positiv mu-direction, -1 = negative mu-direction
+        direction = 1;                                                      %Direction in which the curve shall be continued. 1 = positive mu-direction, -1 = negative mu-direction
         display = 'on';                                                     %Display information in command window if = 'on', otherwise = 'off'
         plot = 'on';                                                        %If = 'on', a continuation plot is displayed during continuation
         step_control = 'angle';                                             %Default method used by step control
         step_control_param;                                                 %Array storing parameters used by step control
-        step_width = 0.1;                                                   %Stepwidth for continuation, further the initial stepwidth if step control is implemented
+        step_width = 0.1;                                                   %Step width for continuation, further the initial step width if step control is implemented
         step_width_limit = [];                                              %Limits for adaption of step width by step control
         max_cont_step = 1500;                                               %Maximum number of continuation steps
-        mu_limit                                                            %Limit of bifurcation paramter, when reached the continuation stops, e.g. mu_limit = [-1,2]
+        mu_limit                                                            %Limit of bifurcation parameter, when reached the continuation stops, e.g. mu_limit = [-1,2]
         fsolve_opts = optimoptions('fsolve','Display','none','UseParallel',false,'MaxFunctionEvaluations',20000,'MaxIter',1e3); %Options for fsolve to solve corrector-equation
         yp                                                                  %YP is the predicted curve point. It is public since it is exchanged with the ApproxMethod object.
         sub_con function_handle                                             %Function_handle for subspace constraint 
-        d_sub_con function_handle                                           %Derivatice of subspace constraint   
+        d_sub_con function_handle                                           %Derivative of subspace constraint   
 
         %Parameter of active curve point
         dy0                                                                 %Direction vector of the predictor
@@ -32,10 +32,10 @@ classdef Continuation < handle
         %Parameters of predicted curve point
         p_y1 = 0;                                                             %Initialise for get method of p_arcl_1 to be well defined
         p_J1
-        p_newton_flag = 0;                                                    %Exitflag of Newton solver
-        p_stopping_flag                                                       %Exitflag of continuation
-        p_arcl_0  = 0;                                                        %arclength of current point
-        p_arcl_1  = 0;                                                        %arclength of new point: Has its own get method
+        p_newton_flag = 0;                                                    %Exit flag of Newton solver
+        p_stopping_flag                                                       %Exit flag of continuation
+        p_arcl_0  = 0;                                                        %arc-length of current point
+        p_arcl_1  = 0;                                                        %arc-length of new point: Has its own get method
 
         p_y0_old                                                              %Stores last 3 "old" curve point for predictors
         p_error = NaN;                                                        %Current error of the solution point
@@ -53,12 +53,11 @@ classdef Continuation < handle
         p_vectors_bfp                                                         %(Eigen-)vectors corresponding to multipliers at bifurcation point
         p_arclength_bfp                                                       %arc-length of current bifurcation point 
         p_error_bfp  = NaN;                                                   %error at the bifurcation point      
-        % p_stability_flag                                                      %indicating if stability computation was successful and if stability can be determined based on multipliers
     end
     
     properties(Access=private)
         p_contDo uint32 = 1;                                                  %While contDo=1, do continuation, if conDo=0 stop continuation
-        p_local_cont_counter uint32 = 1;                                      %Counts number of continuated points
+        p_local_cont_counter uint32 = 1;                                      %Counts number of computed solutions
 
         %Parameters of the last point
         p_dy_old                                                              %Direction vector of the predictor
@@ -82,7 +81,6 @@ classdef Continuation < handle
         p_r = 1;                                                              %Factor which adapts step width
         p_e = 1;                                                              %Used for PID step control
         p_dx_dmu                                                              %Used for PID step control
-        p_C                                                                   %Used for parable or cubic predictor: stores coefficients C1 and C2 (and C3) of the polynom
     end
     %%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%
@@ -114,18 +112,18 @@ classdef Continuation < handle
         obj = iterate_data(obj);                                            %Iterates the relevant data: new data point 1 is now current data point 0 for next iteration
         obj = check_limits(obj);                                            %Checks, if the current continuation parameter is within the prescribed mu limit
 
-        obj = stepcontrol(obj);                                             %Method adapts stepwidth according to achieve a determined number of Newton iterations
+        obj = stepcontrol(obj);                                             %Method adapts step width according to achieve a determined number of Newton iterations
         obj = choose_stepcontrol_param(obj);                                %Method defining the default values of step_control_param
         obj = choose_subspace(obj);                                         %Method defines function for subspace constraint
         
         obj = plot_contplot(obj,S,DYN);                                     %Method for plotting a live continuation plot
-        obj = error_control(obj,S,AM,DYN);                                  %Method for controlling the error by adapting the discretization scheme
+        obj = error_control(obj,S,AM,DYN);                                  %Method for controlling the error by adapting the discretisation scheme
         obj = bifurcation_stability(obj,DYN,AM,S,ST);                       %Method for calculating the stability and determining bifurcation points
 
         %% Get Method
-        %By altering the get-method. p_arcl_1 always computes the current arclength
+        %By altering the get-method. p_arcl_1 always computes the current arc-length
         function p_arcl_1 = get.p_arcl_1(obj)
-            p_arcl_1 = obj.p_arcl_0 + obj.direction.*norm(obj.p_y1-obj.y0); %This is the currect arclength
+            p_arcl_1 = obj.p_arcl_0 + obj.direction.*norm(obj.p_y1-obj.y0); %This is the current arc length
         end
 
 

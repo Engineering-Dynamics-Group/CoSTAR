@@ -7,13 +7,13 @@
 %% Parameters
 % "Difficult" parameters
 % D = 0.1;              ratio = 1/sqrt(2);              % Damping factor and ratio of excitation frequencies (Omega_2/Omega_1)
-% s1 = 5;               s2 = 5;                         % Amplitudes of excitations
+% s1 = 5;               s2 = 5;                         % Amplitudes of excitation
 % kappa = 0.2;                                          % Coefficient of nonlinear stiffness
 % mu_limit = [3,5];                                     % Limits of continuation diagram
 
 % "Easy" parameters - advantageous for testing stability computation
 D = 0.05;            ratio = sqrt(2);                   % Damping factor and ratio of excitation frequencies (Omega_2/Omega_1)
-s1 = 0.25;           s2 = 0.25;                         % Amplitudes of excitations
+s1 = 0.25;           s2 = 0.25;                         % Amplitudes of excitation
 kappa = 1.5;                                            % Coefficient of nonlinear stiffness
 mu_limit = [0.8, 2];                                    % Limits of continuation diagram
 
@@ -30,16 +30,16 @@ load('workspace_test_SHM_QPS_duffing.mat')              %Contains s0 of difficul
 
 
 %% Properties
-options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);                                                           %Properties of the System
+options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);                                               %Properties of the system
 options.opt_sol  = costaropts('stability','on','cont','on','non_auto_freq',non_auto_freq,'sol_type','quasiperiodic','approx_method','shooting','act_param',active_parameter); %Properties of the solution
-options.opt_cont = costaropts('step_control','combination','pred','cubic','subspace','pseudo-arc','mu_limit',mu_limit);             %Properties for continuation
-options.opt_approx_method = costaropts('solver','ode45','n_char',30);                                                               %Properties for approx_method (e.g. Shoot)
-options.opt_init = costaropts('iv',s_easy_mu_2);
-% options.opt_init = costaropts('ic',IC,'tinit',1000,'deltat',1000,'dt',0.1);
-options.opt_stability = costaropts('iterate_bfp','on');
+options.opt_cont = costaropts('step_control','angle','pred','cubic','subspace','pseudo-arc','mu_limit',mu_limit);       %Properties for continuation
+options.opt_approx_method = costaropts('solver','ode45','n_char',30);                                                   %Properties for the approximation method
+options.opt_init = costaropts('iv',s_easy_mu_2);                                                                        %Properties for initial value
+% options.opt_init = costaropts('ic',IC,'tinit',1000,'deltat',1000,'dt',0.1);                                           %Properties for initial value
+options.opt_stability = costaropts('iterate_bfp','on');                                                                 %Properties for stability
 
 options.opt_cont.step_width = 0.25;                     %Initial step width    
-options.opt_cont.step_control_param = [3, 5/180*pi];    %Step control parameters
+options.opt_cont.step_control_param = [2, 5];           %Step control parameters
 options.opt_cont.direction = -1;                        %Changes the direction of continuation 
 
 

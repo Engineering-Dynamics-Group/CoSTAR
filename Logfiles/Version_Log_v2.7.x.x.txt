@@ -513,3 +513,67 @@ Bugfix: Computation of eigenvalues and eigenvectors of monodromy matrix or Jacob
         - PS_SHM_calc_stability_non_auto:
             --> eig(M) replaced by eig(full(M)) (line 53)
             --> Code optimised and duplicate code parts removed
+    
+
+
+--------------------------------------------
+------------------ v2.7.2 ------------------
+--------------------------------------------
+
+Reworked Continuation methods direction_vector and predictor.
+Now, direction_vector only computes either a tangent or a secant. All former calculations for parable and cubic predictor were moved to method predictor.
+
+    @Continuation:
+        - Continuation:
+            --> Properties p_stability_flag (was already set as comment) and p_C removed (lines 56 and 85)
+        - direction_vector:
+            --> Calculations for parable and cubic predictor removed
+            --> Behaviour now: In case of tangent predictor or only one curve point is available, a tangent is computed. In all other cases, a secant is computed
+        - predictor:
+            --> Rework of cases 'parable' and 'cubic' using former code from direction_vector
+
+
+----------
+
+Changes to step control. r_limit adapted and behaviour of additional constraints as well as of method 'combination' reworked.
+
+    @Continuation:
+        - choose_stepcontrol_param:
+            --> All "max" changed to "nom" (lines 14, 15, 17, 21, 23, 27, 29, 39 and 45)
+            --> Additional constraint option 2 for method 'corrector_iterations' removed
+            --> Default values adapted (lines 15, 21, 27, 28, 33, 34 and 39)
+        - s_help_opt_cont:
+            --> Info text of fields 'step_control_param' adapted and order of step control methods changed (lines 42, 48, 49 and 54 - 64)
+        - stepcontrol:
+            --> Adapted bottom r-limit to 0.25 and damping factor of method 'corrector_iterations' to 0.25 (lines 22 and 52)
+            --> Reworked behaviour of additional constraints of all step control methods.
+                Now, both r-values are always computed (main criterion and additional constraint). If r_add_cstr < 1, the minimum of both of them is taken.
+            --> Changed behaviour of step control method 'combination'. Now, the r-values are averaged for specific r-value ranges
+            --> Display messages adapted
+
+    test:
+        --> Adapted the step_control_param field in following test scripts:
+            - test_FDM_PS_duffing           - test_FDM_QPS_cvdP             - test_FDM_QPS_laval
+            - test_FDM_PS_harmonic          - test_FDM_QPS_duffing          - test_FDM_QPS_vdP
+            - test_FDM_PS_vdP               - test_FDM_QPS_harmonic         - test_SHM_QPS_duffing
+        --> Some small changes to:
+            - test_EQ_parable
+
+    Tutorials:
+        - Example_PS_FDM:
+            --> Adapted the step_control_param field (lines 50 and 79)
+        - Example_QPS_SHM:
+            --> Adapted the step_control_param field (line 52)
+        - Tutorial_PS_FDM:
+            --> Adapted the step_control_param field (lines 257, 262 and 363)
+        - Tutorial_QPS_SHM:
+            --> Adapted the step_control_param field (lines 272 and 277)
+     
+
+----------
+
+@Solution:
+
+    - contplot:
+        --> Fixed missing "$" in line 140
+        --> Angle \theta in ylabel is now depicted in bold for quasi-periodic solutions (lines 132, 146 and 160)

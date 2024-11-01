@@ -30,7 +30,7 @@ options.opt_cont = costaropts('mu_limit',mu_limit,'display','step_control_info')
 % Available step control methods: 'off', 'on', 'corrector_iterations', 'norm_corrector', 'combination', 'angle', ('pid')
 options.opt_cont.step_width = 0.25;
 % options.opt_cont.step_control = 'angle';
-% options.opt_cont.step_control_param = [3, 3/180*pi];                                                                                                                   
+% options.opt_cont.step_control_param = [2, 3];                                                                                                                   
 
 
 %% Continuation

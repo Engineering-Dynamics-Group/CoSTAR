@@ -254,12 +254,12 @@ options.opt_approx_method = costaropts('n_int',100,'scheme','central','approx_or
 %       demonstrated here in order to show the fields and possible values. For usage of the field 'points', please see section ...
 %       1.4 or section 2.2 of the "van der Pol Oscillator" example below.
 %
-options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.25,'step_control_param',[3,7.5/180*pi]);
+options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.25,'step_control_param',[2,7.5]);
 % Mandatory fields: - 'mu_limit':            Sets the limits of the continuation. For this purpose, we defined the "mu_limit" variable.
 % Optional fields:  - 'step_width':          Defines the initial step width (default: 0.1). The step width will be altered in the ...
 %                                            range of step_width*[0.2, 5].
 %                   - 'step_control_param':  Sets properties for the step control (default value for step control method 'angle', ...
-%                                            which is used here: [3,3/180*pi]).
+%                                            which is used here: [2,3]).
 % NOTE: The fields belonging to the step control ('step_width' and 'step_control_param') are set in order to reduce the numerical ...
 %       effort. They are explained in a separate step control tutorial so you can ignore them at the moment.
 %
@@ -360,7 +360,7 @@ options_kappa.opt_sol = costaropts('sol_type','periodic','approx_method','finite
                                    'non_auto_freq',non_auto_freq_kappa,'act_param',active_parameter_kappa);
 options_kappa.opt_init = costaropts('fdm_sol',FDM_sol);
 options_kappa.opt_approx_method = costaropts('n_int',150,'points',[-4,-3,-2,-1,0,1,2]);     % The field 'points' is used this time
-options_kappa.opt_cont = costaropts('mu_limit',mu_limit_kappa,'step_width',0.25,'step_control_param',[3,7.5/180*pi]);
+options_kappa.opt_cont = costaropts('mu_limit',mu_limit_kappa,'step_width',0.25,'step_control_param',[2,7.5]);
 %
 [S_kappa,DYN_kappa] = costar(options_kappa); 
 %

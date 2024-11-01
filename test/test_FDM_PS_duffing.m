@@ -35,7 +35,7 @@ options.opt_stability = costaropts('iterate_bfp','off','solver','ode45');       
 options.opt_cont.step_width = 0.2;
 options.opt_cont.step_width_limit = options.opt_cont.step_width .* [0.2 10];
 % options.opt_cont.step_control = 'angle';
-options.opt_cont.step_control_param = [3, 7.5/180*pi]; 
+options.opt_cont.step_control_param = [2, 7.5];
 
 
 %% Continuation
