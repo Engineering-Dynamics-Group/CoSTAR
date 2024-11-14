@@ -7,7 +7,6 @@ classdef Continuation < handle
         pred string = 'tangent';                                            %Predictor to be used for the prediction of new curve point
         subspace string = 'pseudo-arc';                                     %Defines the subspace-constraint to close the corrector-equation
         direction = 1;                                                      %Direction in which the curve shall be continued. 1 = positive mu-direction, -1 = negative mu-direction
-        display = 'on';                                                     %Display information in command window if = 'on', otherwise = 'off'
         plot = 'on';                                                        %If = 'on', a continuation plot is displayed during continuation
         step_control = 'angle';                                             %Default method used by step control
         step_control_param;                                                 %Array storing parameters used by step control
@@ -58,6 +57,7 @@ classdef Continuation < handle
     properties(Access=private)
         p_contDo uint32 = 1;                                                  %While contDo=1, do continuation, if conDo=0 stop continuation
         p_local_cont_counter uint32 = 1;                                      %Counts number of computed solutions
+        p_last_msg;                                                           %Saves the latest "Iter" messages printed to the command window
 
         %Parameters of the last point
         p_dy_old                                                              %Direction vector of the predictor
@@ -110,9 +110,9 @@ classdef Continuation < handle
         obj = predictor(obj);                                               %Generates predictor to given point on diagram
         
         obj = iterate_data(obj);                                            %Iterates the relevant data: new data point 1 is now current data point 0 for next iteration
-        obj = check_limits(obj);                                            %Checks, if the current continuation parameter is within the prescribed mu limit
+        obj = check_limits(obj,DYN);                                        %Checks, if the current continuation parameter is within the prescribed mu limit
 
-        obj = stepcontrol(obj);                                             %Method adapts step width according to achieve a determined number of Newton iterations
+        obj = stepcontrol(obj,DYN);                                         %Method adapts step width according to achieve a determined number of Newton iterations
         obj = choose_stepcontrol_param(obj);                                %Method defining the default values of step_control_param
         obj = choose_subspace(obj);                                         %Method defines function for subspace constraint
         

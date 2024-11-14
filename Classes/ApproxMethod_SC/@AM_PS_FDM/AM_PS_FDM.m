@@ -10,6 +10,7 @@ classdef AM_PS_FDM < ApproxMethod
         scheme = 'central';     % Discretization scheme used to approximate the derivation dz(theta_i)/dtheta
         approx_order = 6;       % Order of finite-difference approximation of dz(theta_i)/dtheta
         points                  % Stores the local grid point indices sigma_k which are used to approximate dz/dtheta at theta_i using z_(i+sigma_k) = z(theta_i + sigma_k * DeltaTheta)               
+        weights;                % Stores the weighting factors needed to approximate dz(theta_i)/dtheta by dz_i/dtheta = 1/DeltaTheta * sum_(k=1)^p ( w_(sigma_k) * z_(i+sigma_k) )
         c0                      % Fourier-coefficient of 0-th order to create the initial solution vector
         c1                      % Fourier-coefficient of 1-st order cosine term to create the initial solution vector
         s1                      % Fourier-coefficient of 1-st order sine term to create the initial solution vector
@@ -26,7 +27,6 @@ classdef AM_PS_FDM < ApproxMethod
 
     properties(Access = private)
     
-        p_weights;              % Stores the weighting factors needed to approximate dz(theta_i)/dtheta by dz_i/dtheta = 1/DeltaTheta * sum_(k=1)^p ( w_(sigma_k) * z_(i+sigma_k) )
         p_w_mat_J;              % Stores a diagonal sparse matrix containing the weights according to a certain pattern. Needed for the Jacobian matrix
         p_ind_blkdiag_mat;      % Stores the indices which are needed to create a block diagonal sparse matrix. This accelerates the calculation of the Jacobian matrix
 

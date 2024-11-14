@@ -73,7 +73,5 @@ function help_struct = s_help_opt_cont()
     help_struct.optional.plot.value                 = '''on'' or ''off'' \n Default: ''on''';
     help_struct.optional.plot.text                  = 'Plots the solution branch during the continuation process. Set to ''off'' to save computation time.';
 
-    help_struct.optional.display.value              = '''off'', ''on'' or \n''step_control_info'' \n Default: ''on''';
-    help_struct.optional.display.text               = 'Controls the command window output during continuation.\n --> ''on'': Enables the default output.\n --> ''step_control_info'': Displays the default output plus additional step control information.';
-
+   
 end

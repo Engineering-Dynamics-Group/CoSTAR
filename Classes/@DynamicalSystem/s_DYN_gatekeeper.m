@@ -13,9 +13,10 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
     system_allowed_fieldnames    = {'order','rhs','dim','param','info'};                                                                    %allowed fieldsnames in the options super structure
 
     opt_sol_mandatory_fieldnames  = {'sol_type','cont','stability'};                                                                         %required fieldsnames in the options super structure
-    opt_sol_allowed_fieldnames    = {'sol_type','cont','stability','approx_method','act_param','non_auto_freq','auto_freq'};                             %allowed fieldsnames in the options super structure
+    opt_sol_allowed_fieldnames    = {'sol_type','cont','stability','approx_method','act_param','non_auto_freq','auto_freq','display'};                             %allowed fieldsnames in the options super structure
 
     sol_type_allowed_fieldvalues   = {'equilibrium','eq','periodic','ps','quasiperiodic','qps'};
+    display_allowed_fieldvalues = {'off','final','iter','iter-detailed','step-control','error-control','full'};
 
     %% Check the system structure
     GC.check_fields(system,'system',system_mandatory_fieldnames,system_allowed_fieldnames);
@@ -27,7 +28,7 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
     GC.speak;
 
     %% system structure: check the entries
-    %Check the mandatory fields first (these are defintively present)
+    %Check the mandatory fields first (these are definitively present)
     %%%%%%%%%%%%%%%%%%%%
     GC.check_data(system.order,'system.order','double','scalar',[0,1]);
     GC.check_data(system.rhs,'system.rhs','function_handle', [] ,[]);
@@ -48,7 +49,7 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
 
 
     %% opt_sol structure: check the entries  
-    %Check the mandatory fields first (these are defintively present)
+    %Check the mandatory fields first (these are definitively present)
     %%%%%%%%%%%%%%%%%%%%
     GC.check_data(opt_sol.sol_type,'opt_sol.sol_type','char', [] ,sol_type_allowed_fieldvalues);
     GC.check_data(opt_sol.cont,'opt_sol.cont','char',[],{'on','off'});
@@ -69,6 +70,10 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
             GC.error_msg{1,end+1} = 'You set opt_sol.cont to "on", which means you want to continue a solution branch. However, you did not supply an active parameter via opt_sol.act_param.';
         end
     end
+    % Check display
+    if isfield(opt_sol,'display')          
+        GC.check_data(opt_sol.display,'opt_sol.display','char',[],display_allowed_fieldvalues); 
+    end
     GC.speak; %This statement assures that up to now - everything is cool with the supplied data sets
 
     
@@ -77,7 +82,7 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
 
         %Check them again (allowed fields changed... it is easier this way)
         opt_ep_sol_mandatory_fieldnames  = {'sol_type','cont','stability'};
-        opt_eq_sol_allowed_fieldnames    = {'sol_type','cont','act_param','stability'};                        %allowed fieldsnames in the options super structure
+        opt_eq_sol_allowed_fieldnames    = {'sol_type','cont','act_param','stability','display'};                        %allowed fieldsnames in the options super structure
         GC.check_fields(opt_sol,'opt_sol',opt_ep_sol_mandatory_fieldnames,opt_eq_sol_allowed_fieldnames);
         GC.speak();
 
@@ -106,7 +111,7 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
     if strcmpi(opt_sol.sol_type,'periodic') || strcmpi(opt_sol.sol_type,'ps')
 
         opt_p_sol_mandatory_fieldnames  = {'sol_type','cont','stability','approx_method'};                                              %needed fieldsnames in the options super structure
-        opt_p_sol_allowed_fieldnames    = {'sol_type','cont','stability','approx_method','act_param','non_auto_freq','auto_freq'};      %allowed fieldsnames in the options super structure
+        opt_p_sol_allowed_fieldnames    = {'sol_type','cont','stability','approx_method','act_param','non_auto_freq','auto_freq','display'};      %allowed fieldsnames in the options super structure
 
         p_approx_method_allowed_fieldvalues = {'fourier-galerkin','fgm','shooting','shm','finite-difference','fdm'};
 
@@ -188,7 +193,7 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
     if strcmpi(opt_sol.sol_type,'quasiperiodic') || strcmpi(opt_sol.sol_type,'qps')
 
         opt_qp_sol_mandatory_fieldnames  = {'sol_type','cont','stability','approx_method'};                                                            %needed fieldsnames in the options super structure
-        opt_qp_sol_allowed_fieldnames    = {'sol_type','cont','stability','approx_method','act_param','non_auto_freq','auto_freq'};      %allowed fieldsnames in the options super structure
+        opt_qp_sol_allowed_fieldnames    = {'sol_type','cont','stability','approx_method','act_param','non_auto_freq','auto_freq','display'};      %allowed fieldsnames in the options super structure
 
         qp_approx_method_allowed_fieldvalues = {'fourier-galerkin','fgm','shooting','shm','finite-difference','fdm'};
 
@@ -225,7 +230,7 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
             end
             [warn_msg,freq_limit] = check_freq(Omega);
             if ~isempty(warn_msg)
-                if numel(Omega) == 1
+                if isscalar(Omega)
                     GC.error_msg{1,end+1} = 'The initial value of the non-autonomous frequency, which you provided via opt_sol.non_auto_freq(mu),';
                     GC.error_msg{1,end+1} = append('equals Omega = ', num2str(Omega), '. This is below the frequency limit of ', num2str(freq_limit,'%.0e'), '.');
                 elseif numel(Omega) == 2
@@ -238,7 +243,7 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
             GC.check_data(opt_sol.auto_freq,'opt_sol.auto_freq','double',{'scalar','vector'},[]);
             [warn_msg,freq_limit] = check_freq(opt_sol.auto_freq);
             if ~isempty(warn_msg)
-                if numel(opt_sol.auto_freq) == 1
+                if isscalar(opt_sol.auto_freq)
                     GC.error_msg{1,end+1} = 'The initial value of the autonomous frequency, which you provided via opt_sol.auto_freq,';
                     GC.error_msg{1,end+1} = append('equals omega = ', num2str(opt_sol.auto_freq), '. This is below the frequency limit of ', num2str(freq_limit,'%.0e'), '.');
                 elseif numel(opt_sol.auto_freq) == 2

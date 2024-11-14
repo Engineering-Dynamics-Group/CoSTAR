@@ -23,9 +23,9 @@ options.opt_stability       = costaropts('iterate_bfp','on');                   
 
 
 %% Single Solution
-tic
-[S1,DYN1] = costar(options);                    % Calculate initial solution
-zeit1 = toc;
+timer = tic;                                    % Record current time
+[S1,DYN1] = costar(options);                    % Calculate initial solution and continue the curve
+time1 = toc(timer);                             % Display elapsed time since tic
 
 
 %% Properties
@@ -38,9 +38,9 @@ options.opt_stability       = costaropts('iterate_bfp','on');                   
 
 
 %% Continuation
-tic
+timer = tic;                                    % Record current time
 [S2,DYN2] = costar(options);                    % Calculate initial solution and continue the curve
-zeit2 = toc;
+time2 = toc(timer);                             % Display elapsed time since tic
 
 
 %% Test Postprocessing

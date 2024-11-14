@@ -49,9 +49,9 @@ options.opt_init = costaropts('C0',zeros(2,1),'Cmatrix',c_max2,'Smatrix',s_max2,
 options.opt_approx_method = costaropts('n_FFT',2^6,'error_limit',[1e-3 1e-2]);                                              % Properties for approx_method
 options.opt_cont = costaropts('pred','parable','mu_limit',mu_limit,'direction',-1,'display','step_control_info');           % Properties for continuation
 
-tic
-[S,DYN] = costar(options);
-toc
+timer = tic;                                    % Record current time
+[S,DYN] = costar(options);                      % Calculate initial solution and continue the curve
+time = toc(timer);                              % Display elapsed time since tic
 
 
 %% Test Postprocessing

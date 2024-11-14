@@ -33,9 +33,9 @@ options.opt_cont = costaropts('mu_limit',mu_limit,'display','step_control_info')
 
 
 %% Continuation
-tic                                                                     % Record current time
-[S,DYN] = costar(options);                                              % Calculate initial solution and continue the curve
-toc                                                                     % Display elapsed time since tic
+timer = tic;                                    % Record current time
+[S,DYN] = costar(options);                      % Calculate initial solution and continue the curve
+time = toc(timer);                              % Display elapsed time since tic
 
 
 %% Comparison with shooting

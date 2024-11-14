@@ -5,7 +5,11 @@ classdef SOL_QPS_FDM < Solution
 
     properties
 
-        freq            % Property to save the frequency
+        freq                        % Property to save the frequency
+        local_gridpoint_indices_1   % Stores the local grid point indices in theta_1-direction, which determine the grid points relative to node i that are used for the finite difference approximation
+        local_gridpoint_indices_2   % Stores the local grid point indices in theta_2-direction, which determine the grid points relative to node j that are used for the finite difference approximation
+        local_gridpoint_weights_1   % Stores the weights related to the local grid point indices in theta_1-direction
+        local_gridpoint_weights_2   % Stores the weights related to the local grid point indices in theta_2-direction
             
     end
 
@@ -43,6 +47,11 @@ classdef SOL_QPS_FDM < Solution
             elseif DYN.n_auto == 2
                 obj.freq(:,1) = y1(end-2:end-1,1);                              % Frequencies if system is fully autonomous
             end
+
+            obj.local_gridpoint_indices_1 = AM.points_1;                        % Local grid point indices in theta_1-direction
+            obj.local_gridpoint_indices_2 = AM.points_2;                        % Local grid point indices in theta_2-direction
+            obj.local_gridpoint_weights_1 = AM.weights_1';                      % Weights related to local grid point indices in theta_1-direction
+            obj.local_gridpoint_weights_2 = AM.weights_2';                      % Weights related to local grid point indices in theta_2-direction
 
             if strcmpi(DYN.stability,'on')
                 obj.multipliers(:,1)    = varargin{1,1}{1,2};

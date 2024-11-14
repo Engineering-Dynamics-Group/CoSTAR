@@ -24,7 +24,7 @@ options.opt_sol  = costaropts('sol_type','ps','approx_method','fdm','cont','on',
                               'non_auto_freq',non_auto_freq,'act_param',active_parameter);                                  % Properties of the solution 
 options.opt_init = costaropts('c1',C1,'s1',S1);                                                                             % Properties for initial solution             
 options.opt_approx_method = costaropts('n_int',100,'scheme','forward','approx_order',2);                                    % Properties of approximation method FDM
-options.opt_cont = costaropts('mu_limit',mu_limit,'display','step_control_info');                                           % Properties for continuation
+options.opt_cont = costaropts('mu_limit',mu_limit,'display','iter');                                           % Properties for continuation
 
 % Step control options  
 % Available step control methods: 'off', 'on', 'corrector_iterations', 'norm_corrector', 'combination', 'angle', ('pid')
@@ -34,9 +34,9 @@ options.opt_cont.step_width = 0.25;
 
 
 %% Continuation
-tic                                                                     % Record current time
-[S,DYN] = costar(options);                                              % Calculate initial solution and continue the curve
-toc                                                                     % Display elapsed time since tic
+timer = tic;                                    % Record current time
+[S,DYN] = costar(options);                      % Calculate initial solution and continue the curve
+time = toc(timer);                              % Display elapsed time since tic
 
 
 %% Comparison with shooting

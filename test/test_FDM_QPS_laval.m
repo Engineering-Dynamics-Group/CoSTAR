@@ -46,9 +46,9 @@ options.opt_cont.step_control = 'angle';
 
 
 %% Continuation
-tic                                             % Record current time
+timer = tic;                                    % Record current time
 [S,DYN] = costar(options);                      % Calculate initial solution and continue the curve
-toc                                             % Display elapsed time since tic 
+time = toc(timer);                              % Display elapsed time since tic
 
 
 %% Comparison with FGM

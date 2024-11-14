@@ -279,9 +279,10 @@ function obj = getWeights(obj,DYN)
 
     obj.points_1 = sigma_1;
     obj.points_2 = sigma_2;
-    obj.p_weights_1 = w_1;    
-    obj.p_weights_2 = w_2;
+    obj.weights_1 = w_1;    
+    obj.weights_2 = w_2;
 
+    %{
     disp('Using finite differences to approximate dz(theta_1,theta_2)/dtheta_1 and dz(theta_1,theta_2)/dtheta_2.')
     disp(' ')
     disp(table(categorical({scheme_1;scheme_2}), [approx_order_1;approx_order_2], ...
@@ -292,5 +293,6 @@ function obj = getWeights(obj,DYN)
     disp(table(sigma_2', w_2, 'VariableNames', {'sigma_2_k', 'w_2_(sigma_k)'}))
     disp('-------------------------------------------------------')
     disp('Starting to find initial solution ...')
+    %}
     
 end

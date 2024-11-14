@@ -7,13 +7,13 @@
 %@S:    Solution subclass object
 %@ST:   Stability subclass object
 
-function bifurcation_stability(obj,DYN,AM,S,ST)
+function obj = bifurcation_stability(obj,DYN,AM,S,ST)
 
 
         %% Calculate Stability
         [obj.p_multipliers,obj.p_vectors,obj.p_n_unstable_1,stability_flag] = ST.calc_stability(obj.p_y1,obj.p_J1);               % Compute the respective multiplier (eigenvalue, Floquet, Lyapunov Exponent)
         
-
+%        if mod(obj.p_local_cont_counter,15) == 0; stability_flag = 0; end
         if stability_flag > 0                                           % Only move forward if the stability computation was regular
         
 
@@ -66,7 +66,7 @@ function bifurcation_stability(obj,DYN,AM,S,ST)
         
                     end
 
-                    
+      %  p_newton_flag_bfp = 0;
                     % Save the bifurcation point
                     if (p_newton_flag_bfp>0) && (stability_flag>0)
                         
@@ -83,7 +83,11 @@ function bifurcation_stability(obj,DYN,AM,S,ST)
                     
                     else
 
-                        warning('Iteration of the bifurcation point failed on the current step!');
+                        warn_text = append('Iteration of bifurcation point between solutions Iter = ',num2str(obj.p_local_cont_counter),' and Iter = ',num2str(obj.p_local_cont_counter+1),' failed!');
+                        write_log(DYN,append('WARNING: ',warn_text))                % Write warning in log file
+                        S.warnings{end+1} = warn_text;                              % Save warning in Solution object
+                        obj.p_last_msg = sprintf('%s%s%s\n',obj.p_last_msg,append('Warning: ',warn_text),' ');  % Save the warning in the "last messages" property
+                        warning(warn_text);                                         % Display warning
 
                     end
 
@@ -97,7 +101,11 @@ function bifurcation_stability(obj,DYN,AM,S,ST)
         %% Warning if stability computation has failed
         else
 
-            warning('Stability computation failed on the current step!');
+            warn_text = append('Stability computation failed for solution Iter = ',num2str(obj.p_local_cont_counter+1),'!');
+            write_log(DYN,append('WARNING: ',warn_text))                            % Write warning in log file
+            S.warnings{end+1} = warn_text;                                          % Save warning in Solution object
+            obj.p_last_msg = sprintf('%s%s%s\n',obj.p_last_msg,append('Warning: ',warn_text),' ');      % Save the warning in the "last messages" property
+            warning(warn_text)                                                      % Display warning
 
         end
 

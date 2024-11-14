@@ -29,7 +29,7 @@ function [res,J_res] = PS_FDM_residuum(obj,y,DYN)
     DeltaTheta = 2*pi / n_int;                  % Distance in hyper-time coordinate theta between two consecutive grid points for dicretization  ( DeltaT = DeltaTheta / omega )
     
     sigma = obj.points;                         % Local grid point indices sigma_k which are needed to approximate dz/dtheta at theta_i
-    w = obj.p_weights;                          % Weighting factors needed to approximate dz/dtheta at theta_i
+    w = obj.weights;                            % Weighting factors needed to approximate dz/dtheta at theta_i
 
     % Update the continuation parameter in the system parameter array
     param = DYN.param;

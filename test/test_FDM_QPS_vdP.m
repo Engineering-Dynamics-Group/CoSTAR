@@ -42,9 +42,9 @@ options.opt_cont.step_control = 'angle';
 
 
 % Continuation and postprocessing
-tic                                             % Record current time
+timer = tic;                                    % Record current time
 [S1,DYN1] = costar(options);                    % Calculate initial solution and continue the curve
-toc                                             % Display elapsed time since tic 
+time1 = toc(timer);                             % Display elapsed time since tic
 
 benchmark_postprocess_quasiperiodic(DYN1,S1);   % Postprocessing
 
@@ -109,9 +109,9 @@ options.opt_cont.step_control = 'angle';
 
 
 % Continuation and postprocessing
-tic                                             % Record current time
+timer = tic;                                    % Record current time
 [S2,DYN2] = costar(options);                    % Calculate initial solution and continue the curve
-toc                                             % Display elapsed time since tic 
+time2 = toc(timer);                             % Display elapsed time since tic
 
 benchmark_postprocess_quasiperiodic(DYN2,S2);   % Postprocessing
 

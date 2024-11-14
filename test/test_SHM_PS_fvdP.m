@@ -31,8 +31,8 @@ options.opt_stability = costaropts('iterate_bfp','on');
 
                                                      %Changes the direction of continuation
 %% Continuation
-tic
-[S,DYN] = costar(options);                                                              %Calculate initial solution and continue the curve to set limits
-zeit = toc;
+timer = tic;                                    % Record current time
+[S,DYN] = costar(options);                      % Calculate initial solution and continue the curve
+time = toc(timer);                              % Display elapsed time since tic
 
 benchmark_postprocess_periodic(DYN,S)

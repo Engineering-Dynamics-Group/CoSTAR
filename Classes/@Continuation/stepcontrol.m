@@ -2,7 +2,7 @@
 %
 % @obj: Continuation class object
 
-function obj = stepcontrol(obj)
+function obj = stepcontrol(obj,DYN)
 
 switch obj.step_control
  
@@ -13,7 +13,11 @@ switch obj.step_control
 
         if obj.p_convergence == 0                                                                   % If corrector did not converge previously
             obj.step_width = obj.p_step_width_init;                                                 % Reset step-width to initial step width
-            disp(append('Step width reset to step_width = ',num2str(obj.step_width)));              % Display information
+            info_text = append('Step width reset to step_width = ',num2str(obj.step_width));        % Set info text
+            write_log(DYN,info_text)                                                                % Write info text in log file
+            if strcmpi(DYN.display,'step-control') || strcmpi(DYN.display,'full')
+                disp(info_text);                                                                    % Display information
+            end
         end
 
 
@@ -42,10 +46,10 @@ switch obj.step_control
                 else
                     r_add_cstr = add_cstr_nom / add_cstr_val;           % Calculate r_add_cstr using asymptotic expansion of alpha. add_cstr_value sets the nominal (desired) angle
                 end
-                display_message_info = append('corr_it = ', num2str(obj.p_it));     % Set display message
+                display_message_info = append('corr_it = ', num2str(obj.p_it));
                 if r_add_cstr < 1                                       % If r_add_cstr < 1 ...
                     r_pre = min([r_it,r_add_cstr]);                     % take the minimum of r_it and r_add_cstr
-                    display_message_info = append(display_message_info, ', r_it = ', num2str(r_it), ', r_add_cstr = ', num2str(r_add_cstr));      % Append info
+                    display_message_info = append(display_message_info, ', r_it = ', num2str(r_it), ', r_add_cstr = ', num2str(r_add_cstr));    % Set additional display info
                 else                                                    % In all other cases ...
                     r_pre = r_it;                                       % use r_it only
                 end
@@ -65,7 +69,7 @@ switch obj.step_control
                 r_it = it_nom / obj.p_it;                               % Ratio of nominal number of corrector iterations to actual number of corrector iterations       
                 norm_corr = norm(obj.p_y1-obj.yp);                      % Norm of "corrector-vector"
                 r_norm_corr = norm_corr_nom / norm_corr;                % Calculate preliminary value of r by setting a nominal value for norm "corrector-vector". This leads to step widths being more regular
-                display_message_info = append('norm_corr = ', num2str(norm_corr), ', corr_it = ', num2str(obj.p_it));   % Set display message
+                display_message_info = append('norm_corr = ', num2str(norm_corr), ', corr_it = ', num2str(obj.p_it));   % Set additional display info
                 if r_it < 1                                             % If number of corrector iterations exceeds nominal number of corrector iterations ...
                     r_pre = min([r_it,r_norm_corr]);                    % take the minimum of r_it and r_norm_corr
                     display_message_info = append(display_message_info, ', r_norm_corr = ', num2str(r_norm_corr), ', r_it = ', num2str(r_it));      % Append info
@@ -90,7 +94,7 @@ switch obj.step_control
                 else
                     r_alpha = alpha_nom / alpha;                        % Calculate r_alpha using asymptotic expansion of alpha. alpha_nom sets the nominal (desired) angle
                 end
-                display_message_info = append('alpha = ', num2str(alpha), '°, corr_it = ', num2str(obj.p_it));    % Set display message
+                display_message_info = append('alpha = ', num2str(alpha), '°', ' corr_it = ', num2str(obj.p_it));   % Set additional display info
                 if r_it < 1                                             % If number of corrector iterations exceeds nominal number of corrector iterations ...
                     r_pre = min([r_it,r_alpha]);                        % take the minimum of r_it and r_alpha
                     display_message_info = append(display_message_info, ', r_alpha = ', num2str(r_alpha), ', r_it = ', num2str(r_it));      % Append info
@@ -122,7 +126,7 @@ switch obj.step_control
                     r_pre = 0.5 * (r_it + r_alpha);                     % take the mean of both r-values
                 end
                 d = 0.25;                                               % Set damping factor (default: 0.25)
-                display_message_info = append('r_it = ', num2str(r_it), ', r_alpha = ', num2str(r_alpha), ', corr_it = ', num2str(obj.p_it));       % Set display message
+                display_message_info = append('alpha = ', num2str(alpha), ', corr_it = ', num2str(obj.p_it), ', r_alpha = ', num2str(r_alpha), ', r_it = ', num2str(r_it));     % Set additional display info
             
 
             case 'pid'
@@ -144,7 +148,7 @@ switch obj.step_control
                     int = (1/obj.p_e)^kI;                                   % "Past"
                     diff = (obj.p_e_old^2/(obj.p_e*obj.p_e_old_old))^kD;    % "Future" --> swap e_old_old and e_old in order to make sense?
                     r_PID = prop * int * diff;
-                    display_message_info = append('e = ', num2str(obj.p_e), ', prop = ', num2str(prop), ', int = ', num2str(int), ', diff = ', num2str(diff), '. corr_it = ', num2str(obj.p_it));   % Set display message
+                    display_message_info = append('e = ', num2str(obj.p_e), ', prop = ', num2str(prop), ', int = ', num2str(int), ', diff = ', num2str(diff), ', corr_it = ', num2str(obj.p_it));   % Set additional display info
                 else
                     r_PID = r_limit(2);                                     % If parameter e is zero (direction vectors dy0 and dy_old are equal), r_pre can be set to maximum value
                     display_message_info = append('e = 0, corr_it = ', num2str(obj.p_it));      % Set display message
@@ -169,23 +173,22 @@ switch obj.step_control
         obj.step_width = max( min(step_width_pre,obj.step_width_limit(2)), obj.step_width_limit(1) );       % Set step_width. If step_width_pre exceeds limits, corresponding limit is taken. Otherwise, step_width_pre is taken
 
 
-        % Display information
-        if strcmpi(obj.display,'step_control_info')                     % Display information if message is desired
-
-            if step_width_old == obj.step_width                         % If step width has not been adapted ...
-                if obj.step_width == obj.step_width_limit(1)            % ... because bottom step width limit has been reached
-                    disp(append('Step width not adapted since bottom step width limit has been reached (r_pre = ', num2str(r_pre), '). ', display_message_info))
-                elseif obj.step_width == obj.step_width_limit(2)        % ... because upper step width limit has been reached
-                    disp(append('Step width not adapted since upper step width limit has been reached (r_pre = ', num2str(r_pre), '). ', display_message_info))
-                else                                                    % ... because factor r = 1
-                    disp(append('Step width not adapted since step width is optimal (r_pre = ', num2str(r_pre), '). ', display_message_info))
-                end
-
-            else                                                        % If step width has been adapted
-                disp(append('Step width adapted to step_width = ', num2str(obj.step_width), ' by factor r = ', num2str(obj.p_r), '. r_pre = ', num2str(r_pre), ', ', display_message_info));
-
+        % Step control information
+        if step_width_old == obj.step_width                         % If step width has not been adapted ...
+            if obj.step_width == obj.step_width_limit(1)            % ... because bottom step width limit has been reached
+                step_control_info = append('Step width not adapted since bottom step width limit has been reached (r_pre = ', num2str(r_pre), '). ', display_message_info);
+            elseif obj.step_width == obj.step_width_limit(2)        % ... because upper step width limit has been reached
+                step_control_info = append('Step width not adapted since upper step width limit has been reached (r_pre = ', num2str(r_pre), '). ', display_message_info);
+            else                                                    % ... because factor r = 1
+                step_control_info = append('Step width not adapted since step width is optimal (r_pre = ', num2str(r_pre), '). ', display_message_info);
             end
+        else                                                        % If step width has been adapted
+            step_control_info = append('Step width adapted to step_width = ', num2str(obj.step_width), ' by factor r = ', num2str(obj.p_r), '. r_pre = ', num2str(r_pre), ', ', display_message_info);
+        end
+        write_log(DYN,step_control_info)                            % Write step control info in log file
 
+        if strcmpi(DYN.display,'step-control') || strcmpi(DYN.display,'full')                 
+            disp(step_control_info)                                 % Display step control info
         end
 
 

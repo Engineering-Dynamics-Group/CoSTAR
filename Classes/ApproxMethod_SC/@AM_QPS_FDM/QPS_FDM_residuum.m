@@ -38,9 +38,9 @@ function [res,J_res] = QPS_FDM_residuum(obj,y,DYN)
     DeltaTheta_2 = 2*pi / n_int_2;              % Hyper-time interval between two consecutive grid points in theta_2-direction ( DeltaT_2 = DeltaTheta_2 / omega_2 )
     
     sigma_1 = obj.points_1;                     % Local grid point indices sigma_1_k which are needed to approximate dz(theta_1_i,theta_2_j)/dtheta_1
-    w_1 = obj.p_weights_1;                      % Weighting factors which are needed to approximate approximate dz(theta_1_i,theta_2_j)/dtheta_1
+    w_1 = obj.weights_1;                        % Weighting factors which are needed to approximate approximate dz(theta_1_i,theta_2_j)/dtheta_1
     sigma_2 = obj.points_2;                     % Local grid point indices sigma_2_k which are needed to approximate dz(theta_1_i,theta_2_j)/dtheta_2
-    w_2 = obj.p_weights_2;                      % Weighting factors which are needed to approximate approximate dz(theta_1_i,theta_2_j)/dtheta_2
+    w_2 = obj.weights_2;                        % Weighting factors which are needed to approximate approximate dz(theta_1_i,theta_2_j)/dtheta_2
 
     % Update the continuation parameter in the system parameter array
     param = DYN.param;

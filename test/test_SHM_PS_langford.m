@@ -23,9 +23,9 @@ options.opt_approx_method = costaropts('solver','ode45','n_shoot',5);           
 options.opt_stability = costaropts('iterate_bfp','on');                                                                                                                      %Changes the direction of continuation (uncomment only if algorithm doesn't start properly)
 
 %% Continuation
-tic
-[S,DYN] = costar(options);                                                                                                                                 %Calculate initial solution and continue the curve to set limits
-zeit = toc;
+timer = tic;                                    % Record current time
+[S1,DYN1] = costar(options);                    % Calculate initial solution and continue the curve
+time1 = toc(timer);                             % Display elapsed time since tic
 
 
 %% Properties
@@ -40,12 +40,12 @@ options.opt_stability       = costaropts('iterate_bfp','on');                   
 
 
 %% Continuation
-tic
-[S,DYN] = costar(options);                                                                                                                                 %Calculate initial solution and continue the curve to set limits
-zeit = toc;
+timer = tic;                                    % Record current time
+[S2,DYN2] = costar(options);                    % Calculate initial solution and continue the curve
+time2 = toc(timer);                             % Display elapsed time since tic
 
 %% Test Postprocessing
-benchmark_postprocess_periodic(DYN,S);
+benchmark_postprocess_periodic(DYN2,S2);
 
 
 

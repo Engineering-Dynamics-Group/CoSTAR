@@ -44,9 +44,9 @@ options.opt_cont.direction = -1;                        %Changes the direction o
 
 
 %% Continuation
-tic
-[S,DYN] = costar(options); 
-toc
+timer = tic;                                            % Record current time
+[S,DYN] = costar(options);                              % Calculate initial solution and continue the curve
+time = toc(timer);                                      % Display elapsed time since tic
 
 
 %% Test Postprocessing

@@ -5,7 +5,9 @@ classdef SOL_PS_FDM < Solution
 
     properties
 
-        freq            % Property to save the frequency
+        freq                        % Property to save the frequency
+        local_gridpoint_indices     % Stores the local grid point indices, which determine the grid points relative to node i that are used for the finite difference approximation
+        local_gridpoint_weights     % Stores the weights related to the local grid point indices
             
     end
 
@@ -44,11 +46,13 @@ classdef SOL_PS_FDM < Solution
                 obj.freq(1,1) = y1(end-1,1);                                    % Frequency if system is autonomous
             end
 
+            obj.local_gridpoint_indices = AM.points;                            % Local grid point indices
+            obj.local_gridpoint_weights = AM.weights';                          % Weights related to local grid point indices
+
             if strcmpi(DYN.stability,'on')
                 obj.multipliers(:,1)    = varargin{1,1}{1,2};
                 obj.vectors(:,:,1)      = varargin{1,1}{1,5};
                 obj.n_unstable(1,1)     = varargin{1,1}{1,3};
-                
             end
 
         end

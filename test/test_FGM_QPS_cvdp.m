@@ -25,9 +25,9 @@
     options.opt_init = costaropts('c0',zeros(4,1),'cmatrix',c_max,'smatrix',s_max,'hmatrix',K3);
 
     
-    tic
-    [S,DYN] = costar(options);      
-    toc
+    timer = tic;                                    % Record current time
+    [S,DYN] = costar(options);                      % Calculate initial solution and continue the curve
+    time = toc(timer);                              % Display elapsed time since tic
 
 
     %% Test Postprocessing

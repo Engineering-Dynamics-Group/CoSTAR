@@ -27,9 +27,9 @@ options.opt_stability     = costaropts('iterate_bfp','on');                     
 
 
 %% Single Solution
-tic
-[S1,DYN1] = costar(options);                    % Calculate initial solution and continue the curve to set limits
-zeit1 = toc;
+timer = tic;                                    % Record current time
+[S1,DYN1] = costar(options);                    % Calculate initial solution and continue the curve
+time1 = toc(timer);                             % Display elapsed time since tic
 
 % opts = struct('space','solution','eval','all');
 % [s,mu] = S.solget(DYN,opts);
@@ -45,9 +45,9 @@ options.opt_stability = costaropts('iterate_bfp','on');                         
 
 
 %% Continuation
-tic
-[S2,DYN2] = costar(options);                    % Calculate initial solution and continue the curve to set limits
-zeit2 = toc;
+timer = tic;                                    % Record current time
+[S2,DYN2] = costar(options);                    % Calculate initial solution and continue the curve
+time2 = toc(timer);                             % Display elapsed time since tic
 
 %     opts = struct('space','solution','eval','all');
 %     [s,mu] = S.solget(DYN,opts);
