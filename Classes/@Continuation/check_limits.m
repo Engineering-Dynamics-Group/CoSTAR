@@ -27,24 +27,28 @@ elseif strcmpi(DYN.display,'final') || strcmpi(DYN.display,'iter')
     % The info text is only displayed for the latest N solutions in the command window
     % Idea: Save the info text of the latest N solutions in obj.p_last_msg. 
     % In the next loop, delete these info texts from the command window, update obj.p_last_msg and display it
-    % Furthermore, warning messages are not deleted, but instead iteratively passed to the top
+    % Furthermore, warning messages are not deleted, but instead iteratively passed to the top (they are printed again at the top to have the orange color)
     %  (i.e. the warning messages are gathered at the top and N info texts are displayed below)
-    if strcmpi(DYN.display,'final');    N = 1;                           % Display only the latest info text in case of DYN.display = 'final'
-    elseif strcmpi(DYN.display,'iter'); N = 5; end                       % Display the latest 5 info texts in case of DYN.display = 'iter'
-    reverse_str = repmat(sprintf('\b'), 1, length(obj.p_last_msg));      % This string will delete the old displayed info texts from the previous loop
-    obj.p_last_msg = sprintf('%s%s\n',obj.p_last_msg,info_text);         % Add the new info text
-    if local_cont_counter > (N+1)                                        % Remove first line when at least N info texts have been displayed (+1 for initial solution)
-        end_str = append('Iter: ',num2str(local_cont_counter-N+1));      % String identifying where to end the deletion
-        delete_str = extractBefore(obj.p_last_msg,end_str);              % This is the part which needs to be deleted
-        if startsWith(obj.p_last_msg,'Warning')                          % If delete_str begins with a warning message (i.e. the warning message is the top line)
-           warn_str = extractBefore(obj.p_last_msg,append('Iter: ',num2str(local_cont_counter-N))); % Get only the warning message
-           reverse_str = extractAfter(reverse_str,length(warn_str));     % Exclude the warning message from deletion (we want to keep it in the command window)
-        elseif contains(delete_str,'Warning')                            % If delete_str contains a warning message, but there is an info text first
-            delete_str = extractBefore(delete_str,'Warning');            % Exclude the warning message from deletion and delete only the info text (i.e. the top line)
+    if strcmpi(DYN.display,'final');    N = 1;                          % Display only the latest info text in case of DYN.display = 'final'
+    elseif strcmpi(DYN.display,'iter'); N = 5; end                      % Display the latest 5 info texts in case of DYN.display = 'iter'
+    reverse_str = repmat(sprintf('\b'), 1, length(obj.p_last_msg));     % This string will delete the old displayed info texts from the previous loop
+    obj.p_last_msg = sprintf('%s%s\n',obj.p_last_msg,info_text);        % Add the new info text
+    if local_cont_counter > (N+1)                                       % Remove first line when at least N info texts have been displayed (+1 for initial solution)
+        end_str = append('Iter: ',num2str(local_cont_counter-N+1));     % String identifying where to end the deletion
+        delete_str = extractBefore(obj.p_last_msg,end_str);             % This is the part which needs to be deleted
+        if startsWith(obj.p_last_msg,'Warning')                         % If delete_str begins with a warning message (i.e. the warning message is the top line)
+           warn_str = extractBefore(obj.p_last_msg,append('Iter: ',num2str(local_cont_counter-N))); % Get only the warning message to print it again
+        elseif contains(delete_str,'Warning')                           % If delete_str contains a warning message, but there is an info text first
+            delete_str = extractBefore(delete_str,'Warning');           % Exclude the warning message from deletion and delete only the info text (i.e. the top line)
         end
-        obj.p_last_msg = erase(obj.p_last_msg,delete_str);               % Remove the top info text
+        obj.p_last_msg = erase(obj.p_last_msg,delete_str);              % Remove the top info text
     end
-    fprintf([reverse_str,obj.p_last_msg]);                               % Display latest N info texts in command window
+    if exist('warn_str','var')                                          % If we extracted a warning (i.e. a warning has been passed to the top)
+        fprintf(reverse_str); warning(warn_str(10:end));                % Remove the info texts and the warning, but print the warning again to have the orange color
+        fprintf(['\b\b',obj.p_last_msg]);                               % Now print the new info texts
+    else                                                                % Normal case: No warning has been passed to the top
+        fprintf([reverse_str,obj.p_last_msg]);                          % Display the latest N info texts in command window (including warnings)
+    end                             
 else 
     % In case of DYN.display \in {'iter-detailed','step-control','error-control','full'}, the info text is displayed for each solution
     disp(info_text)
@@ -77,7 +81,7 @@ elseif(obj.p_local_cont_counter>=obj.max_cont_step)      % Check if maximal numb
     obj.p_stopping_flag = stopping_text;
 
 else
-    write_log(DYN,'')
+    write_log(DYN,'\n-------------------------------------')
 
 end
 

@@ -99,7 +99,7 @@ Fcn = @(t,z,param) vdP_auto_ap(t,z,param);          % Right-hand side of dz/dtau
 
 % Options
 options.system   = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','Continuation of van der Pol Oscillator');   % Properties of the system
-options.opt_sol = costaropts('sol_type','periodic','approx_method','shooting','cont','on','stability','off', ...            % Properties of the solution
+options.opt_sol = costaropts('sol_type','periodic','approx_method','shooting','cont','on','stability','on', ...             % Properties of the solution
                              'auto_freq',auto_freq,'act_param',active_parameter);                                           % Properties of the solution
 options.opt_init = costaropts('ic',IC);                                                                                     % Property for initial solution
 options.opt_approx_method = costaropts('solver','ode45','n_shoot',2);                                                       % Properties of approximation method

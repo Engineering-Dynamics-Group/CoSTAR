@@ -26,8 +26,8 @@ load('workspace_test_SHM_QPS_cvdP.mat')              %only contains s0 since DYN
 
 %% Properties
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',4);                                                                          %Properties of the System
-options.opt_sol  = costaropts('stability','on','cont','on','auto_freq',auto_freq,'sol_type','quasiperiodic','approx_method','shooting','act_param',active_parameter); %Properties of the solution
-options.opt_cont = costaropts('step_control','off','pred','parable','subspace','pseudo-arc','mu_limit',mu_limit,'display','step_control_info');    %Properties for continuation
+options.opt_sol  = costaropts('stability','on','cont','on','auto_freq',auto_freq,'sol_type','quasiperiodic','approx_method','shooting','act_param',active_parameter,'display','full'); %Properties of the solution
+options.opt_cont = costaropts('step_control','off','pred','parable','subspace','pseudo-arc','mu_limit',mu_limit);              %Properties for continuation
 options.opt_approx_method = costaropts('solver','ode45','n_char',50);                                                                             %Properties for sol_method (e.g. Shoot)
 options.opt_init = costaropts('iv',s0); 
 %options.opt_init = costaropts('ic',IC,'tinit',1000,'deltat',1000,'dt',0.1);

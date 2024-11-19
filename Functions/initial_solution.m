@@ -50,7 +50,6 @@ else
 end
 % checkGradients_opts = optimoptions('fsolve',FiniteDifferenceType='forward'); checkGradients(Fcn,y,checkGradients_opts,Display='on',Tolerance=1e-6);   %FDM: Check the Jacobian matrix
 
-
 % No initial solution found
 if newton_flag~=1
     error_text = 'ERROR: No initial solution found!';                   % Set error text
@@ -58,7 +57,7 @@ if newton_flag~=1
     write_log(DYN,error_text)                                           % Write error text in log file
     write_log(DYN,'finalize_error',error_msg)                           % Finalize log file with error message
     if ~strcmpi(DYN.display,'off')
-        disp(error_text); disp(' '); disp(error_msg); disp(' ')             % Display error text and message
+        disp(error_text); disp(' '); disp(error_msg); disp(' ')         % Display error text and message
         disp('-----------------------------------------------------')
         disp('--------------  Finished with error!  ---------------');
         disp('-----------------------------------------------------')
@@ -67,143 +66,148 @@ if newton_flag~=1
     error(append(error_text(8:end),' ',error_msg))                      % Throw error
 end
 
+info_text = 'Initial solution found!';                                  % This message is updated if stability is successfully computed
 
-%%%%%%%%%%%%%%%%%%%%%%%%%% Error Control Loop %%%%%%%%%%%%%%%%%%%%%%%%%%
-% This loop is slightly different from the loop in the Continuation class
-% since it is does not update the dimension of the last curve point
 
-added_output = cell(0,0);
+%%%%%%%%%%%%%%%%%%%%%%% Frequency Check %%%%%%%%%%%%%%%%%%%%%%%
 
-if strcmpi(AM.error_control,'on')
+stopping_msg = check_freq(DYN,y);
+if ~isempty(stopping_msg)                                               % If frequency(s) are smaller than frequency limit
+    DYN.cont = 'off';                                                   % Deactivate continuation (if it was set to 'on')
+    warn_msg = 'WARNING: Small or negative frequency(s) detected for initial solution!';     % Set warning message
+    S.warnings{end+1} = warn_msg(10:end);                               % Save warning in Solution object
+    % Everything else (displaying warning, writing log file etc.) has to be done after this if...else... block
 
-    iterate = 1;
-    counter = 0;
-    increase = 1;           % These values help to avoid a constant switching between de- and increasing, if error tolerance are set too close to each other
-    decrease = 1;           % If we start increasing or decreasing once, the other one is not possible anymore
+else
 
-    while iterate
 
-        counter = counter + 1;
-        err = AM.IF_estimate_error(y,DYN);
-        err_control_text = append('Current Error: ',num2str(err),' -- Number of Harmonics: ',num2str(size(AM.hmatrix,2)-1));
-        if ~(strcmpi(DYN.display,'off') || strcmpi(DYN.display,'final'))
-            disp(err_control_text); 
-        end
-        write_log(DYN,err_control_text)
+    %%%%%%%%%%%%%%%%%%%%%%%%%% Error Control Loop %%%%%%%%%%%%%%%%%%%%%%%%%%
+    % This loop is slightly different from the loop in the Continuation class
+    % since it is does not update the dimension of the last curve point
 
-        if (err > AM.error_limit(2)) && (counter < AM.ec_iter_max+1) && increase
-            err_control_text = append('Increase Discretization (Iteration: ',num2str(counter),')');
+    added_output = cell(0,0);                                               % Initialize (needed for saving)
+
+    if strcmpi(AM.error_control,'on')
+
+        iterate = 1;
+        counter = 0;
+        increase = 1;           % These values help to avoid a constant switching between de- and increasing, if error tolerance are set too close to each other
+        decrease = 1;           % If we start increasing or decreasing once, the other one is not possible anymore
+
+        while iterate
+
+            counter = counter + 1;
+            err = AM.IF_estimate_error(y,DYN);
+            err_control_text = append('Current Error: ',num2str(err),' -- Number of Harmonics: ',num2str(size(AM.hmatrix,2)-1));
             if ~(strcmpi(DYN.display,'off') || strcmpi(DYN.display,'final'))
-                disp(err_control_text); 
+                disp(err_control_text);
             end
             write_log(DYN,err_control_text)
-            [y0,iterate] =  AM.IF_increase_discretization(y,DYN); %this might also update properties in AM
-            decrease = 0;
-        elseif (err < AM.error_limit(1)) && (counter < AM.ec_iter_max+1) && decrease
-            err_control_text = append('Decrease Discretization (Iteration: ',num2str(counter),')');
-            if ~(strcmpi(DYN.display,'off') || strcmpi(DYN.display,'final'))
-                disp(err_control_text); 
-            end
-            write_log(DYN,err_control_text)
-            [y0,iterate] = AM.IF_decrease_discretization(y,DYN); %this might also update properties in AM
-            increase = 0;
-        else
-            iterate = 0;
-        end
 
-        if iterate          % Recalculate a new curve point with de-/increased discretisation
-            % If autonomous y_old contains predicted solution
-            if(strcmpi(DYN.sol_type,'quasiperiodic')&&strcmpi(DYN.approx_method,'shooting'))
-                AM.IF_up_res_data(obj,DYN);                     % !!! Check this line if error_control becomes available for quasiperiodic shooting !!!
-                AM.y_old = y0;
-                Fcn = @(y)AM.fun_Jac_wrapper_init(y,y0,DYN);    % Function wrapper for initial solution, if Jacobian is supplied
-                newtonOpts.SpecifyObjectiveGradient = true;
+            if (err > AM.error_limit(2)) && (counter < AM.ec_iter_max+1) && increase
+                err_control_text = append('Increase Discretization (Iteration: ',num2str(counter),')');
+                if ~(strcmpi(DYN.display,'off') || strcmpi(DYN.display,'final'))
+                    disp(err_control_text);
+                end
+                write_log(DYN,err_control_text)
+                [y0,iterate] =  AM.IF_increase_discretization(y,DYN); %this might also update properties in AM
+                decrease = 0;
+            elseif (err < AM.error_limit(1)) && (counter < AM.ec_iter_max+1) && decrease
+                err_control_text = append('Decrease Discretization (Iteration: ',num2str(counter),')');
+                if ~(strcmpi(DYN.display,'off') || strcmpi(DYN.display,'final'))
+                    disp(err_control_text);
+                end
+                write_log(DYN,err_control_text)
+                [y0,iterate] = AM.IF_decrease_discretization(y,DYN); %this might also update properties in AM
+                increase = 0;
             else
-                AM.iv = y0(1:(end-1));                          % Archive initial solution
-                Fcn = @(y)[AM.res(y);y(end)-y0(end)];           % Define corrector-function containing the residual function and the subspace-constraint
+                iterate = 0;
             end
-            
-            newtonOpts.Display = 'off';                         % Deactivate fsolve output
-            [y,~,newton_flag,~,J] = fsolve(Fcn,y0,newtonOpts);  % Solve corrector-function
 
+            if iterate          % Recalculate a new curve point with de-/increased discretisation
+                % If autonomous y_old contains predicted solution
+                if(strcmpi(DYN.sol_type,'quasiperiodic')&&strcmpi(DYN.approx_method,'shooting'))
+                    AM.IF_up_res_data(obj,DYN);                     % !!! Check this line if error_control becomes available for quasiperiodic shooting !!!
+                    AM.y_old = y0;
+                    Fcn = @(y)AM.fun_Jac_wrapper_init(y,y0,DYN);    % Function wrapper for initial solution, if Jacobian is supplied
+                    newtonOpts.SpecifyObjectiveGradient = true;
+                else
+                    AM.iv = y0(1:(end-1));                          % Archive initial solution
+                    Fcn = @(y)[AM.res(y);y(end)-y0(end)];           % Define corrector-function containing the residual function and the subspace-constraint
+                end
+
+                newtonOpts.Display = 'off';                         % Deactivate fsolve output
+                [y,~,newton_flag,~,J] = fsolve(Fcn,y0,newtonOpts);  % Solve corrector-function
+
+            end
+
+        end
+
+        if ~(strcmpi(DYN.display,'off') || strcmpi(DYN.display,'final'))
+            disp(' ');
+        end
+        write_log(DYN,'')
+        added_output{1} = err;
+
+    end
+
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%% STABILITY %%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Has to be called after the error_control step
+
+    if strcmpi(DYN.stability,'on')
+
+        [multipliers,vectors,n_unstable,stability_flag] = ST.calc_stability(y,J);
+        added_output{2} = multipliers;
+        added_output{3} = n_unstable;
+        added_output{4} = stability_flag;
+        added_output{5} = vectors;
+        
+        if stability_flag == 0                                                              % Stability computation failed
+            warn_msg = 'WARNING: Stability computation failed for the initial solution!';   % Set warning message
+            S.warnings{end+1} = warn_msg(10:end);                                           % Save warning in Solution object
+        elseif n_unstable == 0                                                              % Stable solution found
+            info_text = 'Initial solution (stable) found!';                                 % Update info text
+        elseif n_unstable > 0                                                               % Unstable solution found
+            info_text = 'Initial solution (unstable) found!';                               % Update info text
         end
 
     end
 
-    if ~(strcmpi(DYN.display,'off') || strcmpi(DYN.display,'final'))
-        disp(' '); 
-    end 
-    write_log(DYN,'')
-    added_output{1} = err;
 
-end
+    %%%%%%%%%%%%%%%%%%%% Save initial solution %%%%%%%%%%%%%%%%%%%%
 
-info_text = 'Initial solution found!';
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%% STABILITY %%%%%%%%%%%%%%%%%%%%%%%%%%
-% Has to be called after the error_control step
-
-if strcmpi(DYN.stability,'on')
-
-    [multipliers,vectors,n_unstable,stability_flag] = ST.calc_stability(y,J);
-    added_output{2} = multipliers;
-    added_output{3} = n_unstable;
-    added_output{4} = stability_flag;
-    added_output{5} = vectors;
-
-    if stability_flag == 0   
-        warn_text = 'WARNING: Stability computation failed for the initial solution!';
-        write_log(DYN,warn_text)
-        S.warnings{end+1} = warn_text(10:end);                  % Save warning in Solution object
-        warning(warn_text(10:end));
-    elseif n_unstable == 0     
-        info_text = 'Initial solution (stable) found!';
-    elseif n_unstable > 0      
-        info_text = 'Initial solution (unstable) found!';   
+    if strcmpi(DYN.sol_type,'quasiperiodic') && strcmpi(DYN.approx_method,'shooting')
+        S.IF_arch_init_data(y,J,AM.Ik,newton_flag,AM.phi,DYN,added_output);
+    else
+        S.IF_arch_init_data(y,J,newton_flag,DYN,AM,added_output);
     end
 
 end
 
 
-%%%%%%%%%%%%%%%%%%%% Save initial solution %%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%% Display info and warning and write log %%%%%%%%%%%%
 
 if ~strcmpi(DYN.display,'off')
-    disp(info_text); disp(' '); 
+    disp(info_text); disp(' ');                 % Display info text
 end
-write_log(DYN,info_text)
-
-if strcmpi(DYN.sol_type,'quasiperiodic') && strcmpi(DYN.approx_method,'shooting')
-    S.IF_arch_init_data(y,J,AM.Ik,newton_flag,AM.phi,DYN,added_output);
-else
-    S.IF_arch_init_data(y,J,newton_flag,DYN,AM,added_output);
+write_log(DYN,info_text)                        % Write info text to log
+if exist('warn_msg','var')
+    warning(warn_msg(10:end)); disp(' ')        % Display warning (either frequency check or stability computation failed)
+    write_log(DYN,append('\n',warn_msg))        % Write warning in log file
 end
 
-% Check the frequencies
-[warn_msg,~] = check_freq(DYN,y);
-if ~isempty(warn_msg)                                                   % If frequency(s) are smaller than frequency limit
-    DYN.cont = 'off';                                                   % Deactivate continuation (if it was set to 'on')
-    warn_text = 'WARNING: Small or negative frequency(s) detected!';    % Set warning text
-    S.stopping_flag = append(warn_msg);                                 % Save stopping message
-    S.warnings{end+1} = warn_text(10:end);                              % Save warning in Solution object
-    warning(warn_text(10:end));                                         % Display warning
-    write_log(DYN,'finalize',append(warn_text,'\n\n',warn_msg))         % Finalize log file with warning text and message
-    if ~strcmpi(DYN.display,'off')
-        disp(' '); disp(warn_msg)                                       % Display warning text and message
-        disp(' ')
-        disp('-----------------------------------------------------')
-        disp('------------  Finished with warning(s)!  ------------');
-        disp('-----------------------------------------------------')
-        disp(' '); disp(' ')
+
+%%%%%%%%%%%%%%%%% Stopping (no continuation) %%%%%%%%%%%%%%%%%%
+
+if strcmpi(DYN.cont,'off')
+    if isempty(stopping_msg)                    % Set stopping message if it has not already been set by check_freq
+        stopping_msg = 'CoSTAR stopped after initial solution because continuation was turned off.';  
     end
-
-% Set stopping message if no continuation is desired
-elseif strcmpi(DYN.cont,'off')
-    stopping_msg = 'CoSTAR stopped after initial solution because continuation was turned off.';    % Set stopping message
-    write_log(DYN,'finalize',stopping_msg)                              % Finalize log file with stopping message
-    S.stopping_flag = stopping_msg;                                     % Save stopping message
+    write_log(DYN,'finalize',stopping_msg)      % Finalize log file with stopping message
+    S.stopping_flag = stopping_msg;             % Save stopping message
     if ~strcmpi(DYN.display,'off')
-        disp(stopping_msg)                                                  % Display stopping message
+        disp(stopping_msg)                      % Display stopping message
         disp(' ')
         disp('-----------------------------------------------------')
         if ~isempty(lastwarn)

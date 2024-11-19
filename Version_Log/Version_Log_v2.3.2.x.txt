@@ -1,0 +1,110 @@
+Log of different Code Versions of branch V2.1.2.x 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%% CHANGES TO EXISTING CODE %%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+V2.3.2.1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+1) Stability class: 	Added a sort_multipliers function for generalizing the sorting process. 
+					Added the sort_multipliers functionality to the calc_stability functions of the different subclasses 
+					Extended curve container with the multipliers and the number of unstable values
+					Added the function periodic_test_functions in ST_PS_Shoot. This is a static method since this method should also be called by the Hill method
+					Added the test_function property in Stability master class
+					Added an assignment of the test_function property in the s_stability_selection static method
+					Extended the curve container for the test_functions.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+1) costaropts:		costaropts now finds automatically doubled fieldnames and throws an error.
+
+V2.3.2.3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+1)check_costar:			plays now sound when finished. Accepts now EQ, PS, QPS, Shooting, FGM to selectively test subgroups
+2) Stability:			Changed order of variables in curve_container 
+3) s_CON_gatekeeper:	mu_limit is now mandatory 
+4) Solution:			Added the bifuraction table property (line 29); Added corresponding default allocation in constructor for the property
+6) SOL_EQ:				Added bifurcation table update in the IF_arch_bfp_data
+6) SOL_PS_Shoot:	    Added bifurcation table update in the IF_arch_bfp_data
+6) SOL_PS_FGM:		    Added bifurcation table update in the IF_arch_bfp_data
+7) ST_PS_Shoot:			Added message and info label for the bifuraction table corresponding to the test_functions
+7) ST_EQ:				Added message and info label for the bifuraction table 
+8) contplot:			Updated the contplot function: It plot bifurcation labels now and marks stable and unstable solution areas automatically
+
+V2.3.2.3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+1) Stability:			update_curve_container_bfp and clean_curve_container: sign function fo determination of stability change has been deleted, since it does not work  in the case for changing from n>0 to n>0+1
+2) Solution:			Changed in all solution IF_arch_bfp_data: the number of unstable multipliers in the bifurcation point is now not 0 but identical to the number before the change.
+3) test:				Added test_laval_EQ; Added RHS laval_eq; Changed name from benchmark_postprocess_eq to benchmark_postprocess_equilibrium and corrected the test filey;
+
+V2.3.2.6
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+1) Gatekeeper:			Changed the check_fields method so that is accepts cells of strings and not only structs.
+2) s_help_xxx			Basically all classes and subclasses received s_help_xxx files. These files are declared static in the class description and are found autonomously by the 
+						costarhelp class methods. 		
+		
+V2.3.2.7
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+1) contplot:			Bug fix for label plotting of bifurcations: Now the correct label is plotted
+	
+
+V2.3.2.8
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+1) ST_QPS_Shoot:		Line 38: Added the crit_multi method, which is required by the superclass.
+						Added the corresponding crit_multi method
+						s_stability_selection: Added if-statment: Stability cannot be computed for Fourier-Galerkin at the moment
+						
+2) check_costar:		Removed the option to supply a code path. Added the option to supply one or TWO code words
+		
+
+V2.3.2.8
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+1) EQ_calc_stability:				Deleteted max_mult output and changed it to stabi_flag
+									Added try and catch statement
+2) check_stability_values:			Deleteted max_mult output. Input is now stabi_flag
+3) PS_Shoot_calc_stability_auto:	Deleteted max_mult output and changed it to stability_flag
+									Added try and catch statements; Deleted the last "if flag ..." statement
+4) bifurcation_stability: 			Deleted the max_mult variable. Inserted the stabilit_flag statement
+									Added if-statements to handle the case of a failure in the stability computation or the iteration of bifurcation point
+									Changed the statement for the termination of the iteration loop to a difference in the multipliers
+5) clean_curve_container:			Can now handle the case, when there was a failure in the compuation of a point or the stability. 
+6) Continuation:					p_max_multiplier_bfp delted.
+7) ALL SOL_classes:					Removed the max_multiplier from all archive methods
+8) update_curve_container/_bfp:		Removed the max_multiplier from the function and the usage in the method.
+9) identify_bifurcation:				Changed the call to the test_functions in the curve_container from 6 to 5.
+10) get_stability_fcn:			     Changed the call to the test_functions in the curve_container from 6 to 5 and for the multipliers from 5 to 4
+11) PS_Shoot_calc_stabilitynon_auto: Deleteted max_mult output and changed it to stability_flag
+									 Added try and catch statements; Deleted the last "if flag ..." statement
+12) QPS_Shoot_calc_stability: 		 Deleteted max_mult output and changed it to stability_flag
+									 Added try and catch statements; Deleted the last "if flag ..." statement
+									 Deleted the flag parameter and replaced it by the stability_flag statement
+
+
+V2.3.2.10
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+1) Repaired a bug in the display of bifurcation labels
+2) Repaired a bug in the n_unstable computation: There was a sign command too much
+
+
+
+V2.3.2.11
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+1) cont and stability options changed from 1/0 to "on"/"off". I made the according changes in numerous subfiles.
+2) error_control options changed from 1/0 to to "on"/"off". I made the according changes in numerous subfiles.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%% NEW CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+V2.3.2.1
+
+ST_PS_Shooting:		Added PS_test_functions as a static method to the class (so that it can be called by the to-be-implemented ST_PS_Hill class)
+
+
+V2.3.2.3
+1) Stability:			Added the get_stability_fcn method for getting the test_function or multiplier from the curve_container, which had a zero crossing
+						Added the identify_bifurcation method, which gives back a label and info message for the identified bifurcation
+
+V2.3.2.6
+1) costarhelp: 			The costarhelp class with a lot of mehtods was added. It serves as a universal help interface

@@ -1,0 +1,128 @@
+Log of different Code Versions of branch V1.0.2.x 
+(Implementation of FGM for periodic and quasi-periodic solutions)
+
+
+%%%%%%%%%%%% CHANGES TO EXISTING CODE %%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+V1.0.2.1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% According to Manual
+1) s_DYN_gatekeeper - line 107: Added 'fourier-galerkin' to p_sol_method_allowed_fieldvalues
+2) s_ST_gatekeeper: Added an if-statement calling FGM gatekeeper.
+3) s_method_selection: Added an if statement for assigning ST.res to the FGM method.
+4) s_solution_selection: Added an if statement to create an solution object of the SOL_PS_FGM for the FGM method.
+
+%% New changes
+1) system structure gets the key "dim", which determines the dim of the state space
+2) DynamicalSystem gets the property dim, which is assigned to the value of the dim key
+3) Gatekeeper:
+	- Added dim in the s_DYN_gatekeeper into system_mandatory_fieldnames and system_allowed_fieldnames (line 12 and 13)
+	- Added a check for the dim value in code line 34
+	- Added the system structure as argument to the SolutionType Gatekeeper (for checking the correct dimension of initial values)
+		- Added system to the call at SolutionType class line 15.
+		- Added system to the call at m_gatekeeper class line 53.
+		- Added system to the call at s_ST_gatekeeper for all gatekeepers.
+		- Added system to the call at ST_Equilibrium class line 13.
+		- Added system to the call at s_EQ_gatekeeper class line 12.
+		- Added system to the call at ST_PS_Shoot class line 16.
+		- Added system to the call at s_PS_Shoot_gatekeeper class line 12.
+		- Changed line 43 in s_EQ_gatekeeper. 
+		- Changed line 42 in s_PS_Shoot_gatekeeper. 
+		
+		
+	
+4) The methods IF_arch_init_data and IF_arch_data now also get passed the ST object. This is needed to store e.g. the 
+   (adapted) hmatrix in every continuation step. 
+	- Changes made in:
+		initial_solution, line 25: S.IF_arch_init_data(y,J,newton_flag,DYN,ST); 
+		m_continuation, line 33: S.IF_arch_data(obj,DYN,ST); 
+		SOL_EQ, line 13: IF_arch_init_data(obj,y1,J,newton_flag,DYN,ST):
+		SOL_EQ, line 25: IF_arch_data(obj,CON,DYN,ST) 
+		SOL_PS_Shoot, line 19: IF_arch_init_data(obj,y1,J1,newton_flag,DYN)
+		SOL_PS_Shoot, line 37: IF_arch_data(obj,CON,DYN,ST)    
+
+V1.0.2.3
+5) Added varargin to check_fields in the Gatekeeper class to allow for multiple checks
+
+6) Changed a few thinks in check_costar.
+
+V1.0.2.4
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% According to Manual
+1) s_DYN_gatekeeper - Added 'quasiperiodic' to sol_type_allowed_fieldvalues
+2) Added a gatekeeper check for quasiperiodicity. 
+3) s_ST_gatekeeper: Added an if-statement calling QPS FGM gatekeeper.
+4) s_method_selection: Added an if statement for assigning ST.res to the FGM method.
+5) s_solution_selection: Added an if statement to create an solution object of the SOL_QPS_FGM for the FGM method.
+
+
+11) Changed the update frequency function	
+12) !!! Changed param from array to cell !!!
+13) initial_solution - line 11: 			adapted to param{DYN.act_param}
+14) shoot_single_auto_fun line 16: 			adapted to param{DYN.act_param}
+15) shoot_single_fun line 11: 				adapted to param{DYN.act_param}
+16) ST_Equilibrium line 38: 				adapted to param{DYN.act_param}
+17) evalsol_time in SOL_PS_Shoot line 39: 	adapted to param{DYN.act_param} 
+
+
+V1.0.2.5
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Rework of post-processing for quasiperiodicity:
+
+1) solget: Changed vecnorm call in case 'euclidean'
+2) solget: Changed code for case 'function_handle'
+
+
+
+
+
+%%%%%%%%%%%% NEW CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+V1.0.2.1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+1) New SOL and ST subclass folder created
+2) PS_FGM_residuum function created
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+V1.0.2.2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+1)	Added opt_init check in the ST_PS_FGM_gatekeeper
+2) 	getIV function implemented
+3) 	writing the PS_FGM_residuum function file
+4)  wrote all of the solution subclass stuff and did initial tests
+  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+V1.0.2.3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+1) Added a phase_condition method to ST_PS_FGM
+2) Added multiple files to the test folder to check for the periodic 
+   solutions
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+V1.0.2.3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+1) Added a phase_condition method to ST_PS_FGM
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+V1.0.2.4
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+1) ST_QPS_FGM implemented
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+V1.0.2.5
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+1) QPS_FGM_residuum implemented for 2D non-auto QP
+2) Changed data type of dim in DynamicalSystem to double (problems in computation 
+   with double data type in the same array)
+   
+SOLUTION CLASS
+3) Implemented evalsol_solution. 
+4) Implemented evalsol_time.
+5) Implemented evalsol_hypertime
+6) Implemented evalsol_frequency.  
+   
+
+

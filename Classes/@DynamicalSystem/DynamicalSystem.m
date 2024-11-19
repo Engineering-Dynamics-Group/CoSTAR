@@ -7,7 +7,7 @@ classdef DynamicalSystem
     %% Properties    
     properties(Constant)
         % Constant properties cannot be changed (read-only)
-        costar_version = '2.7.3';
+        costar_version = '2.8.0';
     end
 
 
@@ -29,6 +29,7 @@ classdef DynamicalSystem
         act_param = 1;                                                  %Defines the index of the continuation parameter in the param array
         non_auto_freq = []                                              %contains all non-autonomous frequencies (this may be type function handle)
         auto_freq = []                                                  %contains all initial values for the autonomous frequencies
+        freq_limit = 1e-4;                                              %CoSTAR stops when the base frequency(s) fall below this limit (ATTENTION: Also set in s_DYN_gatekeeper)
 
         %Internally set
         n_auto uint32                                                   %Gives the number of autonomous frequencies

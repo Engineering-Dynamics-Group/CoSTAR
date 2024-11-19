@@ -1,0 +1,157 @@
+--------------------------------------------
+------------------ v2.8.0 ------------------
+--------------------------------------------
+
+A log file is now created for every CoSTAR computation and the command window output was reworked. 
+The latter can still be controlled via the field 'display', but it was moved to the opt_sol options structure.
+    
+    @DynamicalSystem:
+        - DynamicalSystem:
+            --> Hidden properties "display" and "create_log" added to hidden properties (lines 51 - 55)
+            --> Format of ID improved (line 88)
+            --> MATLAB function lastwarn is resetted in constructor now (line 90)
+        - s_DYN_gatekeeper:
+            --> Check for opt_sol-field 'display' added (lines 16, 19, 73 - 76, 85, 114 and 196)
+        - s_help_opt_sol:
+            --> Info text for field 'display' added (lines 48 - 56)
+
+    @Continuation:
+        - bifurcation_stability:
+            --> Method now returns obj (line 10)
+            --> Warnings reworked, command window output as well as log file entries and saving of warnings added when computation failed (lines 86 - 92 and 104 - 108)
+        - check_limits:
+            --> DymamicalSystem object added to input arguments (line 7)
+            --> Complete rework of command window output, log file entries and saving of stopping messages added (lines 14 - 55, 62 - 65, 70 - 73, 78 - 81 and 84)
+        - Continuation:
+            --> Property "display" removed (former line 10)
+            --> Private property "p_last_msg" added to store command window messages (line 60)
+            --> DymamicalSystem object added to input arguments of check_limits and stepcontrol (lines 113 and 115)
+        - error_control:
+            --> Command window output reworked and log file entries added (lines 32 - 36 and 45 - 49)
+        - m_continuation:
+            --> Command window output, log entries and saving of warnings and stopping messages added (lines 27 - 37, 58 - 63, 90 - 96, 102 - 104, 118 - 123 and 159 - 169)
+            --> DymamicalSystem object added to input arguments of stepcontrol and check_limits (lines 50 and 149)
+        - s_CON_gatekeeper:
+            --> 'display' removed from allowed fieldnames and related check deleted (lines 10, 15 and former line 37)
+        - s_help_opt_cont:
+            --> Info text for field 'display' removed (former lines 76 and 77)
+        - stepcontrol:
+            --> DymamicalSystem object added to input arguments (line 5)
+            --> Command window output reworked and log file entries added (lines 16 - 20, 129 and 176 - 192)
+
+    @AM_PS_FDM:
+        - AM_PS_FDM:
+            --> Property p_weights renamed to weights and moved to normal properties (not private anymore) (line 13)
+        - getWeights:
+            --> Property p_weights adapted to weights (line 163)
+            --> Command window output disabled / commented (lines 165 - 176)
+        - PS_FDM_residuum:
+            --> Property p_weights adapted to weights (line 32)
+
+    @AM_QPS_FDM:
+        - AM_QPS_FDM:
+            --> Properties p_weights_i renamed to weights_i (i \in {1,2}) and moved to normal properties (not private anymore) (lines 18 and 19)
+        - getWeights:
+            --> Properties p_weights_i adapted to weights_i (i \in {1,2}) (lines 282 and 283)
+            --> Command window output disabled / commented (lines 285 - 296)
+        - PS_FDM_residuum:
+            --> Properties p_weights_i adapted to weights_i (i \in {1,2}) (lines 41 and 43)
+
+    @Solution:
+        - Solution:
+            --> Property "warnings = cell(0,0)" added to store all warnings when CoSTAR is running (line 33)
+
+    @SOL_PS_FDM:
+        - SOL_PS_FDM:
+            --> Properties "local_gridpoint_indices" and "local_gridpoint_weights" added (lines 9 and 10)
+            --> Storing of AM_PS_FDM properties "points" and "weights" to new SOL_PS_FDM properties added (lines 49 and 50)
+
+    @SOL_QPS_FDM:
+        - SOL_QPS_FDM: 
+            --> Properties "local_gridpoint_indices_i" and "local_gridpoint_weights_i" (i \in {1,2}) added (lines 9 - 12)
+            --> Storing of AM_QPS_FDM properties "points_i" and "weights_i" (i \in {1,2}) to new SOL_PS_FDM properties added (lines 51 - 55)
+
+    Functions:
+        - check_freq:
+            --> Small changes to all warning messages
+        - initial_solution:
+            --> Complete rework of command window output messages
+            --> Log file entries and saving of warnings and stopping messages added
+            --> Changes to lines 10 - 17, 40, 43, 44, 46, 47, 49, 55 - 66, 69, 77, 78, 101 - 105, 108 - 112, 116 - 120, 139, 146 - 149, 166 - 173 and 191 - 222)
+        - write_log:
+            --> Added
+
+    test:
+        - Changes to test files regarding field 'display': Values adapted and field moved from opt_cont to opt_sol
+        - Changes to test files regarding timer: The computation time is now evaluated using a timer variable to avoid conflict with timer in write_log function
+
+    Tutorials:
+        - Description of field 'display' and reference to log file added as well as decription of command window output adapted. Changes affect:
+            --> Tutorial_EQ
+            --> Tutorial_PS_FDM     --> Tutorial_PS_FGM     --> Tutorial_PS_SHM
+            --> Tutorial_QPS_FDM    --> Tutorial_QPS_FGM    --> Tutorial_QPS_SHM
+        - Live scripts evaluated again to obtain the new command window output. Changes affect:
+            --> Tutorial_EQ     
+            --> Tutorial_Postprocessing_contplot    --> Tutorial_Postprocessing_solget      --> Tutorial_Postprocessing_solplot
+          
+
+----------  
+
+The frequency limit can now be set by the user. Moreover, the implementation of the check in initial_solution and in m_continuation as well as the function freq_check itself were adapted.
+
+    @DynamicalSystem:
+        - DynamicalSystem:
+            --> Property "freq_limit = 1e-4" added (line 32)
+        - s_DYN_gatekeeper:
+            --> Checks for 'freq_limit' added (lines 16, 115, 128 - 139, 209 and 230 - 241)
+            --> Call of function freq_check adapted according to recent changes (lines 155, 163, 257 and 270)
+        - s_help_opt_sol:
+            --> Info text for field 'freq_limit' added (lines 44 - 45)
+	
+    @Continuation:
+        - m_continuation:
+            --> Position of frequency check changed
+            --> Function call adapted according to recent changes
+
+    Functions:
+        - check_freq:
+            --> Input arguments changed. Now there are always two: Either DynamicalSystem object and solution vector OR frequency limit and frequency(s)
+            --> Output argument(s) reduced to warning message
+        - initial_solution:
+            --> Position of frequency check changed
+            --> Function call adapted according to recent changes
+
+    test:
+        - Minor changes to test files regarding new opt_sol field 'freq_limit'
+
+    Tutorials:
+        - Description of field 'freq_check' added. Changes affect:
+            --> Tutorial_EQ
+            --> Tutorial_PS_FDM     --> Tutorial_PS_FGM     --> Tutorial_PS_SHM
+            --> Tutorial_QPS_FDM    --> Tutorial_QPS_FGM    --> Tutorial_QPS_SHM
+
+          
+----------  
+
+@DynamicalSystem:
+    
+    - s_help_opt_sol:
+        --> Minor improvements to info texts (lines 20 - 42)
+
+          
+----------  
+
+Tutorials:
+
+    - Stability computation enabled for all examples if it was turned off and if stability computation is possible. Changes affect:
+        --> Tutorial_PS_FDM     --> Tutorial_PS_FGM     --> Tutorial_PS_SHM
+        --> Example_PS_FDM      --> Example_PS_FGM      --> Example_PS_SHM
+    
+    - Description of variable non_auto_freq as well as of option structs options.system and options.opt_sol improved. 
+      Moreover, the description of the output figure and the line colors was moved to postprocessing section. Changes affect:
+        --> Tutorial_EQ
+        --> Tutorial_PS_FDM     --> Tutorial_PS_FGM     --> Tutorial_PS_SHM
+        --> Tutorial_QPS_FDM    --> Tutorial_QPS_FGM    --> Tutorial_QPS_SHM
+
+
+   

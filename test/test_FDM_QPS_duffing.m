@@ -44,12 +44,12 @@ Fcn = @(t,z,param) duffing_ap_qp(t,z,param);    % Right-hand side of ODE
 %% Properties
 options.system   = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','Continuation of Quasi-Periodic Duffing');           % Properties of the system
 options.opt_sol  = costaropts('sol_type','quasiperiodic','approx_method','finite-difference','cont','on','stability','off',...      % Properties of the solution
-                              'non_auto_freq',non_auto_freq,'act_param',active_parameter);                                          % Properties of the solution
+                              'non_auto_freq',non_auto_freq,'act_param',active_parameter,'display','step-control');                 % Properties of the solution
 options.opt_init = costaropts('c1_matrix',C1_mat,'s1_matrix',S1_mat);                                                               % Properties for initial solution
 % load('workspace_test_duffing_QPS_FDM');    options.opt_init = costaropts('fdm_sol',s0);           % Use already calculated FDM solution vector as initial value
 options.opt_approx_method = costaropts('n_int_1',25,'scheme_1','central','approx_order_1',6,...                                     % Properties of approximation method FDM
                                        'n_int_2',25,'scheme_2','central','approx_order_2',6);                                       % Properties of approximation method FDM
-options.opt_cont = costaropts('mu_limit',mu_limit,'pred','cubic','direction',-1,'display','step_control_info');                     % Properties for continuation
+options.opt_cont = costaropts('mu_limit',mu_limit,'pred','cubic','direction',-1);                                                   % Properties for continuation
 
 % Step control options
 % Available step control methods: 'off', 'on', 'corrector_iterations', 'norm_corrector', 'combination', 'angle', ('pid')

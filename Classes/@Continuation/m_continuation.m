@@ -53,14 +53,14 @@ while  obj.p_contDo
     
     obj = obj.predictor();                          %calculate predicted point
 
-    [warn_msg,~] = check_freq(DYN,obj.yp);                                      %check the frequencies at the predictor point (not done in predictor to be able to break the while loop)
-    if ~isempty(warn_msg)                                                       %if frequency(s) are smaller than frequency limit
-        warn_text = 'WARNING: Small or negative frequency(s) detected!';        %set warning text
-        write_log(DYN,'finalize',append(warn_text,'\n\n',warn_msg))             %finalize log file with warning text and message
-        S.warnings{end+1} = warn_text(10:end);                                  %save warning in Solution object
-        disp(' '); warning(warn_text(10:end));                                  %display warning
-        if ~strcmpi(DYN.display,'off'); disp(' '); disp(warn_msg); end          %display warning message
-        obj.p_stopping_flag = append(warn_msg);                                 %save stopping message
+    stopping_msg = check_freq(DYN,obj.yp);                                      %check the frequencies at the predictor point (not done in predictor to be able to break the while loop)
+    if ~isempty(stopping_msg)                                                   %if frequency(s) are smaller than frequency limit
+        warn_msg = append('WARNING: Small or negative frequency(s) detected for predictor point after Iter = ',num2str(obj.p_local_cont_counter),'!');
+        S.warnings{end+1} = warn_msg(10:end);                                   %save warning in Solution object
+        obj.p_stopping_flag = stopping_msg;                                     %save stopping message
+        disp(' '); warning(warn_msg(10:end));                                   %display warning
+        if ~strcmpi(DYN.display,'off'); disp(' '); disp(stopping_msg); end      %display stopping message
+        write_log(DYN,'finalize',append(warn_msg,'\n\n',stopping_msg))          %finalize log file with warning message and message
         break                                                                   %break the continuation loop (any further computation below might fail)
     end
 
@@ -83,25 +83,25 @@ while  obj.p_contDo
     
     [obj.p_y1,~,obj.p_newton_flag,obj.p_output,obj.p_J1] = fsolve(Fcn,obj.yp,obj.fsolve_opts);      %solve corrector function
 
-    
+
     %%%%%%%%%%%%%  IF NO CONVERGENCE OF FSOLVE  %%%%%%%%%%%
-    if(obj.p_newton_flag<1 && obj.step_width<=obj.step_width_limit(1,1))                            %if fsolve did not converge and step width is already <= minimal step width 
+    if (obj.p_newton_flag < 1) && (obj.step_width <= obj.step_width_limit(1,1))                     %if fsolve did not converge and step width is already <= minimal step width 
         obj.p_contDo = 0;                                                                           %stop continuation
-        warn_text = 'WARNING: No solution found!';                                                  %set warning text
-        warn_msg = 'CoSTAR stopped because corrector did not converge and step width has reached minimal value!';   %set warning message
-        write_log(DYN,'finalize',append(warn_text,'\n\n',warn_msg))                                 %finalize log file with warning text and message
-        S.warnings{end+1} = warn_text(10:end);                                                      %save warning in Solution object
-        disp(' '); warning(warn_text(10:end));                                                      %display warning
-        if ~strcmpi(DYN.display,'off'); disp(' '); disp(warn_msg); end                              %display warning message
-        obj.p_stopping_flag = append(warn_msg);                                                     %save stopping message
+        warn_msg = append('WARNING: No solution found for Iter = ',num2str(obj.p_local_cont_counter+1),'!');            %set warning message
+        stopping_msg = 'CoSTAR stopped because corrector did not converge and step width has reached minimal value!';   %set stopping message
+        S.warnings{end+1} = warn_msg(10:end);                                                       %save warning in Solution object
+        obj.p_stopping_flag = stopping_msg;                                                         %save stopping message
+        disp(' '); warning(warn_msg(10:end));                                                       %display warning
+        if ~strcmpi(DYN.display,'off'); disp(' '); disp(stopping_msg); end                          %display stopping message
+        write_log(DYN,'finalize',append(warn_msg,'\n\n',stopping_msg))                              %finalize log file with warning message and message
     
-    elseif(obj.p_newton_flag<1 && obj.step_width>obj.step_width_limit(1,1))                         %if fsolve did not converge and step width is above minimal step width 
+    elseif (obj.p_newton_flag < 1) && (obj.step_width > obj.step_width_limit(1,1))                  %if fsolve did not converge and step width is above minimal step width 
         step_width_pre = 0.5.*obj.step_width;                                                       %new preliminary step width
         obj.step_width = max([step_width_pre,obj.step_width_limit(1)]);                             %set step_width. If new preliminary step width falls below minimal step width, take minimal step width
         obj.p_convergence = 0;                                                                      %set property p_convergence to zero (for resetting the step_width after convergence)
         info_text = append('Stepwidth adapted to stepwidth = ',num2str(obj.step_width),', because corrector did not converge!');
         write_log(DYN,info_text)                                                                    %write info text in log file
-        if ~(strcmpi(DYN.display,'off') || strcmpi(DYN.display,'final')); disp(info_text); end      %display info text
+        if strcmpi(DYN.display,'step-control') || strcmpi(DYN.display,'full'); disp(info_text); end %display info text
                                                                                         
     
     %%%%%%%%%%%%%%%%%%  FSOLVE CONVERGED  %%%%%%%%%%%%%%%%%
@@ -110,6 +110,20 @@ while  obj.p_contDo
         % checkGradients_opts = optimoptions('fsolve',FiniteDifferenceType='forward'); checkGradients(Fcn,obj.p_y1,checkGradients_opts,Display='on',Tolerance=1e-6);
 
         %IMPORTANT: order of calling the methods must not be changed
+
+        %%%%%%%%%%%%%%%%%%%%%%%  FREQUENCY CHECK  %%%%%%%%%%%%%%%%%%%%%%%
+        stopping_msg = check_freq(DYN,obj.p_y1);                                    %check the frequencies of the solution
+        if ~isempty(stopping_msg)                                                   %if frequency(s) are smaller than frequency limit
+            obj.p_contDo = 0;                                                       %stop continuation
+            warn_msg = append('WARNING: Small or negative frequency(s) detected for solution Iter = ',num2str(obj.p_local_cont_counter+1),'!');
+            S.warnings{end+1} = warn_msg(10:end);                                   %save warning in Solution object
+            obj.p_stopping_flag = stopping_msg;                                     %save stopping message
+            disp(' '); warning(warn_msg(10:end));                                   %display warning
+            if ~strcmpi(DYN.display,'off'); disp(' '); disp(stopping_msg); end      %display stopping message
+            write_log(DYN,'finalize',append(warn_msg,'\n\n',stopping_msg))          %finalize log file with warning message and stopping message
+            break                                                                   %break the continuation loop (any further computation below might fail)
+        end
+
 
         %%%%%%%%%%%%%%%%%%%%%%%%%  ERROR CONTROL  %%%%%%%%%%%%%%%%%%%%%%%
         %Control the error by adapting the discretisation. If the ansatz function is adapted, error_control solves the equation system again
@@ -127,28 +141,12 @@ while  obj.p_contDo
         S.IF_arch_data(obj,DYN,AM);                 %store calculated data point in Solution object
 
 
-        %%%%%%%%%%%%%%%%%%%%%%%  FREQUENCY CHECK  %%%%%%%%%%%%%%%%%%%%%%%
-        [warn_msg,~] = check_freq(DYN,obj.p_y1);    %check the frequencies of the solution
-        if ~isempty(warn_msg)                       %if frequency(s) are smaller than frequency limit
-            obj.p_contDo = 0;                       %stop continuation
-            warn_text = 'WARNING: Small or negative frequency(s) detected!';        %set warning text
-            write_log(DYN,'finalize',append(warn_text,'\n\n',warn_msg))             %finalize log file with warning text and message
-            S.warnings{end+1} = warn_text(10:end);                                  %save warning in Solution object
-            disp(' '); warning(warn_text(10:end));                                  %display warning
-            if ~strcmpi(DYN.display,'off'); disp(' '); disp(warn_msg); end          %display warning message
-            obj.p_stopping_flag = append(warn_msg);                                 %save stopping message
-
-
         %%%%%%%%%%  PLOTTING, CHECKING LIMITS AND DISPLAY INFO  %%%%%%%%%
-        else
+        if strcmpi(obj.plot,'on'); obj.plot_contplot(S,DYN); end    %display a continuation plot if desired
 
-            if strcmpi(obj.plot,'on'); obj.plot_contplot(S,DYN); end    %display a continuation plot if desired
+        obj = obj.iterate_data();                                   %store calculated data point as current data point for next continuation step
 
-            obj = obj.iterate_data();                                   %store calculated data point as current data point for next continuation step
-
-            obj = obj.check_limits(DYN);                                %check limits for bifurcation parameter and number of steps and display information
-
-        end
+        obj = obj.check_limits(DYN);                                %check limits for bifurcation parameter and number of steps and display information
 
     end
 

@@ -13,7 +13,7 @@ function obj = bifurcation_stability(obj,DYN,AM,S,ST)
         %% Calculate Stability
         [obj.p_multipliers,obj.p_vectors,obj.p_n_unstable_1,stability_flag] = ST.calc_stability(obj.p_y1,obj.p_J1);               % Compute the respective multiplier (eigenvalue, Floquet, Lyapunov Exponent)
         
-%        if mod(obj.p_local_cont_counter,15) == 0; stability_flag = 0; end
+
         if stability_flag > 0                                           % Only move forward if the stability computation was regular
         
 
@@ -66,7 +66,7 @@ function obj = bifurcation_stability(obj,DYN,AM,S,ST)
         
                     end
 
-      %  p_newton_flag_bfp = 0;
+
                     % Save the bifurcation point
                     if (p_newton_flag_bfp>0) && (stability_flag>0)
                         
