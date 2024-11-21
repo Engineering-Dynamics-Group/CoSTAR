@@ -111,6 +111,7 @@ classdef Continuation < handle
         S = m_continuation(obj,DYN,S,AM,ST);                                %Main method of class Continuation
         
         %% Methods
+        obj = initial_slope(obj,DYN,AM);                                    %Calculates second curve point to determine initial slope for direction vector (secant, parable, cubic)
         obj = direction_vector(obj);                                        %Calculates the vector of the direction of the predictor (tangent, secant, ...)
         obj = predictor(obj);                                               %Generates predictor to given point on diagram
         
