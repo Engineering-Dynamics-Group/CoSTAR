@@ -36,8 +36,6 @@ if ~strcmpi(DYN.display,'off')
     disp(' ')
 end
 
-% Calculate second curve point with differential perturbation dmu to
-% calculate initial slope for secant predictor
 if(strcmpi(obj.pred,'secant'))
     newtonOpts = optimoptions('fsolve','Display','iter-detailed','MaxFunEvals',1e5,'FiniteDifferenceType','forward');
     y0 = obj.y0;

@@ -20,7 +20,7 @@ C1 = [1;0];     S1 = [0;-0.1];                  % Fourier-coefficients to create
 
 %% Properties
 options.system   = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param);                                                   % Properties of the system  
-options.opt_sol  = costaropts('sol_type','ps','approx_method','fdm','cont','off','stability','off','freq_limit',1e-4,...    % Properties of the solution
+options.opt_sol  = costaropts('sol_type','ps','approx_method','fdm','cont','on','stability','off','freq_limit',1e-4,...    % Properties of the solution
                               'non_auto_freq',non_auto_freq,'act_param',active_parameter,'display','final');                % Properties of the solution 
 options.opt_init = costaropts('c1',C1,'s1',S1);                                                                             % Properties for initial solution
 options.opt_approx_method = costaropts('n_int',100,'scheme','forward','approx_order',2);                                    % Properties of approximation method FDM

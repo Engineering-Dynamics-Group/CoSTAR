@@ -37,6 +37,7 @@ classdef Continuation < handle
         p_arcl_1  = 0;                                                        %arc-length of new point: Has its own get method
 
         p_y0_old                                                              %Stores last 3 "old" curve point for predictors
+
         p_error = NaN;                                                        %Current error of the solution point
         p_n_unstable_1 = NaN;                                                 %Indicates the number of unstable multipliers
         p_n_unstable_0 = NaN;                                                 %Indicates the number of unstable multipliers curve point
@@ -81,6 +82,10 @@ classdef Continuation < handle
         p_r = 1;                                                              %Factor which adapts step width
         p_e = 1;                                                              %Used for PID step control
         p_dx_dmu                                                              %Used for PID step control
+
+        p_initial_slope                                                       %Initial slope for secant predictor (only used in initial continuation step)
+        p_use_qr logical = false;                                             %Boolean to determine whether a qr decomposition has to be used to determine inital slope (only if secant method failed)
+
     end
     %%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%

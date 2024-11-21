@@ -1,4 +1,25 @@
 --------------------------------------------
+------------------ v2.8.1 ------------------
+--------------------------------------------
+
+Secant predictor now works for the initial solution as well and doesn't use a qr decomposition anymore
+
+    @Continuation:
+        - Continuation:
+            --> Line 86 ---- p_initial_slope ---- stores intial slope in case of secant predictor
+            --> Line 87 ---- p_use_qr ----- logical value set true if calculation of second curve point fails, then use qr decomposition instead
+        - direction_vector:
+            --> Line 10 ----- arguments of if statement changed
+            --> Lines 15-17 added ----- use initial slope if secant predictor is used and in first loop
+        - m_continuation: 
+            --> Lines 41-63 added ---- if loop to calculate second curve point for initial slope
+
+    @test:
+        - test_FDM_PS_harmonic:
+            --> Line 23 ----- option 'cont' set to 'on', resolved error in benchmark_postprocess_periodic
+
+
+--------------------------------------------
 ------------------ v2.8.0 ------------------
 --------------------------------------------
 
