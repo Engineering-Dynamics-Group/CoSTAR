@@ -1,0 +1,96 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                 CoSTAR                                  %
+%              Continuation of Solution Torus AppRoximations              %
+%                             Version 2.8.0                               %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This is the log file of CoSTAR computation: ID_2024-11-21_15.53.37
+
+---------------------------------------------------------------------------
+--------------------------------  Options  --------------------------------
+---------------------------------------------------------------------------
+
+CoSTAR was called using the following options:
+
+options.system:
+    order: 1
+      rhs: @(t,z,param)duffing_qp(t,z,param)
+    param: {[0.0500]  [1.5000]  [0.2500]  [0.2500]  [2]  [1.4142]}
+      dim: 2
+
+options.opt_sol:
+        stability: 'on'
+             cont: 'on'
+    non_auto_freq: @(mu)[mu,mu*ratio]
+         sol_type: 'quasiperiodic'
+    approx_method: 'shooting'
+        act_param: 5
+
+options.opt_approx_method:
+    solver: 'ode45'
+    n_char: 30
+
+options.opt_init:
+    (Not defined)
+
+options.opt_cont:
+          step_control: 'angle'
+                  pred: 'cubic'
+              subspace: 'pseudo-arc'
+              mu_limit: [0.8000 2]
+            step_width: 0.2500
+    step_control_param: [2 5]
+             direction: -1
+         max_cont_step: 5
+
+options.opt_stability:
+    iterate_bfp: 'on'
+
+---------------------------------------------------------------------------
+---------------------------  Initial solution  ----------------------------
+---------------------------------------------------------------------------
+
+Starting computation at 2024-Nov-21, 15:53:37.
+
+fsolve is trying to find an initial solution ...
+
+                                             Norm of      First-order   Trust-region
+ Iteration  Func-count     ||f(x)||^2           step       optimality         radius
+     0          1             2.35315                             1.9              1
+     1          2           0.0114175       0.891492           0.0392              1
+     2          3         5.99474e-07       0.162142          0.00072           2.23
+     3          4         2.06396e-16    0.000699553         1.37e-08           2.23
+
+Equation solved. The sum of squared function values, r = 2.063960e-16, is less than
+sqrt(options.FunctionTolerance) = 1.000000e-03. The relative norm of the gradient of r,
+1.371859e-08, is less than options.OptimalityTolerance = 1.000000e-06.
+
+Initial solution (stable) found!
+
+---------------------------------------------------------------------------
+-----------------------------  Continuation  ------------------------------
+---------------------------------------------------------------------------
+
+Second cuve point found!
+Iter: 2 -- mu = 1.8186 -- stepwidth = 0.2500 -- stable
+
+-------------------------------------
+Step width adapted to step_width = 0.19566 by factor r = 0.78264. r_pre = 0.78264, alpha = 6.3886° corr_it = 2
+Iter: 3 -- mu = 1.7004 -- stepwidth = 0.1957 -- stable
+
+-------------------------------------
+Step width adapted to step_width = 0.054328 by factor r = 0.27766. r_pre = 0.27766, alpha = 18.0075° corr_it = 3, r_alpha = 0.27766, r_it = 0.66667
+Iter: 4 -- mu = 1.6710 -- stepwidth = 0.0543 -- stable
+
+-------------------------------------
+Step width adapted to step_width = 0.05 by factor r = 0.27794. r_pre = 0.27794, alpha = 17.9892° corr_it = 2
+Iter: 5 -- mu = 1.6465 -- stepwidth = 0.0500 -- stable
+
+CoSTAR stopped because maximal number of continuation steps max_cont_step = 5 was reached.
+
+---------------------------------------------------------------------------
+------------------------  Successfully finished!  -------------------------
+---------------------------------------------------------------------------
+
+Computation finished at 2024-Nov-21, 15:53:41.
+Elapsed time is 4.184 seconds.

@@ -1,4 +1,25 @@
 --------------------------------------------
+----------------- v2.8.0.3 -----------------
+--------------------------------------------
+
+QPS_SHM can now be initilized with a first order fourier series. The time integration has been removed.
+
+    @AM_QPS_SHM
+        - Properties:
+            --> tinit, deltat, t0 removed
+            --> c0, c1, s1 added, store values for first order, two dimensional fourier series
+        - getIV:
+            --> Mutiple changes
+                - else loop removed which did the time integration
+            --> Lines 65-127 else loop added which extracted initial values from fourier series
+        - s_QPS_SHM_gatekeeper:
+            --> Multiple changes
+                - optional fields 
+                    o added 'c0', 'c1', 's1'
+                    o removed 'tinit', 'deltat', 't0'
+                - Corresponding checks removed/added
+
+--------------------------------------------
 ----------------- v2.8.0.2 -----------------
 --------------------------------------------
 

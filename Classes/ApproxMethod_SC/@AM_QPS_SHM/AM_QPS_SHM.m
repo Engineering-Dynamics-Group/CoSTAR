@@ -20,7 +20,11 @@ classdef AM_QPS_SHM < ApproxMethod
         y_old                                                               %Initial conditions of last solution point (for phase condition in autonomous case)
         Y_old                                                               %Values of manifold of last solution point (for phase condition in autonomous case)
         reso_phase = 50;                                                    %Resolution for time integration to determine phase condition
-        
+
+        c0                      % Fourier-coefficient of 0-th order to create the initial solution vector
+        c1_matrix               % Fourier-coefficients (stored in a matrix) of 1-st order cosine terms to create the initial solution vector
+        s1_matrix               % Fourier-coefficients (stored in a matrix) of 1-st order sine terms to create the initial solution vector
+
 %         phase_shift
         
         
@@ -41,6 +45,7 @@ classdef AM_QPS_SHM < ApproxMethod
         %% Constructor
         function obj = AM_QPS_SHM(DYN)
             obj = updateoptions(obj,DYN.opt_approx_method);                         % updateoptions method is inherited from SolutionType
+            obj = updateoptions(obj,DYN.opt_init);                                  % Updates the properties with the values set by the user in opt_init
             obj = setSolver(obj,obj.solver);                                        % set ode Solver for time integration
             obj.n = DYN.dim;                                                        % Get dimension of system
             obj.phi = zeros(obj.n,1);                                               % Set phase for characteristics to zero
