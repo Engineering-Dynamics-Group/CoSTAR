@@ -28,7 +28,7 @@ function help_struct = s_help_contplot()
     help_struct.optional.figure.value = 'figure handle \n e.g.: gcf \n Default: (no value)';
     help_struct.optional.figure.text  = 'Specifies the figure in which to plot the curve. Can be used to plot multiple continuation curves into the same figure.\n When this field is not defined, a new figure is opened.';
 
-    help_struct.optional.color.value = '''r'', ''g'', ''b'', ''c'', ''m'', ''y'',\n ''k'' or [1x3] rgb array \n e.g.: [0,0.5,1] \n Default: ''b'', except \n -> ''r'' for unstable solutions\n -> dark grey when stability\n changes and the bifurcation\n point is not iterated';
+    help_struct.optional.color.value = '''r'', ''g'', ''b'', ''c'', ''m'', ''y'',\n ''k'' or [1x3] rgb array \n e.g.: [0,0.5,1] \n Default: ''b'', except \n -> ''g'' for stable solutions\n -> ''r'' for unstable solutions\n -> orange when stability\n computation failed\n -> pale grey when stability\n changes and the bifurcation\n point is not iterated';
     help_struct.optional.color.text  = 'Defines the colour of the  plotted curve.\n When defining a [1x3] array of rgb values, the minimal allowed value for each element is 0 and the maximal allowed value is 1.';
 
     help_struct.optional.linestyle.value = '''-'', ''--'', '':'' or ''-.'' \n Default: ''-''';

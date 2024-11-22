@@ -63,7 +63,7 @@ contplot_output_1  = S.contplot(DYN,contplot_options_1);        % CoSTAR postpro
 %% Example 2: Maximum absolute value of the state variables
 
 % Plot the maximum absolute value of x(theta) = z_1(theta) in green:
-contplot_options_2 = costaropts('zaxis',@(z) max(abs(z(:,1))),'color','g');
+contplot_options_2 = costaropts('zaxis',@(z) max(abs(z(:,1))),'color','y');
 contplot_output_2  = S.contplot(DYN,contplot_options_2);
 
 % Plot the maximum absolute value of x'(theta) = z_2(theta) in cyan (using rgb code [0,0.8,0.8]) and as dashed line into the same figure:
@@ -74,7 +74,7 @@ contplot_output_3  = S.contplot(DYN,contplot_options_3);
 
 %% Example 3: Section of continuation curve using different resolution
 
-contplot_options_4 = costaropts('zaxis','max2','index',155:170,'resolution',500);     
+contplot_options_4 = costaropts('zaxis','max2','index',185:205,'resolution',500);     
 contplot_output_4  = S.contplot(DYN,contplot_options_4);
 
 xlim([min(contplot_output_4.mu) max(contplot_output_4.mu)])     % Adapt the abscissa limits to the plotted curve
