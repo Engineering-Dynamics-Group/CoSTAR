@@ -8,9 +8,7 @@ Test files adapted to QPS_SHM now also receiving a fourier series
         - test_SHM_QPS_Duffing
         - test_SHM_QPS_vdP
         - test_SHM_QPS_cvdP 
-            --> for each fourier coefficients added
-            --> for each new/additional opt_init for fourier-coeffients added
-            --> for each old opt_init for time integration removed
+            --> for each f
 
 
 --------------------------------------------

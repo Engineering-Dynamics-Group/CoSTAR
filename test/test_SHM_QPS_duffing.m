@@ -28,6 +28,10 @@ IC = 0.1.*ones(2,1);                                    %initial condition
 % load('workspace_test_duffing_QPS_shooting.mat')       % OLD. Throws warning 'Could not find appropriate function on path loading function handle C:\Users\Admin\Desktop\FG-Code_aktuell\v2.1.1.15\test\test_Shooting_duffing_QPS.m>@(mu)[mu,mu*Omega]' after test files have been renamed, altough path was not existing even before
 load('workspace_test_SHM_QPS_duffing.mat')              %Contains s0 of difficult and easy parameters at mu_limit(2) since DYN_init stored in workspace_test_duffing_QPS_shooting throws warning
 
+% C1_mat = [  0,     0,   0;                      % Fourier coefficients to create an initial value for fsolve to find the first point on the curve at mu = 2
+%           -0.2, -0.07, 0];
+% S1_mat = [-0.1, -0.025, 0;
+%             0,     0,   0];
 
 %% Properties
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);                                               %Properties of the system
@@ -35,7 +39,7 @@ options.opt_sol  = costaropts('stability','on','cont','on','non_auto_freq',non_a
 options.opt_cont = costaropts('step_control','angle','pred','cubic','subspace','pseudo-arc','mu_limit',mu_limit);       %Properties for continuation
 options.opt_approx_method = costaropts('solver','ode45','n_char',30);                                                   %Properties for the approximation method
 options.opt_init = costaropts('iv',s_easy_mu_2);                                                                        %Properties for initial value
-% options.opt_init = costaropts('ic',IC,'tinit',1000,'deltat',1000,'dt',0.1);                                           %Properties for initial value
+% options.opt_init = costaropts('c1_matrix',C1_mat,'s1_matrix',S1_mat);
 options.opt_stability = costaropts('iterate_bfp','on');                                                                 %Properties for stability
 
 options.opt_cont.step_width = 0.25;                     %Initial step width    

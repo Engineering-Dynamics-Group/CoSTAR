@@ -24,13 +24,22 @@ Fcn = @(t,z,param)coupledvdp(t,z,param);                                  %Right
 load('workspace_test_SHM_QPS_cvdP.mat')              %only contains s0 since DYN_init stored in workspace_test_cvdp_QPS_shooting throws warning
 
 
+% C1_mat = [0,   0,   0;                          % Fourier coefficients to create an initial value for fsolve to find the first point on the curve
+%           0, -1.4,  0;
+%           2,   0,   0;
+%           0,  2.1,  0];
+% S1_mat = [2,   0,   0;
+%           0,  1.4,  0;
+%           0,   0,   0;
+%           0,  2.1,  0];
+
 %% Properties
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',4);                                                                          %Properties of the System
 options.opt_sol  = costaropts('stability','on','cont','on','auto_freq',auto_freq,'sol_type','quasiperiodic','approx_method','shooting','act_param',active_parameter,'display','full'); %Properties of the solution
 options.opt_cont = costaropts('step_control','off','pred','parable','subspace','pseudo-arc','mu_limit',mu_limit);              %Properties for continuation
-options.opt_approx_method = costaropts('solver','ode45','n_char',50);                                                                             %Properties for sol_method (e.g. Shoot)
+options.opt_approx_method = costaropts('solver','ode45','n_char',35);                                                                             %Properties for sol_method (e.g. Shoot)
 options.opt_init = costaropts('iv',s0); 
-%options.opt_init = costaropts('ic',IC,'tinit',1000,'deltat',1000,'dt',0.1);
+% options.opt_init = costaropts('c1_matrix',C1_mat,'s1_matrix',S1_mat);
 
 options.opt_cont.step_width = 0.1;                                                       %Initial step width                                                                                                                                                                                                                     
 options.opt_cont.direction = 1;                                                          %Changes the direction of continuation 
@@ -43,4 +52,4 @@ time = toc(timer);                              % Display elapsed time since tic
 
 
 %% Test Postprocessing
-benchmark_postprocess_quasiperiodic(DYN,S);
+% benchmark_postprocess_quasiperiodic(DYN,S);
