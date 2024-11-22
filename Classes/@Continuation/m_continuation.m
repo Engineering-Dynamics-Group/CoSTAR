@@ -19,9 +19,12 @@ obj.y0  = S.y0;                                                         %Get act
 obj.p_y0_old = num2cell([zeros(numel(obj.y0),2),obj.y0],1);             %Must be initialized as 1x3 cell array for the error control to work
 obj.p_mu0 = S.y0(end,1);
 if isa(S.J,'cell'); obj.p_J0  = S.J{1,1}; else; obj.p_J0  = S.J; end
-if strcmpi(DYN.stability,'on') && strcmpi(ST.iterate_bfp,'on')
-    obj.p_n_unstable_0 = S.n_unstable; 
-    ST.update_curve_container(DYN,AM,S.arclength,obj.y0,S.multipliers,obj.p_n_unstable_0); %Update the curve container with the first point
+if strcmpi(DYN.stability,'on') 
+    obj.p_stability_flag_old = S.stability_flag;
+    if strcmpi(ST.iterate_bfp,'on')
+        obj.p_n_unstable_0 = S.n_unstable; 
+        ST.update_curve_container(DYN,AM,S.arclength,obj.y0,S.multipliers,obj.p_n_unstable_0); %Update the curve container with the first point
+    end
 end  
 
 cont_header = sprintf('\n%s\n%s\n%s\n',...

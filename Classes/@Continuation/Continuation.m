@@ -51,7 +51,9 @@ classdef Continuation < handle
         p_multipliers_bfp                                                     %multipliers at bifurcation point
         p_vectors_bfp                                                         %(Eigen-)vectors corresponding to multipliers at bifurcation point
         p_arclength_bfp                                                       %arc-length of current bifurcation point 
-        p_error_bfp  = NaN;                                                   %error at the bifurcation point      
+        p_error_bfp  = NaN;                                                   %error at the bifurcation point 
+        p_stability_flag                                                      %exitflag of stability computation
+        p_newton_flag_bfp                                                     %fsolve exitflag of iterating bifurcation point
     end
     
     properties(Access=private)
@@ -65,6 +67,7 @@ classdef Continuation < handle
         p_dx_dmu_old                                                          %Used for PID step control
         p_e_old = 1;                                                          %Used for PID step control
         p_axes_values_old                                                     %Axes values of continuation plot of old solution
+        p_stability_flag_old                                                  %Old exitflag of stability computation
                 
         %Parameters of penultimate point
         p_e_old_old = 1;                                                      %Used for PID step control

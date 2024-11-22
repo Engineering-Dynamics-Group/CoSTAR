@@ -197,8 +197,7 @@ The continuation curve is now displayed in orange when the stability computation
 
     The stability flag is now saved in the solution objects. The required lines were added to following files:
         - SOL_EQ (lines 27, 46 and 66)
-        - SOL_PS_FDM (lines 56, 88 and 117)     - SOL_PS_FGM (lines 51, 105 and 142)    - SOL_PS_SHM (lines 38, 70 and 96)
-        - SOL_QPS_FDM (lines 60, 92 and 123)                                            - SOL_QPS_SHM (lines 41, 68 and 101)
+        - SOL_PS_FDM (lines 56, 88 and 117)     - SOL_PS_FGM (lines 51, 105 and 142)    - SOL_PS_SHM (lines 38, 71 and 117)
 
 
 ----------  
@@ -233,6 +232,13 @@ A stable solution is now displayed in green. Moreover, the automatic plotting co
         --> Bugfix: Warning messages are displayed correctly when continuation starts with warning
             * "warn_str" replaced by "delete_str_split" in line 41
             * Displaying warning messages reworked. Former lines 46 - 48 replaced by new lines 46 - 51
+
+
+templates:
+
+    - Complete folder deleted. This includes the following subfolders, template classes and template methods:
+        --> AM_template: Class AM_template and method s_AM_template_gatekeeper
+        --> SOL_template: Class SOL_template and methods evalsol_frequency, evalsol_hypertime, evalsol_solution and evalsol_time
 
 
 test:

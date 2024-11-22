@@ -37,15 +37,18 @@ elseif strcmpi(DYN.display,'final') || strcmpi(DYN.display,'iter')
         end_str = append('Iter: ',num2str(local_cont_counter-N+1));     % String identifying where to end the deletion
         delete_str = extractBefore(obj.p_last_msg,end_str);             % This is the part which needs to be deleted
         if startsWith(obj.p_last_msg,'Warning')                         % If delete_str begins with a warning message (i.e. the warning message is the top line)
-           warn_str = extractBefore(obj.p_last_msg,append('Iter: ',num2str(local_cont_counter-N))); % Get only the warning message to print it again
+            delete_str_split = splitlines(delete_str(1:end-1));         % Split delete_str in its lines, because there can be multiple warnings
         elseif contains(delete_str,'Warning')                           % If delete_str contains a warning message, but there is an info text first
             delete_str = extractBefore(delete_str,'Warning');           % Exclude the warning message from deletion and delete only the info text (i.e. the top line)
         end
         obj.p_last_msg = erase(obj.p_last_msg,delete_str);              % Remove the top info text
     end
-    if exist('warn_str','var')                                          % If we extracted a warning (i.e. a warning has been passed to the top)
-        fprintf(reverse_str); warning(warn_str(10:end));                % Remove the info texts and the warning, but print the warning again to have the orange color
-        fprintf(['\b\b',obj.p_last_msg]);                               % Now print the new info texts
+    if exist('delete_str_split','var')                                  % If we extracted a warning (i.e. a warning has been passed to the top)
+        fprintf(reverse_str);                                           % Remove the info texts and the warning,
+        for i = 1:numel(delete_str_split)                               % Scan the splitted delete_str for warnings
+            if strcmpi(delete_str_split{i}(1:8),'Warning:'); warning(delete_str_split{i}(10:end)); end      % Print the warning(s) again to have the orange color
+        end  
+        fprintf([obj.p_last_msg]);                                      % Now print the new info texts
     else                                                                % Normal case: No warning has been passed to the top
         fprintf([reverse_str,obj.p_last_msg]);                          % Display the latest N info texts in command window (including warnings)
     end                             
