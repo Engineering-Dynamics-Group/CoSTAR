@@ -13,7 +13,7 @@ function obj = bifurcation_stability(obj,DYN,AM,S,ST)
         %% Calculate Stability
         [obj.p_multipliers,obj.p_vectors,obj.p_n_unstable_1,obj.p_stability_flag] = ST.calc_stability(obj.p_y1,obj.p_J1);               % Compute the respective multiplier (eigenvalue, Floquet, Lyapunov Exponent)
         
-        
+
         if obj.p_stability_flag > 0                                           % Only move forward if the stability computation was regular
         
 
@@ -50,7 +50,11 @@ function obj = bifurcation_stability(obj,DYN,AM,S,ST)
                             Fcn = @(y)[AM.res(y);obj.sub_con(y,obj)];               % Define corrector-function containing the residual function and the subspace-constraint
                         end
                         [obj.p_y_bfp,~,obj.p_newton_flag_bfp,~,obj.p_J_bfp] = fsolve(Fcn,obj.yp,obj.fsolve_opts);               % Solve corrector-function
-        
+
+                        if (obj.p_newton_flag_bfp < 1) || (obj.p_newton_flag_bfp == 2)
+                            break                                                   % Immediately break the loop for these exitflags and issue warning (see below)
+                        end
+
                         % Get Stability
                         [obj.p_multipliers_bfp,obj.p_vectors_bfp,n_unstable,obj.p_stability_flag] = ST.calc_stability(obj.p_y_bfp,obj.p_J_bfp);     % Compute the stability of the newly found point
 
@@ -66,9 +70,8 @@ function obj = bifurcation_stability(obj,DYN,AM,S,ST)
         
                     end
 
-
                     % Save the bifurcation point
-                    if (obj.p_newton_flag_bfp>0) && (obj.p_stability_flag>0)
+                    if (obj.p_newton_flag_bfp > 0) && (obj.p_newton_flag_bfp ~= 2) && (obj.p_stability_flag > 0)
                         
                         % Get the arc-length of the bifurcation point (for solution object)
                         [~,idx] = min(abs(cell2mat(ST.curve_container(3,:))));      % This should identify the (approximated) bifurcation point
@@ -83,7 +86,8 @@ function obj = bifurcation_stability(obj,DYN,AM,S,ST)
                     
                     else
 
-                        warn_text = append('Iteration of bifurcation point between solutions Iter = ',num2str(obj.p_local_cont_counter),' and Iter = ',num2str(obj.p_local_cont_counter+1),' failed!');
+                        warn_text = append(['Iteration of bifurcation point (BFP) between solutions Iter = ',num2str(obj.p_local_cont_counter),' and ' ...
+                                            'Iter = ',num2str(obj.p_local_cont_counter+1),' or stability computation of iterated BFP failed!']);
                         write_log(DYN,append('WARNING: ',warn_text))                % Write warning in log file
                         S.warnings{end+1} = warn_text;                              % Save warning in Solution object
                         obj.p_last_msg = sprintf('%s%s%s\n',obj.p_last_msg,append('Warning: ',warn_text),' ');  % Save the warning in the "last messages" property

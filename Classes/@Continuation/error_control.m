@@ -65,7 +65,24 @@ function obj = error_control(obj,S,AM,DYN)
                 Fcn = @(y)[AM.res(y);obj.sub_con(y,obj)];                                   % Define corrector-function containing the residual function and the subspace-constraint
             end
 
-            [obj.p_y1,~,obj.p_newton_flag,obj.p_output,obj.p_J1] = fsolve(Fcn,obj.yp,obj.fsolve_opts);  % Solve corrector-function
+            [y1,~,newton_flag,output,J1] = fsolve(Fcn,obj.yp,obj.fsolve_opts);              % Solve corrector-function
+
+            % This if...else below does not work yet! 
+            % Reason: AM.IF_up_res_data makes changes to AM object. When fsolve fails and the new solution is not accepted, we need to revert the mentioned changes.
+            %         If we do not revert the changes, there will be an error in stability computation! But how do we revert the changes?
+            % if (newton_flag > 0) && (newton_flag ~= 2)                  % Accept the result from fsolve if exitflag is 1, 3 or 4
+                obj.p_y1 = y1;
+                obj.p_newton_flag = newton_flag;
+                obj.p_output = output;
+                obj.p_J1 = J1;
+            % else                                                        % If exitflag from fsolve is < 0 or = 2
+            %     warn_text = append('Error control stopped early or failed for solution Iter = ',num2str(obj.p_local_cont_counter+1),'!');
+            %     write_log(DYN,append('WARNING: ',warn_text))            % Write warning in log file
+            %     S.warnings{end+1} = warn_text;                          % Save warning in Solution object
+            %     obj.p_last_msg = sprintf('%s%s%s\n',obj.p_last_msg,append('Warning: ',warn_text),' ');      % Save the warning in the "last messages" property
+            %     warning(warn_text)                                      % Display warning
+            %     break                                                   % Immediately break the loop. The last accepted solution is returned
+            % end
 
         end
 

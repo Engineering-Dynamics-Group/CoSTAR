@@ -189,15 +189,18 @@ The continuation curve is now displayed in orange when the stability computation
             --> elseif condition added to handle this case (lines 41 - 45)
 
     @Solution:
-        - Solution:
-            --> Property "stability_flag" added (line 18)
         - contplot:
             --> Getting the relevant stability flags added (lines 196 - 199)
             --> Setting the correct color adapted, case for orange color added (lines 244 - 250, 254 - 256 and 318 - 320)
+        - s_help_contplot
+            --> Info text for 'color' adapted (line 31)
+        - Solution:
+            --> Property "stability_flag" added (line 18)
 
     The stability flag is now saved in the solution objects. The required lines were added to following files:
         - SOL_EQ (lines 27, 46 and 66)
-        - SOL_PS_FDM (lines 56, 88 and 117)     - SOL_PS_FGM (lines 51, 105 and 142)    - SOL_PS_SHM (lines 38, 71 and 117)
+        - SOL_PS_FDM (lines 56, 88 and 117)     - SOL_PS_FGM (lines 51, 105 and 142)    - SOL_PS_SHM (lines 38, 70 and 96)
+        - SOL_QPS_FDM (lines 60, 92 and 123)                                            - SOL_QPS_SHM (lines 41, 68 and 101)
 
 
 ----------  
@@ -215,10 +218,39 @@ A stable solution is now displayed in green. Moreover, the automatic plotting co
             --> "dark_grey" changed to "pale_grey" (lines 257, 298, 304, 310, 320 and 321)
             --> Color 'b' changed to 'g' (lines 247 and 323)
         - s_help_contplot
-            --> 
+            --> Info text for 'color' adapted (line 31)
 
     Tutorials:
-        - 
+        - Example_Postprocessing_contplot:
+            --> Colour in "contplot_options_2" changed to 'y' (line 66)
+            --> Value of 'index' in "contplot_options_4" changed to "185:205" (line 77)
+        - Tutorial_Postprocessing_contplot:
+            --> Description of field 'color' adapted
+            --> Colour in "contplot_options_2" changed to 'y'
+            --> Value of 'index' in "contplot_options_4" changed to "185:205"
+        - Live scripts evaluated again to obtain the new command window output. Changes affect:
+            --> Tutorial_EQ     
+            --> Tutorial_Postprocessing_contplot    --> Tutorial_Postprocessing_solget      --> Tutorial_Postprocessing_solplot
+        - Description of line colour adapted. Changes affect:
+            --> Tutorial_EQ
+            --> Tutorial_PS_FDM     --> Tutorial_PS_FGM     --> Tutorial_PS_SHM
+            --> Tutorial_QPS_FDM    --> Tutorial_QPS_FGM    --> Tutorial_QPS_SHM
+
+
+----------  
+
+CoSTAR can now handle fsolve exitflags > 1. CoSTAR stopps for exitflag = 2 and issues a warning for exitflag \in {3,4}.
+
+    @Continuation:
+        - bifurcation_stability:
+            --> Loop for iterating the bifurcation point is broken when fsolve returns exitflag < 1 or exitflag = 2 (lines 54 - 56)
+            --> "&& (obj.p_newton_flag_bfp ~= 2)" added to i
+
+    Functions:
+        - initial_solution:
+            --> if...elseif conditions for different exitflags added and reworked (lines 55 - 63 and 75 - 82)
+            --> All warning messages are stored in a cell array now (lines 40, 77, 78, 80, 81, 92, 93, 195, 196 and 223 - 227)
+            --> Conditions for different exitflags in error control added, but does not work yet, which is why the code is commented (lines 155 - 168)
 
 
 ----------  
@@ -232,13 +264,6 @@ A stable solution is now displayed in green. Moreover, the automatic plotting co
         --> Bugfix: Warning messages are displayed correctly when continuation starts with warning
             * "warn_str" replaced by "delete_str_split" in line 41
             * Displaying warning messages reworked. Former lines 46 - 48 replaced by new lines 46 - 51
-
-
-templates:
-
-    - Complete folder deleted. This includes the following subfolders, template classes and template methods:
-        --> AM_template: Class AM_template and method s_AM_template_gatekeeper
-        --> SOL_template: Class SOL_template and methods evalsol_frequency, evalsol_hypertime, evalsol_solution and evalsol_time
 
 
 test:
