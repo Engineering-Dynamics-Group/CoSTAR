@@ -30,19 +30,19 @@ All "example_text" within the costarhelp display texts changed to ''example_text
 Changes affect:
 
 	@Continuation:				@DynamicalSystem:			@Solution:
-	    - s_help_opt_cont 		    	    - s_help_opt_sol		    	    - s_help_contplot
-					    	    - s_help_system		    	    - s_help_solget
-									    		    - s_help_solplot
+	    - s_help_opt_cont 		    - s_help_opt_sol		    - s_help_contplot
+					    	        - s_help_system		    	- s_help_solget
+									    		                - s_help_solplot
 
-	@AM_PS_FDM:				@AM_PS_FGM:				@AM_PS_SHM
-	    - s_help_opt_approx_method_PS_FDM	    - s_help_opt_approx_method_PS_FGM	    - s_help_opt_approx_method_PS_SHM
+	@AM_PS_FDM:				                    @AM_PS_FGM:				                    @AM_PS_SHM:
+	    - s_help_opt_approx_method_PS_FDM	        - s_help_opt_approx_method_PS_FGM	        - s_help_opt_approx_method_PS_SHM
 
-	@AM_QPS_FDM:				@AM_QPS_FGM:				@AM_QPS_SHM
-	    - s_help_opt_approx_method_QPS_FDM	    - s_help_opt_approx_method_QPS_FGM	    - s_help_opt_approx_method_QPS_SHM
-											    - s_help_opt_init_QPS_SHM
+	@AM_QPS_FDM:				                @AM_QPS_FGM:				                @AM_QPS_SHM
+	    - s_help_opt_approx_method_QPS_FDM	        - s_help_opt_approx_method_QPS_FGM	        - s_help_opt_approx_method_QPS_SHM
+											        - s_help_opt_init_QPS_SHM
 	    
-	@Stability_EQ				@Stability_PS_SHM			@Stability_QPS_SHM
-	    - s_help_opt_stability_EQ	    	- s_help_opt_stability_PS_SHM    	- s_help_opt_stability_QPS_SHM
+	@Stability_EQ				                @Stability_PS_SHM			                @Stability_QPS_SHM
+	    - s_help_opt_stability_EQ	    	        - s_help_opt_stability_PS_SHM    	        - s_help_opt_stability_QPS_SHM
 
 
 ----------
@@ -53,19 +53,19 @@ Changes affect:
 
 	@Continuation:
 	    - Continuation:
-		--> Private property "p_axes_values_old" added (line 66)
+		    --> Private property "p_axes_values_old" added (line 66)
 	    - plot_contplot:
-		--> The property "p_axes_values_old" stores the the axes values of the old solution (lines 30, 39, 51, 60, 63, 68, 71, 76 and 79)
-		--> The options structure for all contplot calls (except for the call when the continuation has just started) include the field 'axes_values_old', 
-		    which stores the axes values of the old solution (lines 37, 49, 58, 61, 66, 69, 74 and 77)
+		    --> The property "p_axes_values_old" stores the the axes values of the old solution (lines 30, 39, 51, 60, 63, 68, 71, 76 and 79)
+		    --> The options structure for all contplot calls (except for the call when the continuation has just started) include the field 'axes_values_old', 
+		        which stores the axes values of the old solution (lines 37, 49, 58, 61, 66, 69, 74 and 77)
 
 	@Solution:
 	    - contplot:
-		--> The method "contplot_gatekeeper" is skipped when the options-field 'axes_values_old' is present (lines 61 - 63)
-		--> solget_options.index is updated when the options-field 'axes_values_old' is present (lines 97 - 102)
-		--> Output arguments mu and s_out must be corrected when the options-field 'axes_values_old' is present (lines 168 - 171)
-	    - solget:
-		--> The methods "solget_gatekeeper" and "solget_up_index" are skipped when the options-field 'axes_values_old' is present (lines 90 - 93)
+		    --> The method "contplot_gatekeeper" is skipped when the options-field 'axes_values_old' is present (lines 61 - 63)
+		    --> solget_options.index is updated when the options-field 'axes_values_old' is present (lines 97 - 102)
+		    --> Output arguments mu and s_out must be corrected when the options-field 'axes_values_old' is present (lines 168 - 171)
+        - solget:
+		    --> The methods "solget_gatekeeper" and "solget_up_index" are skipped when the options-field 'axes_values_old' is present (lines 90 - 93)
 		
 
 ----------
@@ -83,8 +83,6 @@ Changes affect:
         --> When plotting another solution in already existing figure, the legend entry is added to already existing legend now
         --> Lines 186, 220, 288, 363 added and lines 205, 276, 309, 381 changed
 
-
-----------
 
 @ST_PS_SHM:
 
@@ -206,6 +204,7 @@ Changes affect:
 		- ST_PS_SHM:
 			--> "vectors" added to output arguments of method "PS_SHM_calc_stability_non_auto" (line 38)
 			--> "vectors" added to output arguments of method "PS_SHM_calc_stability_auto" (line 39)
+
 	@ST_QPS_SHM:
 		- QPS_SHM_calc_stability:
 			--> "vectors" added to output arguments (line 15)
@@ -223,15 +222,18 @@ Changes affect:
 	- s_disp_out_help_struct:
 		--> Headers of first two columns changed to "field name" and "allowed field values" (line 19)
 
+
 @Solution:
 
 	- s_help_contplot:
 		--> Descriptions adapted
 
+
 @SOL_PS_FDM:
 
 	- evalsol_hypertime:
 		--> Bugfix: "~isempty" in line 23 changed to "isfield"
+
 
 @SOL_QPS_FDM:
 
@@ -243,3 +245,17 @@ Changes affect:
 		--> Bugfix: "~isempty" in line 22 changed to "isfield"
 		--> if...else condition for n_int_2 added (similar to evalsol_hypertime, see above) (lines 27 - 31)
 
+
+
+--------------------------------------------
+----------------- v2.6.3.1 -----------------
+--------------------------------------------
+
+Version compatibility fix: cell of empty array returned error in version R2021 of MATLAB, which could occur in solplot.
+
+@Solution:
+
+    - solplot:
+        --> Old Legend is got in line 171 now without cell() function
+        --> Setting and getting of the legend removed from all switch cases (lines 186, 201 - 205, 220, 272 - 276, 288, 305 - 309, 363, 377 - 381)
+        --> Legend is now set by new code in ines 370 - 377 (line numbers correspond to after removal of code described above)

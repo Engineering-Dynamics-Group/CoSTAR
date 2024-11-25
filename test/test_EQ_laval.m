@@ -15,7 +15,7 @@ d3 = 0.25;
 Fg = 0.3924;
 
 
-%% DUFFING EXAMPLE
+%% Laval rotor (equilibrium)
 IC = [0.5;0.5;0;0];                                                                       %Initial condition for starting solution
 
 non_auto_freq = @(mu) mu;                                                           %Non autonomous frequency, either as function of bifurcation parameter or as a constant e.g. non_auto_freq = 2*pi
@@ -23,6 +23,7 @@ non_auto_freq = @(mu) mu;                                                       
 param = {eta,Di,Delta,d3,Fg};                                                      %Parameter vector, all constant parameters are set here, the bifurcation parameter gets its starting value (here the left corner of bifurcation diagram)
 active_parameter = 1;                                                               %Which parameter is the bifurcation parameter?
 Fcn = @(z,param) laval_eq(z,param);                                            %Right-hand-side of ODE
+
 
 %% Properties
 options.system   = costaropts('order',0,'rhs',Fcn,'param',param,'dim',4);                                                                                               %Properties of the System
@@ -33,9 +34,10 @@ options.opt_cont = costaropts('step_control','angle','direction',1,'pred','tange
 
 
 %% Continuation
-tic
-[S,DYN] = costar(options);                                                                                                                                  %Calculate initial solution and continue the curve to set limits
-zeit = toc;
+timer = tic;                                    % Record current time
+[S,DYN] = costar(options);                      % Calculate initial solution and continue the curve
+time = toc(timer);                              % Display elapsed time since tic
+
 
 %% Test Postprocessing  
 benchmark_postprocess_equilibrium(DYN,S);

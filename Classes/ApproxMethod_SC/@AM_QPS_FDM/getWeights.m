@@ -270,7 +270,8 @@ function obj = getWeights(obj,DYN)
     %              p_ind_blkdiag_mat            %
     % One part to create the the Jacobian is a block diagonal matrix. In order to place the elements at the correct position, the function sparse() is used
     % sparse() needs the row and column indices of the elements which need to be set. These indices are created here
-    blkdiag_mat = sparse(kron(eye(n_int_1*n_int_2), ones(dim)));                                                % Create the [n_int_1*n_int_2*dim x n_int_1*n_int_2*dim] block diagonal matrix
+    % blkdiag_mat = sparse(kron(eye(n_int_1*n_int_2), ones(dim)));                                              % Inefficient, define sparse before kron(), blows out RAM    
+    blkdiag_mat = kron(speye(n_int_1*n_int_2),spones(ones(dim)));                                               % Create the [n_int_1*n_int_2*dim x n_int_1*n_int_2*dim] block diagonal matrix
     [obj.p_ind_blkdiag_mat(:,1),obj.p_ind_blkdiag_mat(:,2)] = ind2sub(size(blkdiag_mat),find(blkdiag_mat));     % Get the indices of all elements ~= 0 (i.e. = 1)
 
 
@@ -279,9 +280,10 @@ function obj = getWeights(obj,DYN)
 
     obj.points_1 = sigma_1;
     obj.points_2 = sigma_2;
-    obj.p_weights_1 = w_1;    
-    obj.p_weights_2 = w_2;
+    obj.weights_1 = w_1;    
+    obj.weights_2 = w_2;
 
+    %{
     disp('Using finite differences to approximate dz(theta_1,theta_2)/dtheta_1 and dz(theta_1,theta_2)/dtheta_2.')
     disp(' ')
     disp(table(categorical({scheme_1;scheme_2}), [approx_order_1;approx_order_2], ...
@@ -292,5 +294,6 @@ function obj = getWeights(obj,DYN)
     disp(table(sigma_2', w_2, 'VariableNames', {'sigma_2_k', 'w_2_(sigma_k)'}))
     disp('-------------------------------------------------------')
     disp('Starting to find initial solution ...')
+    %}
     
 end

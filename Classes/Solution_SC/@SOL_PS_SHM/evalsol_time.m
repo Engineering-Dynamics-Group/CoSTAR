@@ -1,4 +1,4 @@
-% Method of SOL_PS_SHM: This method (re-)calculates a periodic orbit of a shooting solution
+% Method of SOL_PS_MSHM: This method (re-)calculates a periodic orbit of a multiple shooting solution
 % starting from the iterated point on the periodic oribt
 %
 % @obj:     Solution subclass object
@@ -13,6 +13,7 @@
 function  [s,mu,t] = evalsol_time(obj,DYN,options)
 
     index = options.index;
+    dim = DYN.dim;
     N = numel(index);
   
     for k =1:N
@@ -30,17 +31,17 @@ function  [s,mu,t] = evalsol_time(obj,DYN,options)
         end
 
         Fcn = DYN.rhs;
-        param = DYN.param;                                                                          %Set parameters
+        param = DYN.param;                                                                                  %Set parameters
         param{DYN.act_param} = mu;
         
-        if tspan(1) > 0                                                                             %Start-up integration necessary ...
-            [~,s_su] = obj.solver_function(@(t,z)Fcn(t,z,param),[0,tspan(1)],s0,obj.odeOpts);       %in the range of [0,tspan(1)]
-            s1 = s_su(end,:)';                                                                      %Starting point of actual integration
+        if tspan(1) > 0                                                                                     %Start-up integration necessary ...
+            [~,s_su] = obj.solver_function(@(t,z)Fcn(t,z,param),[0,tspan(1)],s0(1:dim,1),obj.odeOpts);      %in the range of [0,tspan(1)]
+            s1 = s_su(end,:)';                                                                              %Starting point of actual integration
         else                                                                                        
-            s1 = s0;                                                                                %No start-up integration necessary
+            s1 = s0;                                                                                        %No start-up integration necessary
         end
 
-        [t(:,1,k) ,s(:,:,k) ] = obj.solver_function(@(t,z)Fcn(t,z,param),tspan,s1,obj.odeOpts);
+        [t(:,1,k) ,s(:,:,k) ] = obj.solver_function(@(t,z)Fcn(t,z,param),tspan,s1(1:dim,1),obj.odeOpts);    % Start evaluate from first shooting point and integrate over whole interval
         
     end
 

@@ -1,4 +1,4 @@
-%%  Example: van-der-Pol Oscillator (periodic) %%
+%%  Example: van der Pol Oscillator (periodic) %%
 
 % clear variables; clc; close all;              % clear workspace; clear command window; close all figures
 % addpath(genpath('..\'))                       % Add main folder of CoSTAR and all subfolders to search path
@@ -19,23 +19,23 @@ C1 = [2;0];   S1 = [0;-2];                      % Fourier-coefficients to create
 
 %% Properties
 options.system   = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','continuation of van der Pol oscillator');   % Properties of the system
-options.opt_sol = costaropts('sol_type','periodic','approx_method','finite-difference','cont','on','stability','on', ...   % Properties of the solution
+options.opt_sol = costaropts('sol_type','periodic','approx_method','finite-difference','cont','on','stability','off', ...   % Properties of the solution
                              'auto_freq',auto_freq,'act_param',active_parameter);                                           % Properties of the solution
 options.opt_init = costaropts('c0',zeros(2,1),'c1',C1,'s1',S1);                                                             % Property for initial solution
 options.opt_approx_method = costaropts('n_int',200,'points',[-4,-3,-2,-1,0,1,2]);                                           % Properties of approximation method FDM
-options.opt_cont = costaropts('mu_limit',mu_limit,'display','step_control_info');                                           % Properties for continuation
+options.opt_cont = costaropts('mu_limit',mu_limit);                                                                         % Properties for continuation
 
 % Step control options
 % Available step control methods: 'off', 'on', 'corrector_iterations', 'norm_corrector', 'combination', 'angle', ('pid')
 % options.opt_cont.step_width = 0.1;
 % options.opt_cont.step_control = 'off';
-% options.opt_cont.step_control_param = [3, 3/180*pi]; 
+% options.opt_cont.step_control_param = [2, 3]; 
 
 
 %% Continuation
-tic                                                                     % Record current time
-[S,DYN] = costar(options);                                              % Calculate initial solution and continue the curve
-toc                                                                     % Display elapsed time since tic
+timer = tic;                                    % Record current time
+[S,DYN] = costar(options);                      % Calculate initial solution and continue the curve
+time = toc(timer);                              % Display elapsed time since tic
 
 
 %% Comparison with shooting

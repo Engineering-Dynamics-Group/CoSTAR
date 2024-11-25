@@ -21,9 +21,10 @@ classdef SOL_EQ < Solution
             obj.arclength(1,1)        = 0;                                          %Set arclength of first curve point to zero
 
             if strcmpi(DYN.stability,'on')
-                obj.multipliers(:,1)   = varargin{1,1}{1,2};
-                obj.vectors(:,:,1)     = varargin{1,1}{1,5};
-                obj.n_unstable(1,1) = varargin{1,1}{1,3}; 
+                obj.multipliers(:,1)    = varargin{1,1}{1,2};
+                obj.vectors(:,:,1)      = varargin{1,1}{1,5};
+                obj.n_unstable(1,1)     = varargin{1,1}{1,3}; 
+                obj.stability_flag(1,1) = varargin{1,1}{1,4};
             end
 
         end
@@ -42,6 +43,7 @@ classdef SOL_EQ < Solution
                 obj.multipliers(:,end+1)    = CON.p_multipliers;                    %Eigenvalues of the Jacobian
                 obj.vectors(:,:,end+1)      = CON.p_vectors;                        %Eigenvectors of the Jacobian
                 obj.n_unstable(1,end+1)     = CON.p_n_unstable_1;                   %Indiacting number of unstable multipliers
+                obj.stability_flag(1,end+1) = CON.p_stability_flag;                 %Exitflag of stability computation
             end
 
         end
@@ -61,7 +63,8 @@ classdef SOL_EQ < Solution
             obj.multipliers(:,end+1)    = CON.p_multipliers_bfp;                    %Eigenvalues of the Jacobian
             obj.vectors(:,:,end+1)      = CON.p_vectors_bfp;                        %Eigenvectors of the Jacobian
             obj.n_unstable(1,end+1)     = obj.n_unstable(1,end);                    %Indiacting number of unstable multipliers. Definition: The number in the point is equal to the number before the bfp 
-    
+            obj.stability_flag(1,end+1) = CON.p_stability_flag;                     %Exitflag of stability computation
+
             %Fill the table for the bifurcations 
             [label,msg] = ST.identify_bifurcation();
             obj.bifurcation = [obj.bifurcation;{label,numel(obj.mu),msg}];
@@ -76,7 +79,7 @@ classdef SOL_EQ < Solution
 
         %Postprocessing
         [s,mu,time]                             = evalsol_time(obj,DYN,options);                %Function gives back the solution in time domain
-        [s,mu,time]                             = evalsol_hypertime(obj,DYN,options);           %Function gives back the solution in hypertime domain
+        [s,mu,hypertime]                        = evalsol_hypertime(obj,DYN,options);           %Function gives back the solution in hypertime domain
         [s,mu,frequency]                        = evalsol_frequency(obj,DYN,options);           %Function gives back the solution in frequency domain
 
     end

@@ -9,15 +9,15 @@
 %@multipliers:      eigenvalues of Jacobian
 %@vectors:          eigenvectors of Jacobian
 %@n_unstable:       number of unstable eigenvalues
-%@stability_flag:   Flag inidicating success of stability computation
+%@stability_flag:   Flag indicating success of stability computation
 
 function   [multipliers,vectors,n_unstable,stability_flag] = EQ_calc_stability(obj,y,J,DYN)
 
-            stability_flag = 1;     %Flag inidicating success of stability computation
+            stability_flag = 1;     %Flag indicating success of stability computation
             tol = 10*eps;           %Tolerance to determine if value is numerically zero
 
             try
-                [eigenvectors,eigenvalues] = eig(J(1:end-1,1:end-1));           %calcualte eigenvalues: The last row and column correspond to the ...
+                [eigenvectors,eigenvalues] = eig(full(J(1:end-1,1:end-1)));     %calculate eigenvalues: The last row and column correspond to the ...
                                                                                 % subspace constraint and are not relevant for the stability investigation.
                 [multipliers,vectors] = obj.sort_multipliers(DYN,diag(eigenvalues),eigenvectors);     %Sorting the multipliers and corresponding vectors according to different criteria
                 cm = obj.crit_multi(DYN,multipliers);                           %get the real values of the multipliers

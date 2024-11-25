@@ -1,5 +1,4 @@
-%Gatekeeper function for the ApproxMethod class. In here, all input
-%parameters are checked, before further processing.
+%Gatekeeper function for the ApproxMethod class. In here, all input parameters are checked, before further processing.
 %
 %@GC:                   Gatekeeper object
 %@system:               User supplied option structure for the system
@@ -14,7 +13,7 @@ function s_AM_gatekeeper(GC,system,opt_sol,opt_approx_method,opt_init)
 %%%%%%%%%%%%% EQUILIBRIUM %%%%%%%%%%%%%
 if strcmpi(opt_sol.sol_type,'equilibrium') || strcmpi(opt_sol.sol_type,'eq')
     
-        AM_Equilibrium.s_EQ_gatekeeper(GC,system,opt_approx_method,opt_init);
+        AM_EQ.s_EQ_gatekeeper(GC,system,opt_approx_method,opt_init);
 
 
 %%%%%%%%%%%%% PERIODIC %%%%%%%%%%%%%

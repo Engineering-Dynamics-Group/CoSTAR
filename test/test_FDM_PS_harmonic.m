@@ -20,23 +20,23 @@ C1 = [1;0];     S1 = [0;-0.1];                  % Fourier-coefficients to create
 
 %% Properties
 options.system   = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param);                                                   % Properties of the system  
-options.opt_sol  = costaropts('sol_type','ps','approx_method','fdm','cont','on','stability','off',...                       % Properties of the solution
-                              'non_auto_freq',non_auto_freq,'act_param',active_parameter);                                  % Properties of the solution 
-options.opt_init = costaropts('c1',C1,'s1',S1);                                                                             % Properties for initial solution             
+options.opt_sol  = costaropts('sol_type','ps','approx_method','fdm','cont','on','stability','off','freq_limit',1e-4,...    % Properties of the solution
+                              'non_auto_freq',non_auto_freq,'act_param',active_parameter,'display','final');                % Properties of the solution 
+options.opt_init = costaropts('c1',C1,'s1',S1);                                                                             % Properties for initial solution
 options.opt_approx_method = costaropts('n_int',100,'scheme','forward','approx_order',2);                                    % Properties of approximation method FDM
-options.opt_cont = costaropts('mu_limit',mu_limit,'display','step_control_info');                                           % Properties for continuation
+options.opt_cont = costaropts('mu_limit',mu_limit);                                                                         % Properties for continuation
 
 % Step control options  
 % Available step control methods: 'off', 'on', 'corrector_iterations', 'norm_corrector', 'combination', 'angle', ('pid')
 options.opt_cont.step_width = 0.25;
 % options.opt_cont.step_control = 'angle';
-% options.opt_cont.step_control_param = [3, 3/180*pi];                                                                                                                   
+% options.opt_cont.step_control_param = [2, 3];                                                                                                                   
 
 
 %% Continuation
-tic                                                                     % Record current time
-[S,DYN] = costar(options);                                              % Calculate initial solution and continue the curve
-toc                                                                     % Display elapsed time since tic
+timer = tic;                                    % Record current time
+[S,DYN] = costar(options);                      % Calculate initial solution and continue the curve
+time = toc(timer);                              % Display elapsed time since tic
 
 
 %% Comparison with shooting
@@ -90,4 +90,3 @@ plot(theta, sol_z2, 'r--')
 
 % Postprocessing
 benchmark_postprocess_periodic(DYN,S)
-

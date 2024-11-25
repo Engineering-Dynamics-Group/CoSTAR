@@ -1,7 +1,7 @@
 % Function solget returns a solution at specific solution curve points 
 %   [s_out,varargout] = solget(obj,DYN,options)
 %
-% Input Arguments
+% Input Arguments:
 % @obj:                 Object of Solution class
 % @DYN:                 Object of DynamicalSystem class
 % @options:             struct contain options for calculating solution
@@ -68,59 +68,56 @@
 %                                       doubled values, they are ignored.
 %                                       Mu might lead to ambuguities in
 %                                       case of overhanging curves
-% Output Arguments: 
-% @s_out:               Solution vector in the dimension [options.resolution,
-%                       statespace dimension, number of curve points].
-%                       statespace dimension depends on options.eval    
-% @varargout:           varargout{1,1}: mu - array of continuation parameters, 
-%                       where solution was truely evaluated
-%                       varargout{1,2}: x - time/hypertime/frequency array. 
-%                       for option.space = 'solution'. Nothing is given
-%                       back.
-%                       varargout{1,3}: options structure where options.mu
-%                       might have been replaced by index.
 %
-%Example:   options = struct('xaxis',@(z)z(:,1),'space','time','resolution',300,'interval',[0,2],'mu',[0.5,1,1.5]);
-%           [s,mu,time] = S.solget(DYN,options);
+%
+% Output Arguments: 
+% @output:              Struct containing evaluated solution data, domain data, mu-values and options with the fields:
+%                        - output.solution_eval: evaluated solution data
+%                        - second field depends on solution space:
+%                           * options.space = 'time'      --> output.time: time evaluation points
+%                           * options.space = 'hypertime' --> output.hypertime: hypertime evaluation points
+%                           * options.space = 'frequency' --> output.frequency: angular frequency values
+%                        - output.mu: values of continuation parameter mu
+%                        - output.options: options struct (can be equal to input options struct, but further fields might have been added in solget)
+%
+%
+% Example:  options = costaropts('xaxis',@(z)z(:,1),'space','time','resolution',300,'interval',[0,2],'mu',[0.5,1,1.5]);
+%           output = S.solget(DYN,options);
 
 
-function [s_out,varargout] = solget(obj,DYN,options)      
+function output = solget(obj,DYN,options)
     
     %% Check the options structure: !!! BE CAREFUL - FUNCTION MAY CHANGE OPTIONS STRUCTURE AND SOLUTION OBJECT
-    if ~isfield(options,'axes_values_old')              %When this field is present, contplot is called from the plot_contplot method during a continuation. The two following methods can be skipped in this case since the developers make sure that the options struct is fine
-        options = obj.solget_gatekeeper(DYN,options);   %Check the input options structure
-        options = obj.solget_up_index(DYN,options);     %Updates options.index: options.mu (if present) is replaced by options.index in this function. 
+    if ~isfield(options,'axes_values_old')              % When this field is present, contplot is called from the plot_contplot method during a continuation. The two following methods can be skipped in this case since the developers make sure that the options struct is fine
+        options = obj.solget_gatekeeper(DYN,options);   % Check the input options structure
+        options = obj.solget_up_index(DYN,options);     % Updates options.index: options.mu (if present) is replaced by options.index in this function. 
     end
 
-    % The index is now unique, if mu leads to doubled values. options.index
-    % can be used without caution for doubled indices or indices not
-    % occurring in the SOLUTION subclass object
+    % The index is now unique, if mu leads to doubled values 
+    % options.index can be used without caution for doubled indices or indices not occurring in the SOLUTION subclass object
 
-    %Set resolution default, if not defined
+    % Set resolution default, if not defined 
     if ~isfield(options,'resolution')
-        options.resolution = 200;
+        if strcmpi(DYN.sol_type,'quasiperiodic') && strcmpi(options.space,'hypertime')
+            options.resolution = 50;
+        elseif ~strcmpi(DYN.sol_type,'equilibrium')
+            options.resolution = 200;
+        end
     end
+
 
     %% Get the solutions and do the calculations (if necessary)
-    varargout = cell(1,3);
 
     switch options.space
 
         case 'time'
-            %This method must return array structures
-            [s,mu,x]  = obj.evalsol_time(DYN,options);
-            varargout{1,2} = x;
+            [s,mu,t] = obj.evalsol_time(DYN,options);
 
-        case 'hypertime' %time and trajectory store to the same thing... mainly relevant for 
-            %This method must return array structures
-            [s,mu,x]   = obj.evalsol_hypertime(DYN,options);
-            varargout{1,2} = x;
+        case 'hypertime'
+            [s,mu,theta] = obj.evalsol_hypertime(DYN,options);
 
-        case 'frequency'        
-            %This method must return array structures: It operates on
-            %hyper-time series.
-            [s,mu,x]   = obj.evalsol_frequency(DYN,options);
-            varargout{1,2} = x;
+        case 'frequency'
+            [s,alpha,mu,f] = obj.evalsol_frequency(DYN,options);
 
     end
 
@@ -141,15 +138,18 @@ function [s_out,varargout] = solget(obj,DYN,options)
     % Apply the requested function to the data
     if isa(options.eval,'function_handle')
 
-        if s_array_dim == (1+idx_assist)                % EQ for 'hypertime'
+        if s_array_dim == (1+idx_assist)                % EQ 'hypertime'
+            s_out = zeros([numel(options.eval(s(:,1))),numel(options.index)]);          % Initialise s_out
             for k = 1:numel(options.index)
                 s_out(:,k) = options.eval(s(:,k));
             end
-        elseif s_array_dim == (2+idx_assist)            % EQ for 'time' and 'frequency' | PS for 'time', 'hypertime' and 'frequency' | QPS for 'time' and 'frequency'
+        elseif s_array_dim == (2+idx_assist)            % PS 'hypertime', 'time' and 'frequency'
+            s_out = zeros([size(options.eval(s(:,:,1))),numel(options.index)]);         % Initialise s_out
             for k = 1:numel(options.index)
                 s_out(:,:,k) = options.eval(s(:,:,k));
             end
-        elseif s_array_dim == (3+idx_assist)           % QPS for 'hypertime'
+        elseif s_array_dim == (3+idx_assist)            % QPS 'hypertime'
+            s_out = zeros([size(options.eval(s(:,:,:,1)),[1 2]),size(options.eval(s(:,:,:,1)),3),numel(options.index)]); % Initialise s_out (third array dimension needs to be queried separately since it would be neglected by size() if it was equal to 1)
             for k = 1:numel(options.index)
                s_out(:,:,:,k) = options.eval(s(:,:,:,k));
             end
@@ -162,7 +162,7 @@ function [s_out,varargout] = solget(obj,DYN,options)
             case 'euclidean'
 
                s_out = vecnorm(s,2,s_array_dim-idx_assist);  % s_array_dim-idx_assist is important since it assures that the norm is calculated within the correct dimension of s
-        
+
             case 'all'    
 
                s_out = s;
@@ -171,8 +171,23 @@ function [s_out,varargout] = solget(obj,DYN,options)
 
     end
 
-    varargout{1,1} = mu;
-    varargout{1,3} = options;
+    
+    %% Output
+
+    switch options.space                    % The domain values could also be assigned within the switch...case in lines 112 - 123, ...
+        case 'time'                         % bit it is done here so that the output struct fields of all postprocessing methods ...
+            output.solution_eval = s_out;   % (contplot, solplot and solget) exhibit a common ordering
+            output.time = t;                
+        case 'hypertime'
+            output.solution_eval = s_out;
+            output.hypertime = theta;
+        case 'frequency'
+            output.amplitude = s_out;
+            output.angle = alpha;
+            output.frequency = f;
+    end
+    output.mu = mu;
+    output.options = options;
 
 
 end

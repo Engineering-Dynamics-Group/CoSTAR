@@ -20,17 +20,17 @@ Fcn = @(t,z,param)laval_ps(t,z,param);                                          
 
 %% Properties
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',4);                                                                                               %Properties of the System
-options.opt_sol  = costaropts('stability','on','cont','on','non_auto_freq',non_auto_freq,'sol_type','periodic','approx_method','shooting','act_param',active_parameter);       %Properties of the solution
+options.opt_sol  = costaropts('stability','on','cont','on','non_auto_freq',non_auto_freq,'sol_type','periodic','approx_method','shm','act_param',active_parameter);       %Properties of the solution
 options.opt_init = costaropts('ic',IC);
-options.opt_approx_method = costaropts('solver','ode45');                                                                                                %Properties for approx_method (e.g. Shoot)
+options.opt_approx_method = costaropts('solver','ode45','n_shoot',5);                                                                                                %Properties for approx_method (e.g. Shoot)
 options.opt_stability       = costaropts('iterate_bfp','on');
-options.opt_cont = costaropts('step_control','angle','direction',1,'pred','tangent','subspace','pseudo-arc','mu_limit',mu_limit,'step_width',0.1,'max_cont_step',1e4);                                                             %Properties for continuation
+options.opt_cont = costaropts('step_control','on','direction',1,'pred','tangent','subspace','pseudo-arc','mu_limit',mu_limit,'step_width',0.1,'max_cont_step',1e4);                                                             %Properties for continuation
 
 
 %% Continuation
-tic
-[S,DYN] = costar(options);                                                                                                                                  %Calculate initial solution and continue the curve to set limits
-zeit = toc;
+timer = tic;                                    % Record current time
+[S,DYN] = costar(options);                      % Calculate initial solution and continue the curve
+time = toc(timer);                              % Display elapsed time since tic
 
 %% Test Postprocessing  
 benchmark_postprocess_periodic(DYN,S);

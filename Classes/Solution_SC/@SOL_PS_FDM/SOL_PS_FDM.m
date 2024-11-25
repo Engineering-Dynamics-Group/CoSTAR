@@ -5,7 +5,9 @@ classdef SOL_PS_FDM < Solution
 
     properties
 
-        freq            % Property to save the frequency
+        freq                        % Property to save the frequency
+        local_gridpoint_indices     % Stores the local grid point indices, which determine the grid points relative to node i that are used for the finite difference approximation
+        local_gridpoint_weights     % Stores the weights related to the local grid point indices
             
     end
 
@@ -44,11 +46,14 @@ classdef SOL_PS_FDM < Solution
                 obj.freq(1,1) = y1(end-1,1);                                    % Frequency if system is autonomous
             end
 
+            obj.local_gridpoint_indices = AM.points;                            % Local grid point indices
+            obj.local_gridpoint_weights = AM.weights';                          % Weights related to local grid point indices
+
             if strcmpi(DYN.stability,'on')
                 obj.multipliers(:,1)    = varargin{1,1}{1,2};
                 obj.vectors(:,:,1)      = varargin{1,1}{1,5};
                 obj.n_unstable(1,1)     = varargin{1,1}{1,3};
-                
+                obj.stability_flag(1,1) = varargin{1,1}{1,4};
             end
 
         end
@@ -80,6 +85,7 @@ classdef SOL_PS_FDM < Solution
                 obj.multipliers(:,end+1)    = CON.p_multipliers;                    % Floquet Multipliers
                 obj.vectors(:,:,end+1)      = CON.p_vectors;                        % Eigenvectors corresponding to Floquet Multipliers
                 obj.n_unstable(1,end+1)     = CON.p_n_unstable_1;                   % Number of unstable multipliers
+                obj.stability_flag(1,end+1) = CON.p_stability_flag;                 % Exitflag of stability computation
             end
 
         end
@@ -108,6 +114,7 @@ classdef SOL_PS_FDM < Solution
             obj.multipliers(:,end+1)    = CON.p_multipliers;                % Floquet Multipliers
             obj.vectors(:,:,end+1)      = CON.p_vectors_bfp;                % Eigenvectors corresponding to Floquet Multipliers
             obj.n_unstable(1,end+1)     = obj.n_unstable(1,end);            % Indiacting number of unstable multipliers. Definition: The number in the point is equal to the number before the bfp 
+            obj.stability_flag(1,end+1) = CON.p_stability_flag;             %Exitflag of stability computation
 
             % Fill the table for the bifurcations 
             [label,msg] = ST.identify_bifurcation();
@@ -125,8 +132,8 @@ classdef SOL_PS_FDM < Solution
         
         %Postprocessing
         [s_time,mu,time]                        = evalsol_time(obj,DYN,options);                %Function gives back the solution in time domain
-        [s_hypertime,mu,hypertimes]             = evalsol_hypertime(obj,DYN,options);           %Function gives back the solution in hypertime domain
-        [s_frequency,mu,frequency]              = evalsol_frequency(obj,DYN,options);           %Function gives back the solution in frequency domain
+        [s_hypertime,mu,hypertime]              = evalsol_hypertime(obj,DYN,options);           %Function gives back the solution in hypertime domain
+        [s_amplitude,s_angle,mu,frequency]      = evalsol_frequency(obj,DYN,options);           %Function gives back the solution in frequency domain
 
     end
 

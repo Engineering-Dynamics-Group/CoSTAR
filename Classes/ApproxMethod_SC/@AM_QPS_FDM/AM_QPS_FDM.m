@@ -15,6 +15,8 @@ classdef AM_QPS_FDM < ApproxMethod
         approx_order_2 = 6;     % Order of finite-difference approximation of dz(theta_1_i,theta_2_j)/dtheta_2
         points_1;               % Stores the local grid point indices sigma_1_k which are used to approximate dz(theta_1_i,theta_2_j)/dtheta_1 at using z_(i+sigma_1_k)_j = z(theta_i + sigma_1_k * DeltaTheta_1, theta_j)
         points_2;               % Stores the local grid point indices sigma_2_k which are used to approximate dz(theta_1_i,theta_2_j)/dtheta_2 at using z_i_(j+sigma_2_k) = z(theta_i, theta_j + sigma_2_k * DeltaTheta_2)
+        weights_1;              % Stores the weighting factors needed to approximate dz(theta_1_i,theta_2_j)/dtheta_1 by dz_i_j/dtheta_1 = 1/DeltaTheta_1 * sum_(k=1)^p ( w_1_(sigma_1_k) * z_(i+sigma_1_k)_j )
+        weights_2;              % Stores the weighting factors needed to approximate dz(theta_1_i,theta_2_j)/dtheta_2 by dz_i_j/dtheta_2 = 1/DeltaTheta_2 * sum_(k=1)^p ( w_2_(sigma_2_k) * z_i_(j+sigma_2_k) )
         c0                      % Fourier-coefficient of 0-th order to create the initial solution vector
         c1_matrix               % Fourier-coefficients (stored in a matrix) of 1-st order cosine terms to create the initial solution vector
         s1_matrix               % Fourier-coefficients (stored in a matrix) of 1-st order sine terms to create the initial solution vector
@@ -33,8 +35,6 @@ classdef AM_QPS_FDM < ApproxMethod
 
     properties(Access = private)
     
-        p_weights_1;            % Stores the weighting factors needed to approximate dz(theta_1_i,theta_2_j)/dtheta_1 by dz_i_j/dtheta_1 = 1/DeltaTheta_1 * sum_(k=1)^p ( w_1_(sigma_1_k) * z_(i+sigma_1_k)_j )
-        p_weights_2;            % Stores the weighting factors needed to approximate dz(theta_1_i,theta_2_j)/dtheta_2 by dz_i_j/dtheta_2 = 1/DeltaTheta_2 * sum_(k=1)^p ( w_2_(sigma_2_k) * z_i_(j+sigma_2_k) )
         p_w_1_mat_J;            % Stores a diagonal sparse matrix containing the weights_1 according to a certain pattern. Needed for the Jacobian matrix
         p_w_2_mat_J;            % Stores a diagonal sparse matrix containing the weights_2 according to a certain pattern. Needed for the Jacobian matrix
         p_ind_blkdiag_mat;      % Stores the indices which are needed to create a block diagonal sparse matrix. This accelerates the calculation of the Jacobian matrix

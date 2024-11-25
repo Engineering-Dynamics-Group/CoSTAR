@@ -23,25 +23,25 @@ S1_mat = [  0,    0;
 
 
 %% Properties
-options.system   = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param);                                                           % Properties of the system
-options.opt_sol  = costaropts('sol_type','qps','approx_method','fdm','cont','on','stability','off',...                              % Properties of the solution
-                              'non_auto_freq',non_auto_freq,'act_param',active_parameter);                                          % Properties of the solution
-options.opt_init = costaropts('c1_matrix',C1_mat,'s1_matrix',S1_mat);                                                               % Properties for initial solution
-options.opt_approx_method = costaropts('n_int_1',20,'scheme_1','central','approx_order_1',6,...                                     % Properties of approximation method FDM
-                                       'n_int_2',20,'scheme_2','central','approx_order_2',6);                                       % Properties of approximation method FDM
-options.opt_cont = costaropts('mu_limit',mu_limit,'pred','cubic','display','step_control_info');                                    % Properties for continuation
+options.system   = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param);                                           % Properties of the system
+options.opt_sol  = costaropts('sol_type','qps','approx_method','fdm','cont','on','stability','off',...              % Properties of the solution
+                              'non_auto_freq',non_auto_freq,'act_param',active_parameter,'display','step-control'); % Properties of the solution
+options.opt_init = costaropts('c1_matrix',C1_mat,'s1_matrix',S1_mat);                                               % Properties for initial solution
+options.opt_approx_method = costaropts('n_int_1',20,'scheme_1','central','approx_order_1',6,...                     % Properties of approximation method FDM
+                                       'n_int_2',20,'scheme_2','central','approx_order_2',6);                       % Properties of approximation method FDM
+options.opt_cont = costaropts('mu_limit',mu_limit,'pred','cubic');                                                  % Properties for continuation
 
 % Step control options
 % Available step control methods: 'off', 'on', 'corrector_iterations', 'norm_corrector', 'combination', 'angle', ('pid')
 options.opt_cont.step_width = 0.5;
 % options.opt_cont.step_control = 'angle';
-options.opt_cont.step_control_param = [3, 4/180*pi];
+options.opt_cont.step_control_param = [2, 4];
 
 
 %% Continuation
-tic                                                                     % Record current time
-[S,DYN] = costar(options);                                              % Calculate initial solution and continue the curve
-toc                                                                     % Display elapsed time since tic
+timer = tic;                                    % Record current time
+[S,DYN] = costar(options);                      % Calculate initial solution and continue the curve
+time = toc(timer);                              % Display elapsed time since tic
 
 
 %% Comparison with FGM

@@ -21,7 +21,7 @@ function s_ST_QPS_SHM_gatekeeper(GC,system,opt_sol,opt_stability)
     GC.speak();
 
 
-    % Check the mandatory fields first (these are defintively present)
+    % Check the mandatory fields first (these are definitively present)
     %%%%%%%%%%%%%%%%%%%%
 
 
@@ -33,13 +33,15 @@ function s_ST_QPS_SHM_gatekeeper(GC,system,opt_sol,opt_stability)
     
     GC.speak();
     
-    if isfield(opt_stability,'solver')            
+    if isfield(opt_stability,'solver')
+        if strcmpi(opt_sol.approx_method,'shooting') || strcmpi(opt_sol.approx_method,'shm')
+            % 'solver' is not allowed when using shooting method since solver is already set in opt_approx_method
+            GC.error_msg{1,end+1} = 'You selected the approximation method "shooting" and provided a solver in opt_stability.';
+            GC.error_msg{1,end+1} = 'However, this is not allowed since the solver is already defined via opt_approx_method when using the shooting method.';
+            GC.speak();
+        end
         solver_allowed_fieldvalues = {'ode45','ode78','ode89','ode23','ode113','ode15s','ode23s','ode23t','ode23tb'};
         GC.check_data(opt_stability.solver, 'opt_stability.solver', 'char', [], solver_allowed_fieldvalues); 
-        if strcmpi(opt_sol.approx_method,'shooting')    % 'solver' is not allowed when using shooting method since solver is already set in opt_approx_method
-            GC.error_msg{1,end+1} = 'You selected the approximation method "shooting" and provided a solver in opt_stability.';
-            GC.error_msg{1,end+1} = 'However, this is not allowed since the solver is defined in opt_approx_method when using the shooting method.';
-        end
     end
     
     GC.speak();

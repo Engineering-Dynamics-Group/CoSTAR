@@ -5,7 +5,11 @@ classdef SOL_QPS_FDM < Solution
 
     properties
 
-        freq            % Property to save the frequency
+        freq                        % Property to save the frequency
+        local_gridpoint_indices_1   % Stores the local grid point indices in theta_1-direction, which determine the grid points relative to node i that are used for the finite difference approximation
+        local_gridpoint_indices_2   % Stores the local grid point indices in theta_2-direction, which determine the grid points relative to node j that are used for the finite difference approximation
+        local_gridpoint_weights_1   % Stores the weights related to the local grid point indices in theta_1-direction
+        local_gridpoint_weights_2   % Stores the weights related to the local grid point indices in theta_2-direction
             
     end
 
@@ -44,10 +48,16 @@ classdef SOL_QPS_FDM < Solution
                 obj.freq(:,1) = y1(end-2:end-1,1);                              % Frequencies if system is fully autonomous
             end
 
+            obj.local_gridpoint_indices_1 = AM.points_1;                        % Local grid point indices in theta_1-direction
+            obj.local_gridpoint_indices_2 = AM.points_2;                        % Local grid point indices in theta_2-direction
+            obj.local_gridpoint_weights_1 = AM.weights_1';                      % Weights related to local grid point indices in theta_1-direction
+            obj.local_gridpoint_weights_2 = AM.weights_2';                      % Weights related to local grid point indices in theta_2-direction
+
             if strcmpi(DYN.stability,'on')
                 obj.multipliers(:,1)    = varargin{1,1}{1,2};
                 obj.vectors(:,:,1)      = varargin{1,1}{1,5};
                 obj.n_unstable(1,1)     = varargin{1,1}{1,3};
+                obj.stability_flag(1,1) = varargin{1,1}{1,4};
             end
 
         end
@@ -79,6 +89,7 @@ classdef SOL_QPS_FDM < Solution
                 obj.multipliers(:,end+1)    = CON.p_multipliers;                    % 
                 obj.vectors(:,:,end+1)      = CON.p_vectors;                        % 
                 obj.n_unstable(1,end+1)     = CON.p_n_unstable_1;                   % Number of unstable multipliers
+                obj.stability_flag(1,end+1) = CON.p_stability_flag;                 % Exitflag of stability computation
             end
 
         end
@@ -109,7 +120,8 @@ classdef SOL_QPS_FDM < Solution
             % obj.multipliers(:,end+1)    = CON.p_multipliers;                % 
             % obj.vectors(:,:,end+1)      = CON.p_vectors_bfp;                % 
             % obj.n_unstable(1,end+1)     = obj.n_unstable(1,end);            % Indiacting number of unstable multipliers. Definition: The number in the point is equal to the number before the bfp
-            % 
+            % obj.stability_flag(1,end+1) = CON.p_stability_flag;             % Exitflag of stability computation 
+            %
             % % Fill the table for the bifurcations 
             % [label,msg] = ST.identify_bifurcation();
             % obj.bifurcation = [obj.bifurcation;{label,numel(obj.mu),msg}];
@@ -127,7 +139,7 @@ classdef SOL_QPS_FDM < Solution
         %Postprocessing
         [s_time,mu,time]                        = evalsol_time(obj,DYN,options);                %Function gives back the solution in time domain
         [s_hypertime,mu,hypertimes]             = evalsol_hypertime(obj,DYN,options);           %Function gives back the solution in hypertime domain
-        [s_frequency,mu,frequency]              = evalsol_frequency(obj,DYN,options);           %Function gives back the solution in frequency domain
+        [s_amplitude,s_angle,mu,frequency]      = evalsol_frequency(obj,DYN,options);           %Function gives back the solution in frequency domain
 
     end
 

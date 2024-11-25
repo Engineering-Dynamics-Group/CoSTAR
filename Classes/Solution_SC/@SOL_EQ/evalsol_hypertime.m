@@ -13,9 +13,10 @@
 %           !!! This must(!) be a [options.resolution x 1 x conti_steps] dimensional array !!! dimensional array !!!
 
 
-function [s_hypertime,mu,hypertime] = evalsol_hypertime(obj,DYN,options)
+function [s_out,mu,hypertime] = evalsol_hypertime(obj,DYN,options)
 
-    [s,mu,hypertime] = obj.evalsol_time(DYN,options);
-    s_hypertime = permute(s(1,:,:),[2,3,1]);
+    s_out = obj.s(:,options.index);
+    mu  = obj.mu(1,options.index);
+    hypertime = [];
     
 end

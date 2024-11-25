@@ -12,7 +12,8 @@ function obj = iterate_data(obj)
     obj.p_J0            = obj.p_J1;                         % Jacobian matrix
     obj.p_it            = obj.p_output.iterations;          % Number of corrector iterations for step control
     obj.p_r_old         = obj.p_r;                          % Factor which adapts step width
-    obj.p_n_unstable_0  = obj.p_n_unstable_1;               % Number of unstable multipliers
+    obj.p_n_unstable_0       = obj.p_n_unstable_1;          % Number of unstable multipliers
+    obj.p_stability_flag_old = obj.p_stability_flag;        % Exitflag of stability computation
   
     if strcmpi(obj.step_control,'pid')
         obj.p_e_old_old  = obj.p_e_old;                     % Used for PID step control

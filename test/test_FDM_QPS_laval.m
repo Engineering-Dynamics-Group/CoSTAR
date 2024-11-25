@@ -6,7 +6,7 @@
 
 %% Parameters
 Di = 0.2;     Delta = 1/3;     d3 = 0.25;       % Damping parameters
-e = 0.25;                                       % Excentricity
+e = 0.25;                                       % Eccentricity
 Fg = 0.3924;                                    % Weight force
 
 mu_limit = [1.72,2.5];    mu0 = mu_limit(2);    % Limits of continuation diagram and mu-value at start of continuation | NSB at mu = 1.71477
@@ -31,24 +31,24 @@ S1_mat = [-0.38,   0,   0;
 
 %% Properties
 options.system   = costaropts('order',1,'dim',4,'rhs',Fcn,'param',param);                                                           % Properties of the system
-options.opt_sol  = costaropts('sol_type','quasiperiodic','approx_method','finite-difference','cont','on','stability','off',...      % Properties of the solution
-                              'auto_freq',auto_freq,'non_auto_freq',non_auto_freq,'act_param',active_parameter);                    % Properties of the solution
+options.opt_sol  = costaropts('sol_type','qps','approx_method','fdm','cont','on','stability','off','auto_freq',auto_freq,...        % Properties of the solution
+                              'non_auto_freq',non_auto_freq,'act_param',active_parameter,'display','step-control');                 % Properties of the solution
 options.opt_init = costaropts('c0',c0,'c1_matrix',C1_mat,'s1_matrix',S1_mat);                                                       % Properties for initial solution
 options.opt_approx_method = costaropts('n_int_1',30,'scheme_1','central','approx_order_1',6,...                                     % Properties of approximation method FDM
                                        'n_int_2',30,'scheme_2','central','approx_order_2',6);                                       % Properties of approximation method FDM
-options.opt_cont = costaropts('mu_limit',mu_limit,'pred','secant','direction',-1,'display','step_control_info');                    % Properties for continuation
+options.opt_cont = costaropts('mu_limit',mu_limit,'pred','secant','direction',-1);                                                  % Properties for continuation
 
 % Step control options
 % Available step control methods: 'off', 'on', 'corrector_iterations', 'norm_corrector', 'combination', 'angle', ('pid')
 options.opt_cont.step_width = 0.5;
 options.opt_cont.step_control = 'angle';
-%options.opt_cont.step_control_param = [3, 5/180*pi]; 
+% options.opt_cont.step_control_param = [2, 5]; 
 
 
 %% Continuation
-tic                                             % Record current time
+timer = tic;                                    % Record current time
 [S,DYN] = costar(options);                      % Calculate initial solution and continue the curve
-toc                                             % Display elapsed time since tic 
+time = toc(timer);                              % Display elapsed time since tic
 
 
 %% Comparison with FGM

@@ -7,14 +7,14 @@
 %@S:    Solution subclass object
 %@ST:   Stability subclass object
 
-function bifurcation_stability(obj,DYN,AM,S,ST)
+function obj = bifurcation_stability(obj,DYN,AM,S,ST)
 
 
         %% Calculate Stability
-        [obj.p_multipliers,obj.p_vectors,obj.p_n_unstable_1,stability_flag] = ST.calc_stability(obj.p_y1,obj.p_J1);               % Compute the respective multiplier (eigenvalue, Floquet, Lyapunov Exponent)
+        [obj.p_multipliers,obj.p_vectors,obj.p_n_unstable_1,obj.p_stability_flag] = ST.calc_stability(obj.p_y1,obj.p_J1);               % Compute the respective multiplier (eigenvalue, Floquet, Lyapunov Exponent)
         
 
-        if stability_flag > 0                                           % Only move forward if the stability computation was regular
+        if obj.p_stability_flag > 0                                           % Only move forward if the stability computation was regular
         
 
             %% Iteration of bifurcation point
@@ -22,7 +22,7 @@ function bifurcation_stability(obj,DYN,AM,S,ST)
         
                 ST.update_curve_container(DYN,AM,obj.p_arcl_1,obj.p_y1,obj.p_multipliers,obj.p_n_unstable_1);       % Save the current solution curve point into the container (FIFO storage of the last n points)
         
-                if ~(obj.p_n_unstable_0==obj.p_n_unstable_1)            % Change in number of unstable multipliers detected
+                if ~isnan(obj.p_n_unstable_0) && ~(obj.p_n_unstable_0==obj.p_n_unstable_1)            % Change in number of unstable multipliers detected
         
                     iterate = 1;
                     counter = 0;
@@ -49,16 +49,20 @@ function bifurcation_stability(obj,DYN,AM,S,ST)
                             AM.IF_up_res_data(obj);                                 % Archive initial solution
                             Fcn = @(y)[AM.res(y);obj.sub_con(y,obj)];               % Define corrector-function containing the residual function and the subspace-constraint
                         end
-                        [obj.p_y_bfp,~,p_newton_flag_bfp,~,obj.p_J_bfp] = fsolve(Fcn,obj.yp,obj.fsolve_opts);               % Solve corrector-function
-        
+                        [obj.p_y_bfp,~,obj.p_newton_flag_bfp,~,obj.p_J_bfp] = fsolve(Fcn,obj.yp,obj.fsolve_opts);               % Solve corrector-function
+
+                        if (obj.p_newton_flag_bfp < 1) || (obj.p_newton_flag_bfp == 2)
+                            break                                                   % Immediately break the loop for these exitflags and issue warning (see below)
+                        end
+
                         % Get Stability
-                        [obj.p_multipliers_bfp,obj.p_vectors_bfp,n_unstable,stability_flag] = ST.calc_stability(obj.p_y_bfp,obj.p_J_bfp);     % Compute the stability of the newly found point
+                        [obj.p_multipliers_bfp,obj.p_vectors_bfp,n_unstable,obj.p_stability_flag] = ST.calc_stability(obj.p_y_bfp,obj.p_J_bfp);     % Compute the stability of the newly found point
 
                         % Update curve_container
                         ST.update_curve_container_bfp(obj.p_y_bfp,obj.p_multipliers_bfp,n_unstable);                        % Update the curve container data with the newly found point at the appropriate position
         
                         % Stopping criteria
-                        if (max(abs(obj.p_multipliers_bfp-multipliers_old))<ST.abstol_multiplier) || (counter>(ST.max_iter-1)) || p_newton_flag_bfp<1 || stability_flag<1
+                        if (max(abs(obj.p_multipliers_bfp-multipliers_old))<ST.abstol_multiplier) || (counter>(ST.max_iter-1)) || obj.p_newton_flag_bfp<1 || obj.p_stability_flag<1
                             iterate = 0;
                         end
                         
@@ -66,9 +70,8 @@ function bifurcation_stability(obj,DYN,AM,S,ST)
         
                     end
 
-                    
                     % Save the bifurcation point
-                    if (p_newton_flag_bfp>0) && (stability_flag>0)
+                    if (obj.p_newton_flag_bfp > 0) && (obj.p_newton_flag_bfp ~= 2) && (obj.p_stability_flag > 0)
                         
                         % Get the arc-length of the bifurcation point (for solution object)
                         [~,idx] = min(abs(cell2mat(ST.curve_container(3,:))));      % This should identify the (approximated) bifurcation point
@@ -83,7 +86,12 @@ function bifurcation_stability(obj,DYN,AM,S,ST)
                     
                     else
 
-                        warning('Iteration of the bifurcation point failed on the current step!');
+                        warn_text = append(['Iteration of bifurcation point (BFP) between solutions Iter = ',num2str(obj.p_local_cont_counter),' and ' ...
+                                            'Iter = ',num2str(obj.p_local_cont_counter+1),' or stability computation of iterated BFP failed!']);
+                        write_log(DYN,append('WARNING: ',warn_text))                % Write warning in log file
+                        S.warnings{end+1} = warn_text;                              % Save warning in Solution object
+                        obj.p_last_msg = sprintf('%s%s%s\n',obj.p_last_msg,append('Warning: ',warn_text),' ');  % Save the warning in the "last messages" property
+                        warning(warn_text);                                         % Display warning
 
                     end
 
@@ -97,7 +105,11 @@ function bifurcation_stability(obj,DYN,AM,S,ST)
         %% Warning if stability computation has failed
         else
 
-            warning('Stability computation failed on the current step!');
+            warn_text = append('Stability computation failed for solution Iter = ',num2str(obj.p_local_cont_counter+1),'!');
+            write_log(DYN,append('WARNING: ',warn_text))                            % Write warning in log file
+            S.warnings{end+1} = warn_text;                                          % Save warning in Solution object
+            obj.p_last_msg = sprintf('%s%s%s\n',obj.p_last_msg,append('Warning: ',warn_text),' ');      % Save the warning in the "last messages" property
+            warning(warn_text)                                                      % Display warning
 
         end
 
