@@ -19,9 +19,12 @@ obj.y0  = S.y0;                                                         %Get act
 obj.p_y0_old = num2cell([zeros(numel(obj.y0),2),obj.y0],1);             %Must be initialized as 1x3 cell array for the error control to work
 obj.p_mu0 = S.y0(end,1);
 if isa(S.J,'cell'); obj.p_J0  = S.J{1,1}; else; obj.p_J0  = S.J; end
-if strcmpi(DYN.stability,'on') && strcmpi(ST.iterate_bfp,'on')
-    obj.p_n_unstable_0 = S.n_unstable; 
-    ST.update_curve_container(DYN,AM,S.arclength,obj.y0,S.multipliers,obj.p_n_unstable_0); %Update the curve container with the first point
+if strcmpi(DYN.stability,'on') 
+    obj.p_stability_flag_old = S.stability_flag;
+    if strcmpi(ST.iterate_bfp,'on')
+        obj.p_n_unstable_0 = S.n_unstable; 
+        ST.update_curve_container(DYN,AM,S.arclength,obj.y0,S.multipliers,obj.p_n_unstable_0); %Update the curve container with the first point
+    end
 end  
 
 cont_header = sprintf('\n%s\n%s\n%s\n',...
@@ -52,7 +55,7 @@ while  obj.p_contDo
     %%%%%%%%%%%%%  PREDICTOR AND STEP CONTROL  %%%%%%%%%%%%
     obj = obj.direction_vector();                   %calculate direction vector
    
-    if obj.p_newton_flag >= 1                       %stepcontrol may be called if corrector converged (first loop: obj.p_newton_flag=0 as stepcontrol does not make sense)
+    if (obj.p_newton_flag == 1) || (obj.p_newton_flag == 3) || (obj.p_newton_flag == 4)     %stepcontrol may be called if corrector converged (first loop: obj.p_newton_flag=0)
         obj = obj.stepcontrol(DYN);                 %adapt step width
         obj.p_convergence = 1;                      %reset convergence property if corrector did not converge previously
     end     
@@ -89,31 +92,51 @@ while  obj.p_contDo
     
     [obj.p_y1,~,obj.p_newton_flag,obj.p_output,obj.p_J1] = fsolve(Fcn,obj.yp,obj.fsolve_opts);      %solve corrector function
 
-
-    %%%%%%%%%%%%%  IF NO CONVERGENCE OF FSOLVE  %%%%%%%%%%%
-    if (obj.p_newton_flag < 1) && (obj.step_width <= obj.step_width_limit(1,1))                     %if fsolve did not converge and step width is already <= minimal step width 
-        obj.p_contDo = 0;                                                                           %stop continuation
-        warn_msg = append('WARNING: No solution found for Iter = ',num2str(obj.p_local_cont_counter+1),'!');            %set warning message
-        stopping_msg = 'CoSTAR stopped because corrector did not converge and step width has reached minimal value!';   %set stopping message
+    
+    %%%%%%%%%%%%  EXITFLAG < 1 OR EXITFLAG = 2  %%%%%%%%%%%
+    if ((obj.p_newton_flag < 1) || (obj.p_newton_flag == 2)) && (obj.step_width <= obj.step_width_limit(1,1))               %if step width is already <= minimal step width 
+        if obj.p_newton_flag < 1
+            warn_msg = append('WARNING: No solution found for Iter = ',num2str(obj.p_local_cont_counter+1),'!');            %set warning message
+            stopping_msg = 'CoSTAR stopped because corrector did not converge and step width has reached minimal value.';   %set stopping message
+        elseif obj.p_newton_flag == 2
+            warn_msg = append(['WARNING: Equation solved for Iter = ',num2str(obj.p_local_cont_counter+1),', but ' ...      %set warning message
+                              'change in y smaller than the specified tolerance, or Jacobian at y is undefined!']);
+            stopping_msg = 'CoSTAR stopped because Jacobian can be undefined and step width has reached minimal value.';    %set stopping message
+        end
         S.warnings{end+1} = warn_msg(10:end);                                                       %save warning in Solution object
         obj.p_stopping_flag = stopping_msg;                                                         %save stopping message
         disp(' '); warning(warn_msg(10:end));                                                       %display warning
         if ~strcmpi(DYN.display,'off'); disp(' '); disp(stopping_msg); end                          %display stopping message
         write_log(DYN,'finalize',append(warn_msg,'\n\n',stopping_msg))                              %finalize log file with warning message and message
+        break                                                                                       %immediately break while loop, because everything else can lead to errors
     
-    elseif (obj.p_newton_flag < 1) && (obj.step_width > obj.step_width_limit(1,1))                  %if fsolve did not converge and step width is above minimal step width 
+    elseif ((obj.p_newton_flag < 1) || (obj.p_newton_flag == 2)) && (obj.step_width > obj.step_width_limit(1,1))            %if fsolve did not converge and step width is above minimal step width 
         step_width_pre = 0.5.*obj.step_width;                                                       %new preliminary step width
         obj.step_width = max([step_width_pre,obj.step_width_limit(1)]);                             %set step_width. If new preliminary step width falls below minimal step width, take minimal step width
         obj.p_convergence = 0;                                                                      %set property p_convergence to zero (for resetting the step_width after convergence)
-        info_text = append('Stepwidth adapted to stepwidth = ',num2str(obj.step_width),', because corrector did not converge!');
+        info_text = append('Stepwidth adapted to stepwidth = ',num2str(obj.step_width),', because corrector did not converge or Jacobian can be undefined!');
         write_log(DYN,info_text)                                                                    %write info text in log file
         if strcmpi(DYN.display,'step-control') || strcmpi(DYN.display,'full'); disp(info_text); end %display info text
-                                                                                        
-    
+
+
     %%%%%%%%%%%%%%%%%%  FSOLVE CONVERGED  %%%%%%%%%%%%%%%%%
     else
         %FDM: Check the Jacobian matrix -> Since R2023b: checkGradients is recommended instead of obj.fsolve_opts.CheckGradients = true
         % checkGradients_opts = optimoptions('fsolve',FiniteDifferenceType='forward'); checkGradients(Fcn,obj.p_y1,checkGradients_opts,Display='on',Tolerance=1e-6);
+
+        if obj.p_newton_flag == 3
+            warn_text = append('Equation solved for Iter = ',num2str(obj.p_local_cont_counter+1),', but change in residual is smaller than specified tolerance!');
+            write_log(DYN,append('WARNING: ',warn_text))                                            % Write warning in log file
+            S.warnings{end+1} = warn_text;                                                          % Save warning in Solution object
+            obj.p_last_msg = sprintf('%s%s%s\n',obj.p_last_msg,append('Warning: ',warn_text),' ');  % Save the warning in the "last messages" property
+            warning(warn_text);                                                                     % Display warning
+        elseif obj.p_newton_flag == 4
+            warn_text = append('Equation solved for Iter = ',num2str(obj.p_local_cont_counter+1),', but magnitude of search direction is smaller than specified tolerance!');
+            write_log(DYN,append('WARNING: ',warn_text))                                            % Write warning in log file
+            S.warnings{end+1} = warn_text;                                                          % Save warning in Solution object
+            obj.p_last_msg = sprintf('%s%s%s\n',obj.p_last_msg,append('Warning: ',warn_text),' ');  % Save the warning in the "last messages" property
+            warning(warn_text);                                                                     % Display warning
+        end
 
         %IMPORTANT: order of calling the methods must not be changed
 

@@ -35,8 +35,8 @@ classdef SOL_PS_SHM < Solution
                 obj.multipliers(:,1)    = varargin{1,1}{1,2};
                 obj.vectors(:,:,1)      = varargin{1,1}{1,5};
                 obj.n_unstable(1,1)     = varargin{1,1}{1,3}; 
+                obj.stability_flag(1,1) = varargin{1,1}{1,4};
             end
-
 
             if DYN.n_auto == 0                                                          % Solution is periodic - if this is true: non-autonomous
                 obj.freq(1,1) = DYN.non_auto_freq(y1(end,1));
@@ -67,6 +67,7 @@ classdef SOL_PS_SHM < Solution
                 obj.multipliers(:,end+1)    = CON.p_multipliers;                        % Floquet Multipliers
                 obj.vectors(:,:,end+1)      = CON.p_vectors;                            % Eigenvectors corresponding to Floquet Multipliers
                 obj.n_unstable(1,end+1)     = CON.p_n_unstable_1;                       % Indiacting number of unstable multipliers
+                obj.stability_flag(1,end+1) = CON.p_stability_flag;                     %Exitflag of stability computation
             end
 
         end
@@ -92,7 +93,8 @@ classdef SOL_PS_SHM < Solution
             obj.vectors(:,:,end+1)      = CON.p_vectors_bfp;                            % Eigenvectors corresponding to Floquet Multipliers
             obj.n_unstable(1,end+1)     = obj.n_unstable(1,end);                        % Indiacting number of unstable multipliers.
                                                                                         % Definition: The number in the point is equal to the number before the bfp
-            % Fill the table for the bifurcations 
+            obj.stability_flag(1,end+1) = CON.p_stability_flag;                         % Exitflag of stability computation
+                                                                                        % Fill the table for the bifurcations 
             [label,msg] = ST.identify_bifurcation();
             obj.bifurcation = [obj.bifurcation;{label,numel(obj.mu),msg}];
 

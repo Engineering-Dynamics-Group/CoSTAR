@@ -62,13 +62,13 @@ solget_output_1  = S.solget(DYN,solget_options_1);                              
 
 %% Example 2: Solutions parametrised in time (including trajectories)
 
-% Return the first state variable z_1 = x of two different solutions (at index 50 and at index 100) with respect to time t for t in [0,25]
-solget_options_2 = costaropts('space','time','eval',@(z) z(:,1),'index',[50,100],'interval',[0,25],'resolution',500);
+% Return the first state variable z_1 = x of two different solutions (at index 30 and at index 100) with respect to time t for t in [0,25]
+solget_options_2 = costaropts('space','time','eval',@(z) z(:,1),'index',[30,100],'interval',[0,25],'resolution',500);
 solget_output_2  = S.solget(DYN,solget_options_2);
 
 
-% Obtain the trajectory data of the solutions at index 50 and at index 100 for their respective periods:
-solget_options_3 = costaropts('space','time','eval',@(z) z(:,1:2),'index',[50,100],'resolution',500);
+% Obtain the trajectory data of the solutions at index 30 and at index 100 for their respective periods:
+solget_options_3 = costaropts('space','time','eval',@(z) z(:,1:2),'index',[30,100],'resolution',500);
 solget_output_3  = S.solget(DYN,solget_options_3);
 
 
@@ -77,12 +77,12 @@ solget_output_3  = S.solget(DYN,solget_options_3);
 
 % Compute the end time of the intervals
 res = 2^13;                                                                         % resolution
-T_50 = 2*pi/S.freq(50);                 T_100 = 2*pi/S.freq(100);                   % periods of the solutions
-Delta_t_50 = 100*T_50 / res;            Delta_t_100 = 100*T_100 / res;              % time steps between two consecutive points
-int_end_50 = 100*T_50 - Delta_t_50;     int_end_100 = 100*T_100 - Delta_t_100;      % end time of the intervals
+T_30 = 2*pi/S.freq(30);                 T_100 = 2*pi/S.freq(100);                   % periods of the solutions
+Delta_t_30 = 100*T_30 / res;            Delta_t_100 = 100*T_100 / res;              % time steps between two consecutive points
+int_end_30 = 100*T_30 - Delta_t_30;     int_end_100 = 100*T_100 - Delta_t_100;      % end time of the intervals
 
-% Compute the frequency content of the solution x(t) at index 50
-solget_options_4 = costaropts('space','frequency','eval',@(z) z(:,1),'index',50,'interval',[0 int_end_50],'resolution',res);
+% Compute the frequency content of the solution x(t) at index 30
+solget_options_4 = costaropts('space','frequency','eval',@(z) z(:,1),'index',30,'interval',[0 int_end_30],'resolution',res);
 solget_output_4  = S.solget(DYN,solget_options_4);
 
 % Compute the frequency content of the solution x(t) at index 100

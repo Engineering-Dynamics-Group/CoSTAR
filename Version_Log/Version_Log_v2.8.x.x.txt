@@ -215,8 +215,6 @@ The frequency limit can now be set by the user. Moreover, the implementation of 
     - s_help_opt_sol:
         --> Minor improvements to info texts (lines 20 - 42)
 
-          
-----------  
 
 Tutorials:
 
@@ -232,3 +230,129 @@ Tutorials:
 
 
    
+--------------------------------------------
+------------------ v2.8.1 ------------------
+--------------------------------------------
+
+Bugfix: A grey line is now displayed in continuation plot when iteration of bifurcation point failed.
+
+    @ Continuation:
+        - bifurcation_stability:
+            --> Variable "stability_flag" changed to property "obj.p_stability_flag" (lines 14, 17, 55, 61 and 71)
+            --> Variable "p_newton_flag_bfp" changed to property "obj.p_newton_flag_bfp" (lines 52, 61 and 71)
+        - Continuation:
+            --> Private properties "p_stability_flag" and "p_newton_flag_bfp" added (lines 55 and 56)
+        - plot_contplot:
+            --> elseif condition in line 51 adapted
+
+    @Solution:
+        - contplot:
+            --> numel(obj.n_unstable)(~/=)=0 changed to (~)isempty(obj.n_unstable) (lines 226 and 231)
+            --> Computation of variables "idx" and "idx_stab" adapted for "else" case (lines 265 - 311)
+
+
+----------  
+
+The continuation curve is now displayed in orange when the stability computation failed.
+
+    @Continuation:
+        - Continuation:
+            --> Private property "p_stability_flag_old" added (line 70)
+        - iterate_data:
+            --> Iteration of "p_stability_flag" added (line 16)
+        - m_continuation:
+            --> Initialization adapted: if condition in line 22 changed, existing code moved in new if condition to lines 24 - 27 and line 23 added
+        - plot_contplot:
+            --> elseif condition added to handle this case (lines 41 - 45)
+
+    @Solution:
+        - contplot:
+            --> Getting the relevant stability flags added (lines 196 - 199)
+            --> Setting the correct color adapted, case for orange color added (lines 244 - 250, 254 - 256 and 318 - 320)
+        - s_help_contplot
+            --> Info text for 'color' adapted (line 31)
+        - Solution:
+            --> Property "stability_flag" added (line 18)
+
+    The stability flag is now saved in the solution objects. The required lines were added to following files:
+        - SOL_EQ (lines 27, 46 and 66)
+        - SOL_PS_FDM (lines 56, 88 and 117)     - SOL_PS_FGM (lines 51, 105 and 142)    - SOL_PS_SHM (lines 38, 70 and 96)
+        - SOL_QPS_FDM (lines 60, 92 and 123)                                            - SOL_QPS_SHM (lines 41, 68 and 101)
+
+
+----------  
+
+A stable solution is now displayed in green. Moreover, the automatic plotting color "dark grey" for continuation plots was changed to "pale grey".
+
+    @Continuation:
+        - plot_contplot:
+            --> Selection of color adapted (lines 10 - 18)
+            --> "dark_grey" changed to "pale_grey" (line 53)
+            --> Color 'b' changed to 'g' for the case when a bifurcation point was computed (lines 64 and 75)
+
+    @Solution:
+        - contplot:
+            --> "dark_grey" changed to "pale_grey" (lines 257, 298, 304, 310, 320 and 321)
+            --> Color 'b' changed to 'g' (lines 247 and 323)
+        - s_help_contplot
+            --> Info text for 'color' adapted (line 31)
+
+    Tutorials:
+        - Example_Postprocessing_contplot:
+            --> Colour in "contplot_options_2" changed to 'y' (line 66)
+            --> Value of 'index' in "contplot_options_4" changed to "185:205" (line 77)
+        - Tutorial_Postprocessing_contplot:
+            --> Description of field 'color' adapted
+            --> Colour in "contplot_options_2" changed to 'y'
+            --> Value of 'index' in "contplot_options_4" changed to "185:205"
+        - Live scripts evaluated again to obtain the new command window output. Changes affect:
+            --> Tutorial_EQ     
+            --> Tutorial_Postprocessing_contplot    --> Tutorial_Postprocessing_solget      --> Tutorial_Postprocessing_solplot
+        - Description of line colour adapted. Changes affect:
+            --> Tutorial_EQ
+            --> Tutorial_PS_FDM     --> Tutorial_PS_FGM     --> Tutorial_PS_SHM
+            --> Tutorial_QPS_FDM    --> Tutorial_QPS_FGM    --> Tutorial_QPS_SHM
+
+
+----------  
+
+CoSTAR can now handle fsolve exitflags > 1. CoSTAR stopps for exitflag = 2 and issues a warning for exitflag \in {3,4}.
+
+    @Continuation:
+        - bifurcation_stability:
+            --> Loop for iterating the bifurcation point is broken when fsolve returns exitflag < 1 or exitflag = 2 (lines 54 - 56)
+            --> "&& (obj.p_newton_flag_bfp ~= 2)" added to if condition in line 74 for saving the bifurcation point
+            --> Warning text adapted (lines 89 and 90)
+        - error_control:
+            --> Conditions for different exitflags added, but does not work yet, which is why most of the code is commented (lines 68 - 85)
+        - m_continuation:
+            --> Step control is only executed for exitflags 1, 3 and 4 (line 52)
+            --> if...elseif conditions for different exitflags added and reworked (lines 90 - 99, 105, 107, 111 and 121 - 133)
+
+    Functions:
+        - initial_solution:
+            --> if...elseif conditions for different exitflags added and reworked (lines 55 - 63 and 75 - 82)
+            --> All warning messages are stored in a cell array now (lines 40, 77, 78, 80, 81, 92, 93, 195, 196 and 223 - 227)
+            --> Conditions for different exitflags in error control added, but does not work yet, which is why most of the code is commented (lines 155 - 168)
+
+
+----------  
+
+@Continuation:
+
+    - bifurcation_stability:
+        --> Bugfix: "~isnan(obj.p_n_unstable_0)" added to if condition in line 25
+
+    - check_limits:
+        --> Bugfix: Warning messages are displayed correctly when continuation starts with warning
+            * "warn_str" replaced by "delete_str_split" in line 41
+            * Displaying warning messages reworked. Former lines 46 - 48 replaced by new lines 46 - 51
+
+
+test:
+
+    - cprintf:
+        --> License text added from removed License.txt
+
+    - license:
+        --> Removed

@@ -38,6 +38,7 @@ classdef SOL_QPS_SHM < Solution
                 obj.multipliers(:,1)    = varargin{1,1}{1,2};
                 obj.vectors(:,:,1)      = varargin{1,1}{1,5};
                 obj.n_unstable(1,1)     = varargin{1,1}{1,3}; 
+                obj.stability_flag(1,1) = varargin{1,1}{1,4};
             end
 
             if DYN.n_auto == 0                                      
@@ -64,6 +65,7 @@ classdef SOL_QPS_SHM < Solution
                 obj.multipliers(:,end+1)    = CON.p_multipliers;                            %
                 obj.vectors(:,:,end+1)      = CON.p_vectors;                                %
                 obj.n_unstable(1,end+1)     = CON.p_n_unstable_1;                           % Indiacting number of unstable multipliers
+                obj.stability_flag(1,end+1) = CON.p_stability_flag;                         % Exitflag of stability computation
             end
 
             if DYN.n_auto == 0                                         
@@ -96,7 +98,8 @@ classdef SOL_QPS_SHM < Solution
             obj.multipliers(:,end+1)    = CON.p_multipliers_bfp;                    %
             obj.vectors(:,:,end+1)      = CON.p_vectors_bfp;                        %
             obj.n_unstable(1,end+1)     = obj.n_unstable(1,end);                    % Indiacting number of unstable multipliers. Definition: The number in the point is equal to the number before the bfp 
-       
+            obj.stability_flag(1,end+1) = CON.p_stability_flag;                     % Exitflag of stability computation
+
             %Fill the table for the bifurcations 
             [label,msg] = ST.identify_bifurcation();
             obj.bifurcation = [obj.bifurcation;{label,numel(obj.mu),msg}];

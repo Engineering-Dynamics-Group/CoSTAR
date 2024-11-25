@@ -37,6 +37,8 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% Corrector %%%%%%%%%%%%%%%%%%%%%%%%%%
 
+warn_msg = cell(0,0);                                                   % Initialize
+
 write_log(DYN,'initialize')                                             % Initialize log file
 if strcmpi(DYN.display,'off') || strcmpi(DYN.display,'final')
     [fsolve_text,y,~,newton_flag,~,J] = evalc('fsolve(Fcn,y0,newtonOpts)');
@@ -50,20 +52,33 @@ else
 end
 % checkGradients_opts = optimoptions('fsolve',FiniteDifferenceType='forward'); checkGradients(Fcn,y,checkGradients_opts,Display='on',Tolerance=1e-6);   %FDM: Check the Jacobian matrix
 
-% No initial solution found
-if newton_flag~=1
-    error_text = 'ERROR: No initial solution found!';                   % Set error text
-    error_msg = 'CoSTAR stopped because corrector did not converge.';   % Set error message
+% No initial solution found or solution found but Jacobian can be undefined
+if (newton_flag < 1) || (newton_flag == 2)
+    if newton_flag < 1
+        error_text = 'ERROR: No initial solution found!';                       % Set error text
+        stopping_msg = 'CoSTAR stopped because corrector did not converge.';    % Set stopping message
+    elseif newton_flag == 2
+        error_text = 'ERROR: Equation solved, but change in y smaller than the specified tolerance, or Jacobian at y is undefined!';    % Set error text
+        stopping_msg = 'CoSTAR stopped because Jacobian can be undefined at initial solution.';                                         % Set stopping message
+    end
     write_log(DYN,error_text)                                           % Write error text in log file
-    write_log(DYN,'finalize_error',error_msg)                           % Finalize log file with error message
+    write_log(DYN,'finalize_error',stopping_msg)                        % Finalize log file with error message
     if ~strcmpi(DYN.display,'off')
-        disp(error_text); disp(' '); disp(error_msg); disp(' ')         % Display error text and message
+        disp(error_text); disp(' '); disp(stopping_msg); disp(' ')      % Display error text and message
         disp('-----------------------------------------------------')
         disp('--------------  Finished with error!  ---------------');
         disp('-----------------------------------------------------')
         disp(' ');
     end
-    error(append(error_text(8:end),' ',error_msg))                      % Throw error
+    error(append(error_text(8:end),' ',stopping_msg))                   % Throw error
+
+% Initial solution found, but fsolve exitflag is not default exitflag
+elseif newton_flag == 3
+    warn_msg{end+1} = 'WARNING: Equation solved, but change in residual is smaller than specified tolerance!';
+    S.warnings{end+1} = warn_msg{end}(10:end);                          % Save warning in Solution object
+elseif newton_flag == 4
+    warn_msg{end+1} = 'WARNING: Equation solved, but magnitude of search direction is smaller than specified tolerance!';
+    S.warnings{end+1} = warn_msg{end}(10:end);                          % Save warning in Solution object
 end
 
 info_text = 'Initial solution found!';                                  % This message is updated if stability is successfully computed
@@ -74,8 +89,8 @@ info_text = 'Initial solution found!';                                  % This m
 stopping_msg = check_freq(DYN,y);
 if ~isempty(stopping_msg)                                               % If frequency(s) are smaller than frequency limit
     DYN.cont = 'off';                                                   % Deactivate continuation (if it was set to 'on')
-    warn_msg = 'WARNING: Small or negative frequency(s) detected for initial solution!';     % Set warning message
-    S.warnings{end+1} = warn_msg(10:end);                               % Save warning in Solution object
+    warn_msg{end+1} = 'WARNING: Small or negative frequency(s) detected for initial solution!';      % Set warning message
+    S.warnings{end+1} = warn_msg{end}(10:end);                          % Save warning in Solution object
     % Everything else (displaying warning, writing log file etc.) has to be done after this if...else... block
 
 else
@@ -137,7 +152,20 @@ else
                 end
 
                 newtonOpts.Display = 'off';                         % Deactivate fsolve output
-                [y,~,newton_flag,~,J] = fsolve(Fcn,y0,newtonOpts);  % Solve corrector-function
+                [y_er,~,newton_flag_er,~,J_er] = fsolve(Fcn,y0,newtonOpts);  % Solve corrector-function
+
+                % This if...else below does not work yet!
+                % Reason: AM.iv makes changes to AM object. When fsolve fails and the new solution is not accepted, we need to revert the mentioned changes.
+                %         If we do not revert the changes, there will be an error in stability computation! But how do we revert the changes?
+                % if (newton_flag_er > 0) && (newton_flag_er ~= 2)  % Accept the result from fsolve if exitflag is 1, 3 or 4
+                    y = y_er;
+                    newton_flag = newton_flag_er;
+                    J = J_er;
+                % else                                                % If exitflag from fsolve is < 0 or = 2
+                %     warn_msg{end+1} = 'WARNING: Error control stopped early or failed for initial solution!';
+                %     S.warnings{end+1} = warn_msg{end}(10:end);      % Save warning in Solution object
+                %     break                                           % Immediately break the loop. The last accepted solution is returned
+                % end
 
             end
 
@@ -162,10 +190,10 @@ else
         added_output{3} = n_unstable;
         added_output{4} = stability_flag;
         added_output{5} = vectors;
-        
+
         if stability_flag == 0                                                              % Stability computation failed
-            warn_msg = 'WARNING: Stability computation failed for the initial solution!';   % Set warning message
-            S.warnings{end+1} = warn_msg(10:end);                                           % Save warning in Solution object
+            warn_msg{end+1} = 'WARNING: Stability computation failed for the initial solution!';    % Set warning message
+            S.warnings{end+1} = warn_msg{end}(10:end);                                      % Save warning in Solution object
         elseif n_unstable == 0                                                              % Stable solution found
             info_text = 'Initial solution (stable) found!';                                 % Update info text
         elseif n_unstable > 0                                                               % Unstable solution found
@@ -192,16 +220,18 @@ if ~strcmpi(DYN.display,'off')
     disp(info_text); disp(' ');                 % Display info text
 end
 write_log(DYN,info_text)                        % Write info text to log
-if exist('warn_msg','var')
-    warning(warn_msg(10:end)); disp(' ')        % Display warning (either frequency check or stability computation failed)
-    write_log(DYN,append('\n',warn_msg))        % Write warning in log file
+if ~isempty(warn_msg)
+    for i = 1:numel(warn_msg)
+        warning(warn_msg{i}(10:end)); disp(' ') % Display warning
+        write_log(DYN,append('\n',warn_msg{i})) % Write warning in log file
+    end
 end
 
 
 %%%%%%%%%%%%%%%%% Stopping (no continuation) %%%%%%%%%%%%%%%%%%
 
 if strcmpi(DYN.cont,'off')
-    if isempty(stopping_msg)                    % Set stopping message if it has not already been set by check_freq
+    if isempty(stopping_msg)                    % Set stopping message if it has not already been set above
         stopping_msg = 'CoSTAR stopped after initial solution because continuation was turned off.';  
     end
     write_log(DYN,'finalize',stopping_msg)      % Finalize log file with stopping message

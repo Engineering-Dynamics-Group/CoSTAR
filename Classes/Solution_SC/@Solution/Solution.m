@@ -15,11 +15,8 @@ classdef Solution < handle
         dy                      %storing the direction vector of the predictor (tangent, secant, ...)
         error                   %solution type specific error
         newton_flag             %storing newton-solver flags. 2D matrix or cell
+        stability_flag          %storing stability computation exitflag
         stopping_flag           %information on the cause of ending the computation:
-        % 0 - Newton Solver did not converge
-        % 1 - stop after initial solution when no continuation desired or lower/upper continuation parameter limit was reached
-        % 2 - maximal number of continuation steps reached
-        % 3 - frequency(s) of the solution are smaller than frequency limit
 
         step_width              %Step width for each solution point
         arclength               %Arclength of Solution curve
