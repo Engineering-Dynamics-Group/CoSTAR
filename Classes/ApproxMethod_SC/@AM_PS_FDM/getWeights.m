@@ -152,7 +152,8 @@ function obj = getWeights(obj,DYN)
     %              p_ind_blkdiag_mat            %
     % One part to create the the Jacobian is a block diagonal matrix. In order to place the elements at the correct position, the function sparse() is used
     % sparse() needs the row and column indices of the elements which need to be set. These indices are created here
-    blkdiag_mat = sparse(kron(eye(n_int), ones(dim)));                                                          % Create the [n_int*dim x n_int*dim] block diagonal matrix
+    % blkdiag_mat = sparse(kron(eye(n_int), ones(dim)));                                                          % Inefficient, define sparse before kron(), blows out RAM
+    blkdiag_mat = kron(speye(n_int),spones(ones(dim)));                                                         % Create the [n_int*dim x n_int*dim] block diagonal matrix
     [obj.p_ind_blkdiag_mat(:,1),obj.p_ind_blkdiag_mat(:,2)] = ind2sub(size(blkdiag_mat),find(blkdiag_mat));     % Get the indices of all elements ~= 0 (i.e. = 1)
 
 

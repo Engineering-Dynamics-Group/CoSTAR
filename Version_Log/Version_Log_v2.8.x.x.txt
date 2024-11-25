@@ -12,6 +12,10 @@ Test files adapted to QPS_SHM now also receiving a fourier series
             --> for each new/additional opt_init for fourier-coeffients added
             --> for each old opt_init for time integration removed
 
+    @AM_(Q)PS_FDM
+        - getWeights
+            --> Line 155 (273) commented (Blows out RAM)
+            --> Line 156 (274) added Sparse defined before Kronecker-Product
 
 --------------------------------------------
 ----------------- v2.8.0.3 -----------------
