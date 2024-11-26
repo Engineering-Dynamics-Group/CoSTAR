@@ -2,15 +2,16 @@
 
 © 2024 Engineering Dynamics Group, Institute of Mechanics, University of Kassel
 
-CoSTAR (Continuation of Solution Torus AppRoximations) is a MATLAB-based toolbox developed by the Engineering Dynamics Group at the University of Kassel for the computation and analysis of stationary, periodic and quasi-periodic solutions in dynamic systems. The toolbox is designed to efficiently calculate bifurcation diagrams using modular predictor-corrector methods that combine various approximation approaches, such as shooting and Fourier-Galerkin methods. This flexibility supports both research and application needs by enabling method comparisons and problem-specific adaptations.
+CoSTAR (Continuation of Solution Torus AppRoximations) is a MATLAB toolbox developed by the Engineering Dynamics Group at the University of Kassel. It enables the efficient computation and analysis of stationary, periodic, and quasi-periodic solutions in dynamic systems. The toolbox is designed to calculate bifurcation diagrams using modular predictor-corrector methods that combine various approximation approaches, such as shooting and Fourier-Galerkin methods. This modular structure supports both research and application needs by facilitating method comparisons and problem-specific adaptations within a unified framework.
 
 ### **Key Features**
-- **Solution Computation:** Implementation of equilibrium, periodic, and quasi-periodic solution methods. Currently, shooting methods and Fourier-Galerkin methods have been implemented for periodic and quasi-periodic solutions
-- **Predictor-Corrector Framework:** A general curve-tracking algorithm independent of the solution method.
-- **Stability Analysis:** Tools for evaluating stability using eigenvalue theory, monodromy matrices, Floquet multipliers, and Lyapunov exponents.
+- **Solution Computation:** Includes equilibrium, periodic, and quasi-periodic solution methods. Currently, shooting methods and Fourier-Galerkin methods are implemented for periodic and quasi-periodic solutions.
+- **Predictor-Corrector Framework:** A general curve-tracing algorithm that operates independently of the specific solution method used.
+- **Stability Analysis:** Features under development include tools for stability evaluation via eigenvalue theory, monodromy matrices, Floquet multipliers, and Lyapunov exponents.
 
 ### **Outlook**
-Future developments aim to extend functionality to track bifurcation points and generate stability maps, enhancing the versatility of the toolbox for complex systems analysis.
+Future developments will expand CoSTAR’s capabilities to track bifurcation points and create stability maps, further enhancing its utility for the analysis of complex dynamic systems.
+
 
 
 ## Getting started
