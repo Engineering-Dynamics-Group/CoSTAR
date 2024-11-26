@@ -2,6 +2,16 @@
 
 © 2024 Engineering Dynamics Group, Institute of Mechanics, University of Kassel
 
+CoSTAR (Continuation of Solution Torus AppRoximations) is a MATLAB-based toolbox developed by the Engineering Dynamics Group at the University of Kassel for the computation and analysis of stationary, periodic and quasi-periodic solutions in dynamic systems. The toolbox is designed to efficiently calculate bifurcation diagrams using modular predictor-corrector methods that combine various approximation approaches, such as shooting and Fourier-Galerkin methods. This flexibility supports both research and application needs by enabling method comparisons and problem-specific adaptations.
+
+### **Key Features**
+- **Solution Computation:** Implementation of equilibrium, periodic, and quasi-periodic solution methods. Currently, shooting methods and Fourier-Galerkin methods have been implemented for periodic and quasi-periodic solutions
+- **Predictor-Corrector Framework:** A general curve-tracking algorithm independent of the solution method.
+- **Stability Analysis:** Tools for evaluating stability using eigenvalue theory, monodromy matrices, Floquet multipliers, and Lyapunov exponents.
+
+### **Outlook**
+Future developments aim to extend functionality to track bifurcation points and generate stability maps, enhancing the versatility of the toolbox for complex systems analysis.
+
 
 ## Getting started
 
