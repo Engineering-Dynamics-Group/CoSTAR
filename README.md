@@ -9,7 +9,7 @@ CoSTAR (Continuation of Solution Torus AppRoximations) is a MATLAB toolbox devel
 - **Predictor-Corrector Framework:** A general curve-tracing algorithm that operates independently of the specific solution method used.
 - **Stability Analysis:** Features under development include tools for stability evaluation via eigenvalue theory, monodromy matrices, Floquet multipliers, and Lyapunov exponents.
 
-### **Getting Started**
+## **Getting Started**
 To get started with CoSTAR, navigate to the [Tutorials folder](./Tutorials) in the repository. This folder contains a variety of tutorial scripts and live scripts that serve as an introduction to the toolbox. 
 
 - All files in the `Tutorials` folder that begin with `Tutorial_` are recommended entry points.  
