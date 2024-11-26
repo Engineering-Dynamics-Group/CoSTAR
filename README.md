@@ -13,12 +13,12 @@ CoSTAR (Continuation of Solution Torus AppRoximations) is a MATLAB toolbox devel
 Future developments will expand CoSTAR’s capabilities to track bifurcation points and create stability maps, further enhancing its utility for the analysis of complex dynamic systems.
 
 ### **Getting Started**
-To get started with CoSTAR, navigate to the [Tutorial folder](./Tutorial) in the repository. This folder contains a variety of tutorial scripts and live scripts that serve as an introduction to the toolbox. 
+To get started with CoSTAR, navigate to the [Tutorial folder](./Tutorials) in the repository. This folder contains a variety of tutorial scripts and live scripts that serve as an introduction to the toolbox. 
 
 - All files in the `Tutorial` folder that begin with `Tutorial_` are recommended entry points.  
 - Files with the `.m` extension provide standard MATLAB scripts, while `.mlx` files are MATLAB Live Scripts with an interactive format, making them ideal for exploration and visualization.
 
 **Example Steps:**
-1. Open MATLAB and navigate to the [Tutorial folder](./Tutorial).
-2. Start with one of the `Tutorial_` files, such as `Tutorial_GettingStarted.mlx`, for an introduction to the toolbox.
+1. Open MATLAB and navigate to the [Tutorial folder](./Tutorials).
+2. Start with one of the `Tutorial_` files, such as `Tutorial_EQ.mlx`, for an introduction to the toolbox.
 3. Follow the examples provided in the scripts to familiarize yourself with the key features and workflows.
