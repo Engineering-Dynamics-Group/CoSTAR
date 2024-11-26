@@ -1,5 +1,6 @@
-# CoSTAR
+# CoSTAR - Continuation of Solution Torus AppRoximations
 
+© 2024 Engineering Dynamics Group, Institute of Mechanics, University of Kassel
 
 
 ## Getting started
