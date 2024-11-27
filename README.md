@@ -15,7 +15,6 @@ For a more detailed list of all available features, please see the PDF [The MATL
 ### **Outlook**
 The toolbox is continuously developed and future releases will expand CoSTAR’s capabilities. Possible upcoming improvements can be found in the PDF [The MATLAB Toolbox CoSTAR](./The_MATLAB_Toolbox_CoSTAR.pdf).
 
-
 ## **Getting Started**
 To get started with CoSTAR, navigate to the [Tutorials folder](./Tutorials) in the repository. This folder contains a variety of tutorial and example scripts that serve as an introduction to the toolbox. 
 
