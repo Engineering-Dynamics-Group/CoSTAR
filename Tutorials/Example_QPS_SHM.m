@@ -37,7 +37,10 @@ mu_limit = [0.8, 2];                                % Limits of the continuation
 eta0 = mu_limit(1);                                 % Value of continuation parameter at start of continuation
 param = {D, kappa, f1, f2, eta0, ratio};            % Parameter array
 active_parameter = 5;                               % Location of continuation parameter within the array
-IC = [1; 1];                                        % Initial point in state space             
+C1_mat = [  0,     0,   0;                          % Fourier coefficients to create an initial value for fsolve to find the first point on the curve at mu = 2
+          -0.2, -0.07, 0];
+S1_mat = [-0.1, -0.025, 0;
+            0,     0,   0];
 
 % Functions
 non_auto_freq = @(mu) [mu, ratio*mu];               % Non-autonomous excitation frequencies
@@ -47,7 +50,7 @@ Fcn =  @(t,z,param) duffing_ap_qp(t,z,param);       % Right-hand side of dz/dtau
 options.system = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','Continuation of Quasi-Periodic Duffing Equation');    % Properties of the system
 options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','shooting','cont','on','stability','on', ...                % Properties of the solution
                              'non_auto_freq',non_auto_freq,'act_param',active_parameter);                                           % Properties of the solution
-options.opt_init = costaropts('ic',IC,'tinit',2000,'deltat',1000,'dt',0.1);                                                         % Property for initial solution
+options.opt_init = costaropts('c1_matrix',C1_mat,'s1_matrix',S1_mat);                                                               % Properties for initial solution
 options.opt_approx_method = costaropts('solver','ode45','n_char',40);                                                               % Properties of approximation method
 options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.25,'step_control_param',[2,5]);                                    % Properties for continuation
 
@@ -93,12 +96,20 @@ clear variables; clc; close all;                    % clear workspace; clear com
 % Parameters
 Di = 0.2;       delta = 1/3;        d3 = 0.25;      % Damping parameters
 e = 0.25;       Fg = 0.3924;                        % Eccentricity and gravitational influence
-mu_limit = [1.72, 2.5];                             % Limits of continuation
+mu_limit = [2.1, 2.5];                             % Limits of continuation
 eta0 = mu_limit(2);                                 % Value of continuation parameter at start of continuation
 param = {eta0, Di, delta, e, d3, Fg};               % Parameter array
 active_parameter = 1;                               % Location of continuation parameter within the array
 auto_freq = 1;                                      % Initial value of the autonomous frequency
-IC = 0.5.*ones(4,1);                                % Initial point in state space  
+C1_mat = [  0,     0,   0;                          % Fourier coefficients to create an initial value for fsolve to find the first point on the curve at mu = 2
+          -0.2, -0.07, 0;
+          0,      0,  0;
+          0.5, -0.02,  0];
+S1_mat = [-0.1, -0.025, 0;
+            0,     0,   0;
+           -0.05,   0,   0;
+            0,     0,   0];
+
 
 % Functions
 non_auto_freq = @(mu) mu;                           % Non-autonomous excitation frequency
@@ -108,15 +119,16 @@ Fcn =  @(t,z,param) laval_qp(t,z,param);            % Right-hand side of dz/dtau
 options.system = costaropts('order',1,'dim',4,'rhs',Fcn,'param',param,'info','Continuation of Jeffcott-Laval Rotor');   % Properties of the system
 options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','shooting','cont','on','stability','on', ...    % Properties of the solution
                              'non_auto_freq',non_auto_freq,'auto_freq',auto_freq,'act_param',active_parameter);         % Properties of the solution
-options.opt_init = costaropts('ic',IC,'tinit',1000,'deltat',1000,'dt',0.1);                                             % Properties for initial solution
-options.opt_approx_method = costaropts('solver','ode45','n_char',30);                                                   % Properties of the approximation method
-options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.2,'direction',-1);                                     % Properties for continuation
+options.opt_init = costaropts('c1_matrix',C1_mat,'s1_matrix',S1_mat);                                                               % Properties for initial solution
+options.opt_approx_method = costaropts('solver','ode45','n_char',59);                                                   % Properties of the approximation method
+ 
+options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.4,'direction',-1);                                     % Properties for continuation
 
 % Continuation
 [S,DYN] = costar(options);                          % CoSTAR is called by costar(options)
 
 % Postprocessing
-solplot_options_2 = costaropts('zaxis',@(z) z(:,:,1),'space','hypertime','resolution',30,'index',[5,30]);   % "options" structure for the solplot function
+solplot_options_2 = costaropts('zaxis',@(z) z(:,:,1),'space','hypertime','resolution',30,'index',[5,10]);   % "options" structure for the solplot function
 solplot_output_2  = S.solplot(DYN,solplot_options_2);                                                       % Plot hyper-time surfaces Z1(theta1,theta2,mu) at desired index
 
 
@@ -127,12 +139,22 @@ clear variables; clc; close all;                    % clear workspace; clear com
 
 % Parameters
 alpha = 0.1;             beta = 1.1;                % Parameters of the system
-mu_limit = [0.1, 1.25];                             % Limits of continuation
+mu_limit = [0.1, 0.4];                              % Limits of continuation
 epsilon0 = mu_limit(1);                             % Value of continuation parameter at start of continuation       
 param = {epsilon0, alpha, beta};                    % Parameter array
 active_parameter = 1;                               % Location of continuation parameter within the array
-auto_freq = [1.04, 1.5];                            % Initial value of the autonomous frequencies
-IC = ones(4,1);                                     % Initial point in state space          
+auto_freq = [1.04,1.49];                            % Initial value of the autonomous frequencies
+C1_mat = [0,   0,   0;                              % Fourier coefficients to create an initial value for fsolve to find the first point on the curve
+          0, -1.4,  0;
+          2,   0,   0;
+          0,  2.1,  0];
+S1_mat = [2,   0,   0;
+          0,  1.4,  0;
+          0,   0,   0;
+          0,  2.1,  0];
+
+
+
 
 % Function
 Fcn = @(t,z,param) coupledvdp(t,z,param);           % Right-hand side of dz/dtau = f(z,epsilon,alpha,beta)
@@ -141,13 +163,13 @@ Fcn = @(t,z,param) coupledvdp(t,z,param);           % Right-hand side of dz/dtau
 options.system   = costaropts('order',1,'dim',4,'rhs',Fcn,'param',param,'info','Continuation of Coupled van der Pol Oscillator');   % Properties of the system
 options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','shooting','cont','on','stability','on', ...                % Properties of the solution
                              'auto_freq',auto_freq,'act_param',active_parameter);                                                   % Properties of the solution
-options.opt_init = costaropts('ic',IC,'tinit',1000,'deltat',2000,'dt',0.1);                                                         % Property for initial solution
-options.opt_approx_method = costaropts('solver','ode45','n_char',50);                                                               % Properties of approximation method
-options.opt_cont = costaropts('mu_limit',mu_limit);                                                                                 % Properties for continuation
+options.opt_init = costaropts('c1_matrix',C1_mat,'s1_matrix',S1_mat);                                                               % Properties for initial solution
+options.opt_approx_method = costaropts('solver','ode45','n_char',35);                                                               % Properties of approximation method
+options.opt_cont = costaropts('step_control','off','mu_limit',mu_limit,'pred','parable','direction',1,'step_width',0.1);                                  % Properties for continuation
 
 % Continuation
 [S,DYN] = costar(options);                          % CoSTAR is called by costar(options)
 
 % Postprocessing
-solplot_options_3 = costaropts('zaxis',@(z) z(:,:,1),'space','hypertime','resolution',50,'index',[5,30]);   % "options" structure for the solplot function
+solplot_options_3 = costaropts('zaxis',@(z) z(:,:,1),'space','hypertime','resolution',50,'index',[5,12]);   % "options" structure for the solplot function
 solplot_output_3  = S.solplot(DYN,solplot_options_3);                                                       % Plot hyper-time surfaces Z1(theta1,theta2,mu) at desired index
