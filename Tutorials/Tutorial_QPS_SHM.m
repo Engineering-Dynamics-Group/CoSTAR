@@ -728,7 +728,7 @@ options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.4,'direction',-
 %
 % In order to plot the hyper-time surfaces Z_i(theta_1,theta_2,mu) (torus function components), we need to call the "solplot" ...
 % function. Similar to the "costar" function, solplot expects a structure that defines all required options for the plot.
-solplot_options_2 = costaropts('zaxis',@(z) z(:,:,1),'space','hypertime','resolution',25,'index',[5,12]);
+solplot_options_2 = costaropts('zaxis',@(z) z(:,:,1),'space','hypertime','resolution',30,'index',[5,10]);
 % Mandatory fields: - 'zaxis':       Defines what is plotted on the vertical axis. "@(z) z(:,:,1)" plots the first component (i = 1) ...
 %                                    of the torus function against the hyper-time domain [0, 2*pi]^2.
 %                   - 'space':       Specifies the "domain" of the plot. 'hypertime' plots the hyper-time surfaces of the solution.
@@ -970,7 +970,7 @@ options.opt_approx_method = costaropts('solver','ode45','n_char',35);
 % NOTE: It is not necessary to set 'solver' since the default value is used. However, it is demonstrated here in order to show ...
 %       the field and a possible value.
 %
-options.opt_cont = costaropts('mu_limit',mu_limit);
+options.opt_cont = costaropts('step_control','off','mu_limit',mu_limit,'pred','parable','direction',1,'step_width',0.1);
 % Mandatory fields: - 'mu_limit':  Sets the limits of the continuation. For this purpose, we defined the "mu_limit" variable.
 % 
 % Finally, we are done defining the required settings. All solution type and approximation method specific fields, which are the ...
@@ -1029,7 +1029,7 @@ options.opt_cont = costaropts('mu_limit',mu_limit);
 %
 % In order to plot the hyper-time surfaces Z_i(theta_1,theta_2,mu) (torus function components), we need to call the "solplot" ...
 % function. Similar to the "costar" function, solplot expects a structure that defines all required options for the plot.
-solplot_options_3 = costaropts('zaxis',@(z) z(:,:,1),'space','hypertime','resolution',50,'index',[5,10]);
+solplot_options_3 = costaropts('zaxis',@(z) z(:,:,1),'space','hypertime','resolution',50,'index',[5,12]);
 % Mandatory fields: - 'zaxis':       Defines what is plotted on the vertical axis. "@(z) z(:,:,1)" plots the first component (i = 1) ...
 %                                    of the torus function against the hyper-time domain [0, 2*pi]^2.
 %                   - 'space':       Specifies the "domain" of the plot. 'hypertime' plots the hyper-time surfaces of the solution.
