@@ -28,13 +28,11 @@ classdef AM_QPS_FDM < ApproxMethod
         % res function_handle                                           % Residual function defined by a solution method (e.g. Shoot)
         % iv
         % error_control = 'off';                                        % Switch for using the error_control feature (default value: off)
-    
     end
 
     %%%%%%%%%%%%%%%%%%%%%%%%%
 
     properties(Access = private)
-    
         p_w_1_mat_J;            % Stores a diagonal sparse matrix containing the weights_1 according to a certain pattern. Needed for the Jacobian matrix
         p_w_2_mat_J;            % Stores a diagonal sparse matrix containing the weights_2 according to a certain pattern. Needed for the Jacobian matrix
         p_ind_blkdiag_mat;      % Stores the indices which are needed to create a block diagonal sparse matrix. This accelerates the calculation of the Jacobian matrix

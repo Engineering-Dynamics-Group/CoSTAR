@@ -1,4 +1,23 @@
 --------------------------------------------
+----------------- v2.8.0.4 -----------------
+--------------------------------------------
+
+Example files adapted to QPS_SHM now also receiving a fourier series
+
+    @Tutorials
+        - Tutorial_QPS_SHM
+            --> for each example fourier coefficients added
+            --> for each example new/additional opt_init for fourier-coeffients added
+            --> for each old opt_init for time integration removed
+            --> multiple changes in comments regarding the afformentioned changes
+            --> multiple changes in comments updateing the method from FDM to SHM due to copying 
+
+        - Example_QPS_SHM 
+            --> for each fourier coefficients added
+            --> for each new/additional opt_init for fourier-coeffients added
+            --> for each old opt_init for time integration removed
+
+--------------------------------------------
 ----------------- v2.8.0.3 -----------------
 --------------------------------------------
 
