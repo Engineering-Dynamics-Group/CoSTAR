@@ -100,13 +100,13 @@ function check_tutorials(varargin)
 
     % Create the display text (has been deleted as well!)
     for i = 1:n_files
-        cprintf('text','%s',filenames{i});
+        fprintf('%s',filenames{i});
         if strcmpi(message{i,2},'passed')
-            cprintf('green',' %s \n','passed');                 % green
+            fprintf(' - %s \n','passed');
         elseif strcmpi(message{i,2},'warning')
-            cprintf('SystemCommands',' %s \n',message{i,1});    % orange
+            fprintf(' - %s \n',message{i,1});
         elseif strcmpi(message{i,2},'error')
-            cprintf('Errors',' %s \n',message{i,1});            % red
+            fprintf(' - %s \n',message{i,1});
         end
     end
 
