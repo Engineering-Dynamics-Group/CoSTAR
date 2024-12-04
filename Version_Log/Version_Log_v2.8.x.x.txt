@@ -186,7 +186,8 @@ New method 'initial_slope' in Continuation, summarizes the code added in v2.8.0.
             --> Line 114 ---- method 'initial_slope' added
         - direction_vector:
             --> Line 11 ----- if argument changed, true only if tangent predictor is chosen or 'use_qr' is true
-            --> Line 16 ----- elseif argument changed, true if local counter  equals 1
+            --> Line 14 ----- added that 'use_qr' is resetted after tangent was used for first step
+            --> Line 17 ----- elseif argument changed, true if local counter  equals 1
         - m_continuation:
             --> Line 40ff --- Block removed and extracted into method 'initial_slope'
             --> Line 42 ----- Call method 'initial_slope'
