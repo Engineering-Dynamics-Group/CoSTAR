@@ -1,81 +1,4 @@
 --------------------------------------------
------------------ v2.8.0.3 -----------------
---------------------------------------------
-
-Test files adapted to QPS_SHM now also receiving a fourier series
-
-    @test
-        - test_SHM_QPS_Duffing
-        - test_SHM_QPS_vdP
-        - test_SHM_QPS_cvdP 
-            --> for each fourier coefficients added
-            --> for each new/additional opt_init for fourier-coeffients added
-            --> for each old opt_init for time integration removed
-
-    @AM_(Q)PS_FDM
-        - getWeights
-            --> Line 155 (273) commented (Blows out RAM)
-            --> Line 156 (274) added Sparse defined before Kronecker-Product
-
---------------------------------------------
------------------ v2.8.0.3 -----------------
---------------------------------------------
-
-QPS_SHM can now be initilized with a first order fourier series. The time integration has been removed.
-
-    @AM_QPS_SHM
-        - Properties:
-            --> tinit, deltat, t0 removed
-            --> c0, c1, s1 added, store values for first order, two dimensional fourier series
-        - getIV:
-            --> Mutiple changes
-                - else loop removed which did the time integration
-            --> Lines 65-127 else loop added which extracted initial values from fourier series
-        - s_QPS_SHM_gatekeeper:
-            --> Multiple changes
-                - optional fields 
-                    o added 'c0', 'c1', 's1'
-                    o removed 'tinit', 'deltat', 't0'
-                - Corresponding checks removed/added
-
---------------------------------------------
------------------ v2.8.0.2 -----------------
---------------------------------------------
-
-New method 'initial_slope' in Continuation, summarizes the code added in v2.8.0.1 m_continuation in method
-
-    @Continuation:
-        - Continuation:
-            --> Line 114 ---- method 'initial_slope' added
-        - direction_vector:
-            --> Line 11 ----- if argument changed, true only if tangent predictor is chosen or 'use_qr' is true
-            --> Line 16 ----- elseif argument changed, true if local counter  equals 1
-        - m_continuation:
-            --> Line 40ff --- Block removed and extracted into method 'initial_slope'
-            --> Line 42 ----- Call method 'initial_slope'
-
---------------------------------------------
------------------ v2.8.0.1 -----------------
---------------------------------------------
-
-Secant predictor now works for the initial solution as well and doesn't use a qr decomposition anymore
-
-    @Continuation:
-        - Continuation:
-            --> Line 86 ---- p_initial_slope ---- stores intial slope in case of secant predictor
-            --> Line 87 ---- p_use_qr ----- logical value set true if calculation of second curve point fails, then use qr decomposition instead
-        - direction_vector:
-            --> Line 10 ----- arguments of if statement changed
-            --> Lines 15-17 added ----- use initial slope if secant predictor is used and in first loop
-        - m_continuation: 
-            --> Lines 41-63 added ---- if loop to calculate second curve point for initial slope
-
-    @test:
-        - test_FDM_PS_harmonic:
-            --> Line 23 ----- option 'cont' set to 'on', resolved error in benchmark_postprocess_periodic
-
-
---------------------------------------------
 ------------------ v2.8.0 ------------------
 --------------------------------------------
 
@@ -229,7 +152,96 @@ Tutorials:
         --> Tutorial_QPS_FDM    --> Tutorial_QPS_FGM    --> Tutorial_QPS_SHM
 
 
-   
+
+--------------------------------------------
+----------------- v2.8.0.1 -----------------
+--------------------------------------------
+
+Secant predictor now works for the initial solution as well and doesn't use a qr decomposition anymore
+
+    @Continuation:
+        - Continuation:
+            --> Line 86 ---- p_initial_slope ---- stores intial slope in case of secant predictor
+            --> Line 87 ---- p_use_qr ----- logical value set true if calculation of second curve point fails, then use qr decomposition instead
+        - direction_vector:
+            --> Line 10 ----- arguments of if statement changed
+            --> Lines 15-17 added ----- use initial slope if secant predictor is used and in first loop
+        - m_continuation: 
+            --> Lines 41-63 added ---- if loop to calculate second curve point for initial slope
+
+    @test:
+        - test_FDM_PS_harmonic:
+            --> Line 23 ----- option 'cont' set to 'on', resolved error in benchmark_postprocess_periodic   
+
+
+
+--------------------------------------------
+----------------- v2.8.0.2 -----------------
+--------------------------------------------
+
+New method 'initial_slope' in Continuation, summarizes the code added in v2.8.0.1 m_continuation in method
+
+    @Continuation:
+        - Continuation:
+            --> Line 114 ---- method 'initial_slope' added
+        - direction_vector:
+            --> Line 11 ----- if argument changed, true only if tangent predictor is chosen or 'use_qr' is true
+            --> Line 14 ----- added that 'use_qr' is resetted after tangent was used for first step
+            --> Line 17 ----- elseif argument changed, true if local counter  equals 1
+        - m_continuation:
+            --> Line 40ff --- Block removed and extracted into method 'initial_slope'
+            --> Line 42 ----- Call method 'initial_slope'
+
+
+
+--------------------------------------------
+----------------- v2.8.0.3 -----------------
+--------------------------------------------
+
+QPS_SHM can now be initilized with a first order fourier series. The time integration has been removed.
+
+    @AM_QPS_SHM
+        - Properties:
+            --> tinit, deltat, t0 removed
+            --> c0, c1, s1 added, store values for first order, two dimensional fourier series
+        - getIV:
+            --> Mutiple changes
+                - else loop removed which did the time integration
+            --> Lines 65-127 else loop added which extracted initial values from fourier series
+        - s_QPS_SHM_gatekeeper:
+            --> Multiple changes
+                - optional fields 
+                    o added 'c0', 'c1', 's1'
+                    o removed 'tinit', 'deltat', 't0'
+                - Corresponding checks removed/added
+
+    @test
+        - test_SHM_QPS_Duffing
+        - test_SHM_QPS_vdP
+        - test_SHM_QPS_cvdP 
+            --> for each fourier coefficients added
+            --> for each new/additional opt_init for fourier-coeffients added
+            --> for each old opt_init for time integration removed
+
+    @AM_(Q)PS_FDM
+        - getWeights
+            --> Line 155 (273) commented (Blows out RAM)
+            --> Line 156 (274) added Sparse defined before Kronecker-Product
+
+    @Tutorials
+        - Tutorial_QPS_SHM
+            --> for each example fourier coefficients added
+            --> for each example new/additional opt_init for fourier-coeffients added
+            --> for each old opt_init for time integration removed
+            --> multiple changes in comments regarding the afformentioned changes
+            --> multiple changes in comments updateing the method from FDM to SHM due to copying 
+        - Example_QPS_SHM 
+            --> for each fourier coefficients added
+            --> for each new/additional opt_init for fourier-coeffients added
+            --> for each old opt_init for time integration removed
+
+
+
 --------------------------------------------
 ------------------ v2.8.1 ------------------
 --------------------------------------------
@@ -355,4 +367,28 @@ test:
         --> License text added from removed License.txt
 
     - license:
+        --> Removed
+
+
+
+--------------------------------------------
+----------------- v2.8.1.1 -----------------
+--------------------------------------------
+
+Main folder:
+
+    - LICENSE file added (Apache 2.0 licence)
+
+    - NOTICE.txt file added
+
+
+test:
+
+    - check_costar:
+        --> cprintf function replaced by fprintf (lines 77, 87, 89 and 93)
+
+    - check_tutorials:
+        --> cprintf function replaced by fprintf (lines 103, 105, 107 and 109)
+    
+    - cprintf:
         --> Removed
