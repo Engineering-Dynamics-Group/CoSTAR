@@ -74,7 +74,7 @@ function check_costar(varargin)
     for ii = 1:size(tmp,2)
 
         script = tmp{1,ii};
-        cprintf('text','%s',script);
+        fprintf('%s',script);
     
         try
             lastwarn(''); %Prepare for checking warning. Clear last warning message
@@ -84,13 +84,13 @@ function check_costar(varargin)
     
             [warnMsg, ~] = lastwarn;
             if ~isempty(warnMsg)
-                cprintf('SystemCommands',' %s \n',append('warning: ',warnMsg));   %orange
+                fprintf(' - %s \n',append('warning: ',warnMsg));
             else
-                cprintf('green',' %s \n','passed'); %green
+                fprintf(' - %s \n','passed');
             end
     
         catch ME
-            cprintf('Errors',' %s \n',append('error: ',ME.message));    %red
+            fprintf(' - %s \n',append('error: ',ME.message));
         end
     
     

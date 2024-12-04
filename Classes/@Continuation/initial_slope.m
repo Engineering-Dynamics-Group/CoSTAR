@@ -5,7 +5,7 @@
 
 function obj = initial_slope(obj,DYN,AM)
 
-newtonOpts = optimoptions('fsolve','Display','iter-detailed','MaxFunEvals',1e5,'FiniteDifferenceType','forward');
+newtonOpts = optimoptions('fsolve','Display','none','MaxFunEvals',1e5,'FiniteDifferenceType','forward');
 y0 = obj.y0;
 de = 1e-4;
 
@@ -22,14 +22,15 @@ end
 [ys,~,secant_flag,~,~] = fsolve(Fcn,y0,newtonOpts);
 obj.p_initial_slope = (ys-y0);
 
-if(secant_flag~=1)
+if (secant_flag < 1) || (secant_flag == 2)
     obj.p_use_qr = true;
-    info_text = 'No second curve point found! Switched to tangent predictor for initial step!';
+    info_text = 'No intermediate curve point found! Using tangent as direction vector for first step.';
 else
-    info_text = 'Second cuve point found!';
+    info_text = 'Intermediate curve point found! Using secant as direction vector.';
 end
 
-disp(info_text); disp(' ');
+disp(info_text);
 write_log(DYN,info_text);
+obj.p_last_msg = sprintf('%s\n',info_text);
 
 end

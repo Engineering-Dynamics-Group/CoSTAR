@@ -165,12 +165,19 @@ non_auto_freq = @(mu) [mu, ratio*mu];
 % These characteristics approximate the sought manifold Z(theta_1,theta_2,mu) if Z(0,theta_2,mu) = Z(2*pi,theta_2,mu) holds. The ...
 % n_char points of the solution Z(theta_1,theta_2,mu) at (theta_1=0,theta_2_i) then form the method solution vector s, which is ...
 % stored in the solution object S.
-% The initial value for fsolve is generated based on a fourier-series of order one.
-% For our Duffing example, we set the matricies of the fourier-series to:
-C1_mat = [  0,     0,   0;                      
-          -0.2, -0.07, 0];
-S1_mat = [-0.1, -0.025, 0;
-            0,     0,   0];
+% The initial value for fsolve is obtained from a fourier-series of order one:
+% Z_FR(theta_1,theta_2) = C0 + C1_1*cos(theta_1) + C1_2*cos(theta_2) + C1_12*cos(theta_1 + theta_2) + ...
+%                            + S1_1*sin(theta_1) + S1_2*sin(theta_2) + S1_12*sin(theta_1 + theta_2)
+% All coefficients can be set by the user. They have to be column vectors of dimension dim and their default value is the zero ...
+% vector. The coefficients are stored in the matrices C1_mat = [C1_1, C1_2, C1_12] and S1_mat = [S1_1, S1_2, S1_12]. It is ...
+% important to note that the better Z_FR matches the first approximate solution Z0, the faster fsolve converges towards Z0. If ...
+% Z_FR is too far away from Z0 and/or the number of characteristics (n_char) is too small, it may happen that fsolve does not ...
+% converge at all! In general, it can be quite challenging to find suitable values for the parameters of the initial value. For ...
+% our Duffing example, we use S1_1 = S1_2 = [0.5; 0] and C1_1 = C1_2 = [0; 0.4] (all other coefficients remain zero), so we set:
+C1_mat = [ 0,   0,  0;          % Since C1_12 = [0; 0], the third column can be omitted.
+          0.4, 0.4, 0];
+S1_mat = [0.5, 0.5, 0;          % Since S1_12 = [0; 0], the third column can be omitted.
+           0,   0,  0];
 
 
 %            1.2.2 The CoSTAR settings              
@@ -256,8 +263,7 @@ options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','shootin
 % type as well as the chosen approximation method. For quasi-periodic solutions using the SHM, there are two possibilities to define ...
 % parameters used to determine the initial value. Overall, there are four optional fields, of which a maximum of three may be used. ...
 % It is not allowed to use 'iv' in combination with the other fields.
-options.opt_init = costaropts('c0',zeros(2,1),'c1_matrix',C1_mat,'s1_matrix',S1_mat);                                                               % Properties for initial solution
-
+options.opt_init = costaropts('c0',zeros(2,1),'c1_matrix',C1_mat,'s1_matrix',S1_mat);
 % Optional fields: - 'c0':         Sets the Fourier series coefficient of the constant term used to create an initial value for fsolve ...
 %                                  to find the first approximate solution Z0. We do not need 'c0' here so we do not specify it.
 %                                  -> Allowed values: [dim x 1] (double) array
@@ -403,16 +409,17 @@ non_auto_freq_kappa = @(mu) [eta_kappa, ratio*eta_kappa];
 param_kappa = {D, kappa0, f1, f2, eta_kappa, ratio};   
 active_parameter_kappa = 2;
 % Instead of time integration, we use the field 'iv' this time in order to directly provide an initial value. For 'iv', we take ...
-% the first solution point of the continuation above, which is the first column of the field 's' of the solution object S. ...
+% the 106th solution point of the continuation above, which is the 106th column of the field 's' of the solution object S ...
+% (we use the 106th solution since we set eta_kappa = 1.5).
 % Furthermore, we change the number of characteristics to 50, so IV is interpolated to adapt to the new number of 'n_char'.
-IV = S.s(:,1);
+IV = S.s(:,106);
 %
 options_kappa.system = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param_kappa,'info','Continuation of Quasi-Periodic Duffing Equation - kappa');
 options_kappa.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','shooting','cont','on','stability','on', ...
                                    'non_auto_freq',non_auto_freq_kappa,'act_param',active_parameter_kappa);
 options_kappa.opt_init = costaropts('iv',IV);                                   % The field 'iv' is used this time
 options_kappa.opt_approx_method = costaropts('solver','ode45','n_char',50);     % We change the number of characteristics to 40
-options_kappa.opt_cont = costaropts('mu_limit',mu_limit_kappa,'step_width',0.05);
+options_kappa.opt_cont = costaropts('mu_limit',mu_limit_kappa);
 %
 [S_kappa,DYN_kappa] = costar(options_kappa); 
 %
@@ -473,7 +480,7 @@ e = 0.25;       Fg = 0.3924;
 % Before we specify the settings needed by CoSTAR, we introduce some important variables, which we will use later on. This is not ...
 % necessarily needed but it helps to keep an overview of the most important variables/settings. Furthermore, important aspects of ...
 % CoSTAR are explained here, making the following section "2.2.2 The CoSTAR settings" clearer.
-mu_limit = [2.1, 2.5];                 % mu_limits = eta_limits = [1.72, 2.5] sets the upper and bottom limit of our continuation.
+mu_limit = [1.72, 2.5];                 % mu_limits = eta_limits = [1.72, 2.5] sets the upper and bottom limit of our continuation.
 %
 eta0 = mu_limit(2);                     % eta0 defines the eta-value at which the continuation begins. We start at the upper limit.
 %
@@ -527,16 +534,25 @@ auto_freq = 1;
 % These characteristics approximate the sought manifold Z(theta_1,theta_2,mu) if Z(0,theta_2,mu) = Z(2*pi,theta_2,mu) holds. The ...
 % n_char points of the solution Z(theta_1,theta_2,mu) at (theta_1=0,theta_2_i) then form the method solution vector s, which is ...
 % stored in the solution object S.
-% The initial value for fsolve is generated based on a fourier-series of order one.
-% For our Laval example, we set the matricies of the fourier-series to:
-C1_mat = [  0,     0,   0;                          
-          -0.2, -0.07, 0;
-          0,      0,  0;
-          0.5, -0.02,  0];
-S1_mat = [-0.1, -0.025, 0;
-            0,     0,   0;
-           -0.05,   0,   0;
-            0,     0,   0];
+% The initial value for fsolve is obtained from a fourier-series of order one:
+% Z_FR(theta_1,theta_2) = C0 + C1_1*cos(theta_1) + C1_2*cos(theta_2) + C1_12*cos(theta_1 + theta_2) + ...
+%                            + S1_1*sin(theta_1) + S1_2*sin(theta_2) + S1_12*sin(theta_1 + theta_2)
+% All coefficients can be set by the user. They have to be column vectors of dimension dim and their default value is the zero ...
+% vector. The coefficients are stored in the matrices C1_mat = [C1_1, C1_2, C1_12] and S1_mat = [S1_1, S1_2, S1_12]. It is ...
+% important to note that the better Z_FR matches the first approximate solution Z0, the faster fsolve converges towards Z0. If ...
+% Z_FR is too far away from Z0 and/or the number of characteristics (n_char) is too small, it may happen that fsolve does not ...
+% converge at all! In general, it can be quite challenging to find suitable values for the parameters of the initial value. For ...
+% our Jeffcott(-Laval) Rotor example, we use (the values look a bit random, but they were determined to ensure fast convergence):
+C0 = [-0.2; -0.2; 0; 0];        % We set C0 like this because we expect a constant shift in the state variables z1 and z2 due to Fg
+C1_mat = [  0,    1.35, 0;      % Since C1_12 = [0; 0; 0; 0], the third column can be omitted.
+          -0.35,   0,   0;
+          -0.95,   0,   0;
+            0,   -1.35, 0];
+S1_mat = [-0.38,   0,   0;      % Since C1_12 = [0; 0; 0; 0], the third column can be omitted.
+            0,   -1.35, 0;  
+            0,   -1.35, 0;
+          0.875,   0,   0];
+
 
 %            2.2.2 The CoSTAR settings              
 %
@@ -623,8 +639,7 @@ options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','shootin
 % type as well as the chosen approximation method. For quasi-periodic solutions using the SHM, there are two possibilities to define ...
 % parameters used to determine the initial value. Overall, there are four optional fields, of which a maximum of three may be used. ...
 % It is not allowed to use 'iv' in combination with the other fields.
-options.opt_init = costaropts('c1_matrix',C1_mat,'s1_matrix',S1_mat);                                                               
-
+options.opt_init = costaropts('c0',C0,'c1_matrix',C1_mat,'s1_matrix',S1_mat);
 % Optional fields: - 'c0':         Sets the Fourier series coefficient of the constant term used to create an initial value for fsolve ...
 %                                  to find the first approximate solution Z0. We do not need 'c0' here so we do not specify it.
 %                                  -> Allowed values: [dim x 1] (double) array
@@ -650,7 +665,7 @@ options.opt_init = costaropts('c1_matrix',C1_mat,'s1_matrix',S1_mat);
 % and execute a continuation, we also have to set the "options.opt_approx_method" as well as the "options.opt_cont" structures. The ...
 % fields of the "options.opt_approx_method" structure depend on the solution type as well as the chosen approximation method. For ...
 % quasi-periodic solutions using the SHM, there are no mandatory fields and two optional fields.
-options.opt_approx_method = costaropts('solver','ode45','n_char',59);
+options.opt_approx_method = costaropts('solver','ode45','n_char',25);
 % Optional fields: - 'solver':  Sets the the MATLAB-proprietary numerical time integration algorithm. Use specialised solvers for ...
 %                               stiff ODEs, e.g. ode15s.
 %                               -> Allowed values: 'ode45', 'ode78', 'ode89', 'ode23', 'ode113', 'ode15s', 'ode23s', 'ode23t', 'ode23tb'
@@ -663,7 +678,7 @@ options.opt_approx_method = costaropts('solver','ode45','n_char',59);
 % NOTE: It is not necessary to set 'solver' since the default value is used. However, it is demonstrated here in order to show ...
 %       the field and a possible value.
 %
-options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.4,'direction',-1);
+options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.25,'direction',-1);
 % Mandatory fields: - 'mu_limit':            Sets the limits of the continuation. For this purpose, we defined the "mu_limit" variable.
 % Optional fields:  - 'step_width':          Defines the initial step width (default: 0.1). The step width will be altered in the ...
 %                                            range of step_width*[0.2, 5].
@@ -728,7 +743,7 @@ options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.4,'direction',-
 %
 % In order to plot the hyper-time surfaces Z_i(theta_1,theta_2,mu) (torus function components), we need to call the "solplot" ...
 % function. Similar to the "costar" function, solplot expects a structure that defines all required options for the plot.
-solplot_options_2 = costaropts('zaxis',@(z) z(:,:,1),'space','hypertime','resolution',30,'index',[5,10]);
+solplot_options_2 = costaropts('zaxis',@(z) z(:,:,1),'space','hypertime','resolution',30,'index',[5,30]);
 % Mandatory fields: - 'zaxis':       Defines what is plotted on the vertical axis. "@(z) z(:,:,1)" plots the first component (i = 1) ...
 %                                    of the torus function against the hyper-time domain [0, 2*pi]^2.
 %                   - 'space':       Specifies the "domain" of the plot. 'hypertime' plots the hyper-time surfaces of the solution.
@@ -796,7 +811,7 @@ alpha = 0.1;    beta = 1.1;
 % Before we specify the settings needed by CoSTAR, we introduce some important variables, which we will use later on. This is not ...
 % necessarily needed but it helps to keep an overview of the most important variables/settings. Furthermore, important aspects of ...
 % CoSTAR are explained here, making the following section "3.2.2 The CoSTAR settings" clearer.
-mu_limit = [0.1, 0.4];                              % mu_limits = epsilon_limits = [0.1, 1.25] sets the limits of our continuation.
+mu_limit = [0.1, 0.5];                              % mu_limits = epsilon_limits = [0.1, 0.5] sets the limits of our continuation.
 %
 epsilon0 = mu_limit(1);                             % epsilon0 defines the epsilon-value at which the continuation begins.
 %
@@ -837,8 +852,15 @@ auto_freq = [1.04,1.49];
 % These characteristics approximate the sought manifold Z(theta_1,theta_2,mu) if Z(0,theta_2,mu) = Z(2*pi,theta_2,mu) holds. The ...
 % n_char points of the solution Z(theta_1,theta_2,mu) at (theta_1=0,theta_2_i) then form the method solution vector s, which is ...
 % stored in the solution object S.
-% The initial value for fsolve is generated based on a fourier-series of order one.
-% For our coupled van-der-Pol example, we set the matricies of the fourier-series to:
+% The initial value for fsolve is obtained from a fourier-series of order one:
+% Z_FR(theta_1,theta_2) = C0 + C1_1*cos(theta_1) + C1_2*cos(theta_2) + C1_12*cos(theta_1 + theta_2) + ...
+%                            + S1_1*sin(theta_1) + S1_2*sin(theta_2) + S1_12*sin(theta_1 + theta_2)
+% All coefficients can be set by the user. They have to be column vectors of dimension dim and their default value is the zero ...
+% vector. The coefficients are stored in the matrices C1_mat = [C1_1, C1_2, C1_12] and S1_mat = [S1_1, S1_2, S1_12]. It is ...
+% important to note that the better Z_FR matches the first approximate solution Z0, the faster fsolve converges towards Z0. If ...
+% Z_FR is too far away from Z0 and/or the number of characteristics (n_char) is too small, it may happen that fsolve does not ...
+% converge at all! In general, it can be quite challenging to find suitable values for the parameters of the initial value. For ...
+% our Coupled van der Pol example, we use:
 C1_mat = [0,   0,   0;                              
           0, -1.4,  0;
           2,   0,   0;
@@ -847,6 +869,7 @@ S1_mat = [2,   0,   0;
           0,  1.4,  0;
           0,   0,   0;
           0,  2.1,  0];
+
 
 %            3.2.2 The CoSTAR settings              
 %
@@ -931,7 +954,6 @@ options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','shootin
 % parameters used to determine the initial value. Overall, there are four optional fields, of which a maximum of three may be used. ...
 % It is not allowed to use 'iv' in combination with the other fields.
 options.opt_init = costaropts('c1_matrix',C1_mat,'s1_matrix',S1_mat);                                                            
-
 % Optional fields: - 'c0':         Sets the Fourier series coefficient of the constant term used to create an initial value for fsolve ...
 %                                  to find the first approximate solution Z0. We do not need 'c0' here so we do not specify it.
 %                                  -> Allowed values: [dim x 1] (double) array
@@ -970,7 +992,7 @@ options.opt_approx_method = costaropts('solver','ode45','n_char',35);
 % NOTE: It is not necessary to set 'solver' since the default value is used. However, it is demonstrated here in order to show ...
 %       the field and a possible value.
 %
-options.opt_cont = costaropts('step_control','off','mu_limit',mu_limit,'pred','parable','direction',1,'step_width',0.1);
+options.opt_cont = costaropts('mu_limit',mu_limit);
 % Mandatory fields: - 'mu_limit':  Sets the limits of the continuation. For this purpose, we defined the "mu_limit" variable.
 % 
 % Finally, we are done defining the required settings. All solution type and approximation method specific fields, which are the ...
@@ -1029,7 +1051,7 @@ options.opt_cont = costaropts('step_control','off','mu_limit',mu_limit,'pred','p
 %
 % In order to plot the hyper-time surfaces Z_i(theta_1,theta_2,mu) (torus function components), we need to call the "solplot" ...
 % function. Similar to the "costar" function, solplot expects a structure that defines all required options for the plot.
-solplot_options_3 = costaropts('zaxis',@(z) z(:,:,1),'space','hypertime','resolution',50,'index',[5,12]);
+solplot_options_3 = costaropts('zaxis',@(z) z(:,:,1),'space','hypertime','resolution',35,'index',[5,10]);
 % Mandatory fields: - 'zaxis':       Defines what is plotted on the vertical axis. "@(z) z(:,:,1)" plots the first component (i = 1) ...
 %                                    of the torus function against the hyper-time domain [0, 2*pi]^2.
 %                   - 'space':       Specifies the "domain" of the plot. 'hypertime' plots the hyper-time surfaces of the solution.

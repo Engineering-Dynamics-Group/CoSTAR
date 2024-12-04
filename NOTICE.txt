@@ -1,0 +1,3 @@
+Copyright 2024 Engineering Dynamics Group (Prof. Dr. Hartmut Hetzler), Institute of Mechanics, University of Kassel
+
+CoSTAR has been developed by Dr. Simon Bäuerle, Alexander Seifert, Julian Vogelei, Dr. Jonas Kappauf

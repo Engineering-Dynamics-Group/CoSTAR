@@ -134,6 +134,7 @@ solplot_options_2 = costaropts('zaxis',@(z) z(:,:,1),'space','hypertime','resolu
 solplot_output_2  = S.solplot(DYN,solplot_options_2);                                                       % Plot hyper-time surfaces Z1(theta1,theta2,mu) at desired index
 
 
+
 %%        Ex. No 3: van der Pol Oscillator         %%
 %              Full Autonomous System               %
 
