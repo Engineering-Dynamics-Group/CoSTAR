@@ -45,8 +45,8 @@ options.system = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','Co
 options.opt_sol = costaropts('sol_type','periodic','approx_method','shooting','cont','on','stability','on', ...     % Properties of the solution
                              'non_auto_freq',non_auto_freq,'act_param',active_parameter);                           % Properties of the solution
 options.opt_init = costaropts('ic',IC);                                                                             % Property for initial solution
-options.opt_approx_method = costaropts('solver','ode45');                                                           % Properties of approximation method
-options.opt_cont = costaropts('mu_limit',mu_limit);                                                                 % Properties for continuation
+options.opt_approx_method = costaropts('solver','ode45','n_shoot',2);                                               % Properties of approximation method
+options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.05);                                               % Properties for continuation
 
 % Continuation
 [S,DYN] = costar(options);                          % CoSTAR is called by costar(options)

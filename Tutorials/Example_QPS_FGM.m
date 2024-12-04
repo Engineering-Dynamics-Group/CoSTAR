@@ -150,7 +150,7 @@ mu_limit = [0.1, 1.25];                             % Limits of continuation
 epsilon0 = mu_limit(1);                             % Value of continuation parameter at start of continuation       
 param = {epsilon0, alpha, beta};                    % Parameter array
 active_parameter = 1;                               % Location of continuation parameter within the array
-auto_freq = [1.04, 1.5];                        % Initial value of the autonomous frequencies
+auto_freq = [1.04, 1.5];                            % Initial value of the autonomous frequencies
 Hmatrix = [0, 1, 0, 3, 0;                           % Matrix of the harmonics to be used (NOTE: This matrix will only lead to a ...
            0, 0, 1, 0, 3];                          % good approximation if the error control is used!).
 C0 = [0; 0; 0; 0];                                  % Fourier coefficient C_0

@@ -32,9 +32,9 @@ end
 % Get the test sizes
 dim = DYN.dim;                                  % To test fcn_handle output array dimension associcated with the state variables
 
-if isfield(fcn_handle_options,'resolution')
-    test_res = fcn_handle_options.resolution;   % To test fcn_handle output array dimension(s) associcated with (hyper)time direction
-elseif strcmpi(DYN.sol_type,'quasiperiodic') && ~isfield(fcn_handle_options,'space')    % This is for the case when contplot is called for a quasi-periodic solution
+% if isfield(fcn_handle_options,'resolution')   % COMMENTED DUE TO BUG: This does not work when resolution is defined as [1x2]-array
+%     test_res = fcn_handle_options.resolution; % To test fcn_handle output array dimension(s) associcated with (hyper)time direction
+if strcmpi(DYN.sol_type,'quasiperiodic') && ~isfield(fcn_handle_options,'space')        % This is for the case when contplot is called for a quasi-periodic solution
     test_res = 50;                              % 50 is default size for quasi-periodic hypertime space
 elseif strcmpi(DYN.sol_type,'quasiperiodic') && isfield(fcn_handle_options,'space') && strcmpi(fcn_handle_options.space,'hypertime')    % This is for the case when solplot is called for a quasi-periodic solution
     test_res = 50;                              % 50 is default size for quasi-periodic hypertime space
