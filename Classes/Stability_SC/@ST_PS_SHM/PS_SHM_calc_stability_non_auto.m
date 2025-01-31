@@ -34,7 +34,7 @@ else                                        % Recompute the solution with shooti
     % Get a starting vector in state space for the shooting method
     x0 = AM.getIC(y,DYN,n_shoot);
     mu = y(end);
-    J = eye(numel(x0));
+    J = eye(numel(x0));                     % Preallocate
 
     try
         [~,~,stability_flag,~,J] = fsolve(@(x)obj.SHM_fun(x,mu,DYN),x0,obj.fsolve_opts);      % Reshoot the solution to get J
@@ -44,11 +44,15 @@ else                                        % Recompute the solution with shooti
 
 end
 
-M0 = eye(dim,dim);
-for k=1:n_shoot
-    M0 = J((k-1)*dim+1:k*dim,(k-1)*dim+1:k*dim)*M0;     % Calculate the monodromy matrix
+% Calculate the monodromy matrix
+if n_shoot == 1
+    M = J(1:dim,1:dim) + eye(dim);
+else
+    M = eye(dim,dim);
+    for k = 1:n_shoot
+        M = J((k-1)*dim+1:k*dim,(k-1)*dim+1:k*dim)*M;
+    end
 end
-M = M0;
 
 [eigenvectors,eigenvalues] = eig(full(M));      % Calculate Floquet multipliers
 [multipliers,vectors] = obj.sort_multipliers(DYN,diag(eigenvalues),eigenvectors);   % Sorting the multipliers according to different criteria
@@ -61,13 +65,3 @@ n_unstable = numel(find(cm>10*eps));            % Number of unstable values -> 1
 [multipliers,vectors,n_unstable] = obj.check_stability_values(multipliers,vectors,n_unstable,stability_flag);   % Checks for NaN or Inf values
 
 end
-
-
-
-
-
-
-
-
-
-

@@ -1,0 +1,44 @@
+--------------------------------------------
+------------------ v3.0.1 ------------------
+--------------------------------------------
+
+Bugfixes:
+    
+    @Continuation:
+        - s_CON_gatekeeper:
+            --> opt_cont.mu_limit now must be a vector of increasing numerical values (xlim(mu_limit) does not work in contplot otherwise) (lines 26 - 30 added)
+
+    @DynamicalSystem:
+        - DynamicalSystem:
+            --> Version number corrected to 3.0 (line 10)
+
+    @SOL_QPS_FDM:
+        - evalsol_hypertime: 
+            --> When dim = 1, the Z coordinates are not transponsed anymore by the permute function (former line 84)
+            --> An exception has been added: no permutation is required when dim = 1 (lines 84 - 88)
+
+    @ST_PS_SHM:
+        - PS_SHM_calc_stability_auto:
+            --> Computation of monodromy matrix corrected: Exception for n_shoot = 1 added (lines 47 - 54)
+        - PS_SHM_calc_stability_non_auto:
+            --> Computation of monodromy matrix corrected: Exception for n_shoot = 1 added (lines 47 - 54)
+        - s_ST_PS_SHM_gatekeeper:
+            --> "opt_approx_method" corrected to "opt_stability" in lines 61 and 61
+
+    Functions:
+        - initial_solution:
+            --> Spaces in "header" of CoSTAR display output adapted to new version number 3.0: two spaces have been added in line 14
+
+    Tutorials:
+        - Info text for new restriction of opt_cont.mu_limit (must be a vector of increasing numerical values) added to following tutorials:
+            --> Tutorial_EQ
+            --> Tutorial_PS_FDM     --> Tutorial_PS_FGM     --> Tutorial_PS_SHM
+            --> Tutorial_QPS_FDM    --> Tutorial_QPS_FGM    --> Tutorial_QPS_SHM
+          
+
+----------  
+
+The presentation has been updated: a slide containing publications has been added as third slide.
+
+
+

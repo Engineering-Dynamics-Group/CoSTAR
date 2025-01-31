@@ -250,6 +250,7 @@ options.opt_approx_method = costaropts('solver','ode45','n_shoot',2);
 %
 options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.05);
 % Mandatory fields: - 'mu_limit':  Sets the limits of the continuation. For this purpose, we defined the "mu_limit" variable.
+%                                  -> Allowed values: [1x2] double array of increasing numerical values
 % Optional fields:  - 'step_width':          Defines the initial step width (default: 0.1). The step width will be altered in the ...
 %                                            range of step_width*[0.2, 5].
 % NOTE: The field belonging to the step control ('step_width') is set to compute the solution curve with a decent resolution. ...
@@ -547,6 +548,7 @@ options.opt_approx_method = costaropts('solver','ode45','n_shoot',2);
 %
 options.opt_cont = costaropts('mu_limit',mu_limit);
 % Mandatory fields: - 'mu_limit':  Sets the limits of the continuation. For this purpose, we defined the "mu_limit" variable.
+%                                  -> Allowed values: [1x2] double array of increasing numerical values
 %
 % Finally, we are done defining the required settings. All solution type and approximation method specific fields, which are the ...
 % fields of "options.opt_init" and "options.opt_approx_method", were explained above. Concerning the rest of the "options" structures ...

@@ -11,7 +11,7 @@ if ~strcmpi(DYN.display,'off')
     disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
     disp('%                                 CoSTAR                                  %')
     disp('%              Continuation of Solution Torus AppRoximations              %')
-    disp(append('%                             Version ',DYN.costar_version,'                               %'))
+    disp(append('%                              Version ',DYN.costar_version,'                                %'))
     disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
     disp(' ')
 end

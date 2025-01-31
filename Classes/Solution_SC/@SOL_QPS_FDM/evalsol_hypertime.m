@@ -81,7 +81,11 @@ function [s,mu,hypertime] = evalsol_hypertime(obj,DYN,options)
 
         % Hand the interpolated state vectors Z_i_eval to the output array s
         % size(s) = [res_1 x res_2 x dim x n_evals], but size(Z_i_eval) = [dim x res_1 x res_2]
-        s(:,:,:,i) = permute(Z_i_eval,[2,3,1]);     % Z_i_eval needs to be permuted so that s has the correct structure
+        if ismatrix(Z_i_eval)                           % Exception for dim = 1: Z_i_eval is a matrix with size(Z_i_eval) = [res_1 x res_2]
+            s(:,:,1,i) = Z_i_eval;                      % Z_i_eval is already good to go and does not have to be permuted
+        else
+            s(:,:,:,i) = permute(Z_i_eval,[2,3,1]);     % Z_i_eval needs to be permuted so that s has the correct structure
+        end
 
     end
 
