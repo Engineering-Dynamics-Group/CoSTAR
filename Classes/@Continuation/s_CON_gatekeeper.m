@@ -23,6 +23,11 @@ function s_CON_gatekeeper(GC,opt_cont)
     %Check the mandatory fields first (these are definitively present)
     %%%%%%%%%%%%%%%%%%%%
     GC.check_data(opt_cont.mu_limit, 'opt_cont.mu_limit', 'double', [1,2], []);
+    GC.speak;
+    if opt_cont.mu_limit(1) >= opt_cont.mu_limit(2)     % Check that mu_limit is a vector of increasing values
+        GC.error_msg{1,end+1} = append('Your provided limits for the continuation parameter mu are opt_cont.mu_limit = [',num2str(opt_cont.mu_limit(1)),', ',num2str(opt_cont.mu_limit(2)),'].');
+        GC.error_msg{1,end+1} = append('However, mu_limit must be a vector of increasing numerical values (mu_limit(2) > mu_limit(1)).');
+    end
 
     %Check the optional fields now 
     %%%%%%%%%%%%%%%%%%%%

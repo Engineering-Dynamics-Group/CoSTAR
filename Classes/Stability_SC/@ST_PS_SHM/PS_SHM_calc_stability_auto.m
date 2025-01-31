@@ -35,19 +35,24 @@ else    % Recompute the solution with shooting algorithm to get the monodromy ma
     x0 = [AM.getIC(y,DYN,n_shoot);y(end-1)];    % Add the autonomous frequency to the state space initial condition.
     mu = y(end);
     J = eye(numel(x0)-1);                       % Preallocate
+
     try
-        [~,~,stability_flag,~,J] = fsolve(@(x) SHM_auto_fun(obj,x,x0,mu,DYN),x0);   % solve corrector-function
+        [~,~,stability_flag,~,J] = fsolve(@(x) SHM_auto_fun(obj,x,x0,mu,DYN),x0);   % Reshoot the solution to get J
     catch
         stability_flag = 0;                     % If shooting did fail for some reasons, flag is set to 0
     end
     
 end
 
-M0 = eye(dim,dim);
-for k=1:n_shoot
-    M0 = J((k-1)*dim+1:k*dim,(k-1)*dim+1:k*dim)*M0;     % Calculate the monodromy matrix
+% Calculate the monodromy matrix
+if n_shoot == 1
+    M = J(1:dim,1:dim) + eye(dim);
+else
+    M = eye(dim,dim);
+    for k = 1:n_shoot
+        M = J((k-1)*dim+1:k*dim,(k-1)*dim+1:k*dim)*M;
+    end
 end
-M = M0;
 
 [eigenvectors,eigenvalues] = eig(full(M));      % Calculate Floquet multipliers
 [multipliers,vectors] = obj.sort_multipliers(DYN,diag(eigenvalues),eigenvectors);   % Sorting the multipliers according to different criteria

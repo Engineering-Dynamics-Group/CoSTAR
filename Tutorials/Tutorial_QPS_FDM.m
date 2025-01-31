@@ -325,6 +325,7 @@ options.opt_approx_method = costaropts('n_int_1',25,'scheme_1','central','approx
 %
 options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.5,'pred','secant');
 % Mandatory fields: - 'mu_limit':    Sets the limits of the continuation. For this purpose, we defined the "mu_limit" variable.
+%                                    -> Allowed values: [1x2] double array of increasing numerical values
 % Optional fields:  - 'step_width':  Defines the initial step width (default: 0.1). The step width will be altered in the range ...
 %                                    of step_width*[0.2, 5]. It is set here in order to reduce the numerical effort. Step control ...
 %                                    is explained in a separate tutorial in detail.
@@ -721,6 +722,7 @@ options.opt_approx_method = costaropts('n_int_1',30,'scheme_1','central','approx
 %
 options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.5,'pred','secant','direction',-1);
 % Mandatory fields: - 'mu_limit':    Sets the limits of the continuation. For this purpose, we defined the "mu_limit" variable.
+%                                    -> Allowed values: [1x2] double array of increasing numerical values
 % Optional fields:  - 'step_width':  Defines the initial step width (default: 0.1). The step width will be altered in the range ...
 %                                    of step_width*[0.2, 5]. It is set here in order to reduce the numerical effort. Step control ...
 %                                    is explained in a separate tutorial in detail.
@@ -1047,7 +1049,8 @@ options.opt_approx_method = costaropts('n_int_1',35,'points_1',[-4,-3,-2,-1,0,1,
 %       example above.
 %
 options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',1.5,'step_control','off','pred','secant');
-% Mandatory fields: - 'mu_limit':  Sets the limits of the continuation. For this purpose, we defined the "mu_limit" variable.
+% Mandatory fields: - 'mu_limit':      Sets the limits of the continuation. For this purpose, we defined the "mu_limit" variable.
+%                                      -> Allowed values: [1x2] double array of increasing numerical values
 % Optional fields:  - 'step_width':    Defines the (initial) step width (default: 0.1). The step width will be altered in the range ...
 %                                      of step_width*[0.2, 5].
 %                   - 'step_control':  Sets the step control method. We do not want to use step control, so we set it to 'off'.

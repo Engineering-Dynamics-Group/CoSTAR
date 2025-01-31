@@ -304,6 +304,7 @@ options.opt_approx_method = costaropts('solver','ode45','n_char',40);
 %
 options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.25,'step_control_param',[2,5]);
 % Mandatory fields: - 'mu_limit':            Sets the limits of the continuation. For this purpose, we defined the "mu_limit" variable.
+%                                            -> Allowed values: [1x2] double array of increasing numerical values
 % Optional fields:  - 'step_width':          Defines the initial step width (default: 0.1). The step width will be altered in the ...
 %                                            range of step_width*[0.2, 5].
 %                   - 'step_control_param':  Sets properties for the step control (default value for step control method 'angle', ...
@@ -680,6 +681,7 @@ options.opt_approx_method = costaropts('solver','ode45','n_char',25);
 %
 options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.25,'direction',-1);
 % Mandatory fields: - 'mu_limit':            Sets the limits of the continuation. For this purpose, we defined the "mu_limit" variable.
+%                                            -> Allowed values: [1x2] double array of increasing numerical values
 % Optional fields:  - 'step_width':          Defines the initial step width (default: 0.1). The step width will be altered in the ...
 %                                            range of step_width*[0.2, 5].
 %                   - 'direction':           We start the continuation at the upper limit of mu, so we need to decrease mu during ...
@@ -994,6 +996,7 @@ options.opt_approx_method = costaropts('solver','ode45','n_char',35);
 %
 options.opt_cont = costaropts('mu_limit',mu_limit);
 % Mandatory fields: - 'mu_limit':  Sets the limits of the continuation. For this purpose, we defined the "mu_limit" variable.
+%                                  -> Allowed values: [1x2] double array of increasing numerical values
 % 
 % Finally, we are done defining the required settings. All solution type and approximation method specific fields, which are the ...
 % fields of "options.opt_init" and "options.opt_approx_method", were explained above. Concerning the rest of the "options" structures ...
