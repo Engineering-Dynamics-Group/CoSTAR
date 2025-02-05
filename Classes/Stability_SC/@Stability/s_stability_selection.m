@@ -22,15 +22,9 @@ function ST = s_stability_selection(DYN,AM)
 
 
         %%%%%%%%%%% SHOOTING %%%%%%%%%%%
-        ST = ST_PS_SHM(DYN);                    % Stability computation of periodic solutions via SHM (possible for FDM and FGM as well!)
-
-        if(DYN.n_auto==0)
-            ST.calc_stability = @(y,J) ST.PS_SHM_calc_stability_non_auto(y,J,DYN,AM);   % Stability function for non-autonomous single shooting
-        elseif(DYN.n_auto==1)
-            ST.calc_stability = @(y,J) ST.PS_SHM_calc_stability_auto(y,J,DYN,AM);       % Stability function for autonomous single shooting
-        end
-     
-        ST.test_functions = @(multipliers) ST.PS_test_functions(multipliers,DYN);
+        ST = ST_PS_SHM(DYN);                                                        % Stability computation of periodic solutions via SHM (possible for FDM and FGM as well!)
+        ST.calc_stability = @(y,J) ST.PS_SHM_calc_stability(y,J,DYN,AM);            % Stability function
+        ST.test_functions = @(multipliers) ST.PS_test_functions(multipliers,DYN);   % Method to evaluate the test functions
 
 
         %%%%%%%%%%%%% HILL %%%%%%%%%%%%% - to be implemented

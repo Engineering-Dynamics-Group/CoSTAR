@@ -28,6 +28,8 @@ Bugfixes:
     Functions:
         - initial_solution:
             --> Spaces in "header" of CoSTAR display output adapted to new version number 3.0: two spaces have been added in line 14
+        - write_log:
+            --> Spaces in "header" of CoSTAR log adapted to new version number 3.0: two spaces have been added in line 72
 
     Tutorials:
         - Info text for new restriction of opt_cont.mu_limit (must be a vector of increasing numerical values) added to following tutorials:
@@ -42,3 +44,109 @@ The presentation has been updated: a slide containing publications has been adde
 
 
 
+--------------------------------------------
+------------------ v3.0.2 ------------------
+--------------------------------------------
+
+Calculation of Jacobian added to periodic shooting method.
+
+    @Continuation:
+        - bifurcation_stability:
+            --> if condition in line 40 changed, only 'shooting' is required now
+            --> DynamicalSystem object DYN removed from input argument of AM.fun_Jac_wrapper (line 42)
+        - initial_slope:
+            --> if condition in line 12 changed, only 'shooting' is required now
+            --> DynamicalSystem object DYN removed from input argument of AM.fun_Jac_wrapper_init (line 13)
+        - m_continuation:
+            --> if condition in line 78 changed, only 'shooting' is required now
+            --> DynamicalSystem object DYN removed from input argument of AM.fun_Jac_wrapper (line 82)
+            --> Tolerance for checkGradients function adapted to 1e-5 (line 125)
+
+    @AM_PS_FDM:
+        - getIC:
+            --> Method overall slightly improved. Some variables renamed and time vector for evaluation adapted
+
+    @AM_PS_FGM:
+        - getIC:
+            --> Method overall slightly improved. Some variables renamed and time vector for evaluation adapted
+
+    @AM_PS_SHM:
+        - AM_PS_SHM:
+            --> Property y_old added (line 11)
+            --> DynamicalSystem object DYN added to input arguments of method IF_up_res_data (line 39)
+            --> Methods SHM_fun and SHM_auto_fun removed (former lines 41 and 42)
+            --> Methods PS_SHM_residuum, fun_Jac_wrapper and fun_Jac_wrapper_init added (lines 43 - 45)
+        - fun_Jac_wrapper:
+            --> Completely added. This function builds the complete Jacobian including the subspace constraint 
+        - fun_Jac_wrapper_init:
+            --> Completely added. This function builds the complete Jacobian including the subspace constraint 
+        - IF_up_res_data:
+            --> DynamicalSystem object DYN added to input arguments to fit the existing calls in m_continuation and bifurcation_stability (line 4)
+        - PS_SHM_residuum:
+            --> Completely added. This residuum function units the code from SHM_auto_fun and SHM_fun and calculates the Jacobian
+        - SHM_auto_fun:
+            --> Removed. Replaced by PS_SHM_residuum
+        - SHM_fun:
+            --> Removed. Replaced by PS_SHM_residuum
+
+    @AM_QPS_SHM:
+        - AM_QPS_SHM:
+            --> DynamicalSystem object DYN removed from input arguments of methods fun_Jac_wrapper and fun_Jac_wrapper_init (lines 70 and 71)
+        - fun_Jac_wrapper:
+            --> DynamicalSystem object DYN completely removed from the method (lines 19, 23, 29 and 30)
+        - fun_Jac_wrapper_init:
+            --> DynamicalSystem object DYN completely removed from the method (lines 18, 22 and 28)
+
+    @ApproxMethod:
+        - s_method_selection:
+            --> if conditions for periodic shooting removed (former lines 18 - 22) and residuum method updated to PS_SHM_residuum (line 18)
+            --> @(y,DYN) changed to @(y) for quasiperiodic shooting (lines 43, 45 and 47)
+
+    @ST_PS_SHM:
+        - PS_SHM_calc_stability:
+            --> Completely added. This residuum function units the code from PS_SHM_calc_stability_auto and PS_SHM_calc_stability_non_auto
+        - PS_SHM_calc_stability_auto:
+            --> Removed. Replaced by PS_SHM_calc_stability
+        - PS_SHM_calc_stability_non_auto:
+            --> Removed. Replaced by PS_SHM_calc_stability
+        - PS_SHM_ST_residuum:
+            --> Completely added. This residuum function units the code from SHM_auto_fun and SHM_fun and calculates the Jacobian
+        - SHM_auto_fun:
+            --> Removed. Replaced by PS_SHM_ST_residuum
+        - SHM_fun:
+            --> Removed. Replaced by PS_SHM_ST_residuum
+        - ST_PS_SHM:
+            --> fsolve options adapted. 'MaxFunctionEvaluations' removed and 'SpecifyObjectiveGradient' with value true added (line 13)
+            --> Methods PS_SHM_calc_stability_auto, PS_SHM_calc_stability_non_auto, SHM_fun and SHM_auto_fun removed (former lines 42 and 46)
+            --> Methods PS_SHM_calc_stability and PS_SHM_ST_residuum added (lines 42 and 43)
+
+    @Stability:
+        - s_stability_selection:
+            --> if conditions for periodic shooting removed (former lines 27 - 31) and stability method updated to PS_SHM_calc_stability (line 26)
+        
+    Functions:
+        - initial_solution:
+            --> if condition in line 24 changed, only 'shooting' is required now
+            --> DynamicalSystem object DYN removed from input argument of AM.fun_Jac_wrapper_init (line 25)
+            --> Tolerance for checkGradients function adapted to 1e-5 (line 53)
+
+    test:
+        - test_FDM_PS_vdP:
+            --> Stability computation enabled (line 22)
+        - test_SHM_PS_duffing:
+            --> Parameters and mu_limit changed, they are now identical to FDM and FDM test files (lines 8, 9 and 13)
+            --> Single solution: stability computation disabled (line 23)
+            --> Continuation: step control settings adapted (line 40)
+            --> Commented code for some postprocessing replaced by code (commented) to compare Floquet multipliers (lines 49 - 81)
+        - test_SHM_PS_vdP:
+            --> Parameters and options changed. Instable limit cycle is now computed (lines 9, 12, 19, 21, 35 and 36)
+            --> Commented code for some postprocessing replaced by code (commented) to compare Floquet multipliers (lines 44 - 66)
+          
+
+----------  
+
+Bugfixes:
+
+    @AM_PS_SHM:
+        - getIV:
+            --> Method overall improved and wrong code lines regarding the param array and continuation parameter removed

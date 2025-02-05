@@ -67,8 +67,8 @@ classdef AM_QPS_SHM < ApproxMethod
         [f,J] = qp_SHM_mixed_fun(obj,y,DYN);                              % Residual for mixed case for quasi-periodic shooting algorithm
         [f,J] = qp_SHM_auto_fun(obj,y,DYN);                               % Residual for full-autonomous case for quasi-periodic shooting algorithm
 
-        [f,J] = fun_Jac_wrapper(obj,y,DYN,CONT);                            %Function wrapper for fsolve to evaluate jacobian "analytically"
-        [f,J] = fun_Jac_wrapper_init(obj,y,y0,DYN);                         %Function wrapper_init for fsolve to evaluate jacobian "analytically" for initial solution
+        [f,J] = fun_Jac_wrapper(obj,y,CONT);                                % Function wrapper for fsolve to evaluate jacobian "analytically"
+        [f,J] = fun_Jac_wrapper_init(obj,y,y0);                             % Function wrapper_init for fsolve to evaluate jacobian "analytically" for initial solution
 
         f = FcnWrapperODE2(obj,t,z,Fcn,PHI);                                %Function wrapper for ode-solver                             
         f = FcnWrapperODE5(obj,t,z,Fcn,PHI);                                %Function wrapper for ode-solver  
