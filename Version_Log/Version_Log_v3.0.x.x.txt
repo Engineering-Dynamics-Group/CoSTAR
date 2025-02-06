@@ -150,3 +150,9 @@ Bugfixes:
     @AM_PS_SHM:
         - getIV:
             --> Method overall improved and wrong code lines regarding the param array and continuation parameter removed
+
+    @SOL_PS_SHM:
+        - evalsol_hypertime:
+            --> Complete overhaul of method in order to work reliable for instable solutions by taking the multiple shooting solutions into account 
+            --> Former single time integration (+ starting integration) replaced by n_shoot time integrations to get the solution data for one period
+            --> The solution data is then obtained by evaluating the spline on the interval [0,T)

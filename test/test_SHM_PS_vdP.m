@@ -6,7 +6,7 @@
 
 %% Parameters
 IC = [2;0];                                     % Initial condition for starting solution
-mu_limit = [-2,-0.1];                             % Limits of continuation diagram
+mu_limit = [-2,-0.1];                           % Limits of continuation diagram
 auto_freq = 1;                                  % Start value for autonomous frequency
 
 param = {mu_limit(2)};                          % Parameter vector, all constant parameters are set here, the bifurcation parameter gets its starting value (here the left corner of bifurcation diagram)
