@@ -9,8 +9,8 @@ newtonOpts = optimoptions('fsolve','Display','none','MaxFunEvals',1e5,'FiniteDif
 y0 = obj.y0;
 de = 1e-4;
 
-if(strcmpi(DYN.sol_type,'quasiperiodic')&&strcmpi(DYN.approx_method,'shooting'))
-    Fcn = @(y)AM.fun_Jac_wrapper_init(y,y0(end)+obj.direction.*de,DYN);                        % Function wrapper for initial solution, if Jacobian is supplied
+if strcmpi(DYN.approx_method,'shooting')
+    Fcn = @(y) AM.fun_Jac_wrapper_init(y,y0(end)+obj.direction.*de);    % Function wrapper for initial solution, if Jacobian is supplied
     newtonOpts.SpecifyObjectiveGradient = true;
 elseif strcmpi(DYN.approx_method,'finite-difference')                   % Special corrector function due to specification of Jacobian matrix
     newtonOpts.SpecifyObjectiveGradient = true;                         % newtonOpts.CheckGradients = true; can be used to automatically check the Jacobian matrix -> Since R2023b: checkGradients is recommended

@@ -15,11 +15,7 @@ elseif(strcmpi(DYN.sol_type,'periodic'))
     
     if(strcmpi(DYN.approx_method,'shooting'))
         AM = AM_PS_SHM(DYN);
-        if(DYN.n_auto==0)
-                AM.res = @(y) AM.SHM_fun(y,DYN);                        % Residual for non-autonomous single shooting
-        elseif(DYN.n_auto==1)
-                AM.res = @(y) AM.SHM_auto_fun(y,DYN);                   % Residual for autonomous single shooting
-        end
+        AM.res = @(y) AM.PS_SHM_residuum(y,DYN);                        % Residual function
     end
 
     if(strcmpi(DYN.approx_method,'fourier-galerkin'))
@@ -44,11 +40,11 @@ elseif(strcmpi(DYN.sol_type,'quasiperiodic'))
     if(strcmpi(DYN.approx_method,'shooting'))
         AM = AM_QPS_SHM(DYN);
         if(DYN.n_auto==0)                                                   
-            AM.res = @(y,DYN) AM.qp_SHM_non_auto_fun(y,DYN);            % Residual for non-autonomous case
+            AM.res = @(y) AM.qp_SHM_non_auto_fun(y,DYN);                % Residual for non-autonomous case
         elseif(DYN.n_auto==1)                                               
-            AM.res = @(y,DYN) AM.qp_SHM_mixed_fun(y,DYN);               % Residual for mixed case
+            AM.res = @(y) AM.qp_SHM_mixed_fun(y,DYN);                   % Residual for mixed case
         elseif(DYN.n_auto==2)                                               
-            AM.res = @(y,DYN) AM.qp_SHM_auto_fun(y,DYN);                % Residual for full autonomous case
+            AM.res = @(y) AM.qp_SHM_auto_fun(y,DYN);                    % Residual for full autonomous case
         end
     end
 

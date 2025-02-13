@@ -37,9 +37,9 @@ function obj = bifurcation_stability(obj,DYN,AM,S,ST)
                         obj.yp = ST.approx_posc(DYN);                   % Function approximates the point of stability change based on the curve_container; output needs to be assigned to yp for the up_res_data method to work
         
                         % Correct
-                        if(strcmpi(DYN.sol_type,'quasiperiodic')&&strcmpi(DYN.approx_method,'shooting'))
+                        if strcmpi(DYN.approx_method,'shooting')
                             AM.IF_up_res_data(obj,DYN);
-                            Fcn = @(y)AM.fun_Jac_wrapper(y,DYN,obj);                % Set functionwrapper to provide Jacobian
+                            Fcn = @(y) AM.fun_Jac_wrapper(y,obj);       % Set function wrapper to provide Jacobian
                             obj.fsolve_opts.SpecifyObjectiveGradient = true;
                         elseif strcmpi(DYN.approx_method,'finite-difference')
                             AM.IF_up_res_data(obj);

@@ -11,7 +11,7 @@ if ~strcmpi(DYN.display,'off')
     disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
     disp('%                                 CoSTAR                                  %')
     disp('%              Continuation of Solution Torus AppRoximations              %')
-    disp(append('%                              Version ',DYN.costar_version,'                                %'))
+    disp(append('%                             Version ',DYN.costar_version,'                               %'))
     disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
     disp(' ')
 end
@@ -21,9 +21,9 @@ end
 newtonOpts = optimoptions('fsolve','Display','iter-detailed','MaxFunEvals',1e5,'FiniteDifferenceType','forward');
 y0 = [AM.iv;DYN.param{DYN.act_param}];
 
-if(strcmpi(DYN.sol_type,'quasiperiodic')&&strcmpi(DYN.approx_method,'shooting'))
-    Fcn = @(y)AM.fun_Jac_wrapper_init(y,y0,DYN);                        % Function wrapper for initial solution, if Jacobian is supplied
-    newtonOpts.SpecifyObjectiveGradient = true;
+if strcmpi(DYN.approx_method,'shooting')
+    Fcn = @(y) AM.fun_Jac_wrapper_init(y,y0);                           % Function wrapper for initial solution, if Jacobian is supplied
+    newtonOpts.SpecifyObjectiveGradient = true;                         % newtonOpts.CheckGradients = true; can be used to automatically check the Jacobian matrix -> Since R2023b: checkGradients is recommended
 
 elseif strcmpi(DYN.approx_method,'finite-difference')                   % Special corrector function due to specification of Jacobian matrix
     newtonOpts.SpecifyObjectiveGradient = true;                         % newtonOpts.CheckGradients = true; can be used to automatically check the Jacobian matrix -> Since R2023b: checkGradients is recommended
@@ -50,7 +50,7 @@ else
     [y,~,newton_flag,~,J] = fsolve(Fcn,y0,newtonOpts);
     write_log(DYN,'diary_off')                                          % Stop recording of command window for log file
 end
-% checkGradients_opts = optimoptions('fsolve',FiniteDifferenceType='forward'); checkGradients(Fcn,y,checkGradients_opts,Display='on',Tolerance=1e-6);   %FDM: Check the Jacobian matrix
+% checkGradients_opts = optimoptions('fsolve',FiniteDifferenceType='forward'); checkGradients(Fcn,y,checkGradients_opts,Display='on',Tolerance=1e-5);   % Check the user-defined Jacobian matrix
 
 % No initial solution found or solution found but Jacobian can be undefined
 if (newton_flag < 1) || (newton_flag == 2)
