@@ -8,7 +8,7 @@
 function help_struct = s_help_opt_init_EQ()
 
 
-    help_struct.info = 'opt_init --- equilibrium';
+    help_struct.info = 'opt_init --- equilibrium solution';
 
    
     help_struct.mandatory.ic.value            = '[dim x 1] array \n  e.g., [0;1] ';

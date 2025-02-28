@@ -267,9 +267,9 @@ is already used as approximation method) and the number of mappings to calculate
             --> Overhaul of constructor: 
                     * Resetting of default value of 'solver' moved to lines 32 - 38
                     * Resetting of default value of n_char_st added (lines 40 - 45)
-                    * Added selection of correct residuum function (lines 50 - 57)
-                    * Added creation of object of AM_QPS_SHM if solution needs to be reshooted (lines 59 - 69)
+                    * Add
             --> Methods qp_SHM_ST_auto_fun, qp_SHM_ST_mixed_fun and qp_SHM_ST_non_auto_fun added (lines 73 - 77)
+
 
     @Stability:
         - check_stability_values:

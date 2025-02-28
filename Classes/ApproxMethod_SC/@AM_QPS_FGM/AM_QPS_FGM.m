@@ -144,6 +144,7 @@ classdef AM_QPS_FGM < ApproxMethod
         %% Functions for residuum and computation
         res = QPS_FGM_residuum(obj,y,DYN);
         obj = getIV(obj,DYN);  
+        IC = getIC(obj,y,DYN,n_char_st);
     end
 
         methods(Access = private)

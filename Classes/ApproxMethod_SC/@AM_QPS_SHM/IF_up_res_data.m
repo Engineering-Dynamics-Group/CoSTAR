@@ -9,9 +9,16 @@
 %
 % @obj:  ApproximationMethod object
 %
-function obj = IF_up_res_data(obj,CON,DYN)
+function obj = IF_up_res_data(obj,var1,DYN)
 
-obj.iv = CON.yp(1:(end-1));                                                         % update the current initial condition. Used for the poincare phase condition.
+if isa(var1,'Continuation')                                                         % If var1 is an object of Continuation
+    obj.iv = var1.yp(1:(end-1));                                                    % Set iv to predictor point
+    y_old  = var1.p_y0_old{end};                                                    % Get last curve point
+elseif isa(var1,'double')                                                           % var1 should be a solution vector (type double) in all other cases
+    obj.iv = var1;                                                                  % Set iv to given solution vector y0
+    y_old  = var1;                                                                  % Use given solution
+end
+
 
 %% If autonomous frequency present
 % Calculate reference solution and evaluate the derivative of the reference
@@ -20,13 +27,12 @@ if(DYN.n_auto==1)
     dim = DYN.dim;                                                                  % Get dimension of state-space
     n_char = obj.n_char;                                                            % Get number of charecteristics
     reso = obj.reso_phase;                                                          % Get resolution for time-integration
-    p_y0_old = CON.p_y0_old{end};                                                   % Get last curve point
     
     param = DYN.param;                                                              % Set parameter vector
-    param{DYN.act_param} = p_y0_old(end,1);                                         % Set active parameter
+    param{DYN.act_param} = y_old(end,1);                                            % Set active parameter
     Xchar = linspace(0,2*pi*(1-1/(n_char+1)),n_char);                               % Define interval for gradient
-    IV = reshape(p_y0_old(1:end-2,1),[dim,n_char]);                                 % Fetch initial conditions
-    Omega = [DYN.non_auto_freq(p_y0_old(end,1)),p_y0_old(end-1,1)];                 % Set Omega according to autonomous frequency and bifurcation parameter
+    IV = reshape(y_old(1:end-2,1),[dim,n_char]);                                    % Fetch initial conditions
+    Omega = [DYN.non_auto_freq(y_old(end,1)),y_old(end-1,1)];                       % Set Omega according to autonomous frequency and bifurcation parameter
     T_char = linspace(0,2*pi/Omega(1,1),reso);                                      % Integration time for characteristics
     F1 = zeros(reso,n_char,dim);                                                    % Initialize matrix for time solution
         
@@ -49,13 +55,12 @@ elseif(DYN.n_auto==2)
     dim = DYN.dim;                                                                  % Get dimension of state-space
     n_char = obj.n_char;                                                            % Get number of charecteristics                         
     reso = obj.reso_phase;                                                          % Get resolution for time-integration
-    p_y0_old = CON.p_y0_old{end};                                                   % Get last curve point
     
     param = DYN.param;                                                              % Set parameter vector
-    param{DYN.act_param} = p_y0_old(end,1);                                         % Set active parameter
+    param{DYN.act_param} = y_old(end,1);                                            % Set active parameter
     Xchar = linspace(0,2*pi*(1-1/(n_char+1)),n_char);                               % Define interval for gradient
-    IV = reshape(p_y0_old(1:end-3,1),[dim,n_char]);                                 % Fetch initial conditions
-    Omega = [p_y0_old(end-2,1),p_y0_old(end-1,1)];                                  % Set Omega according to autonomous frequency and bifurcation parameter
+    IV = reshape(y_old(1:end-3,1),[dim,n_char]);                                    % Fetch initial conditions
+    Omega = [y_old(end-2,1),y_old(end-1,1)];                                        % Set Omega according to autonomous frequency and bifurcation parameter
     T_char = linspace(0,2*pi/Omega(1,1),reso);                                      % Integration time for characteristics
     F1 = zeros(reso,n_char,dim);                                                    % Initialize matrix for time solution
     F2 = zeros(reso,n_char,dim);                                                    % Initialize matrix for time solution

@@ -27,7 +27,7 @@ classdef SOL_QPS_SHM < Solution
             obj.y0                     = y1;
             obj.s(:,1)                 = y1(1:(end-1-DYN.n_auto),1);                        % Set only the solutions points not the autonous frequencies and bifurcation parameter
             obj.mu(1,1)                = y1(end,1);                                         % Bifurcation parameter
-            obj.J(:,:,1)               = J1;                                                % Jacobian
+            obj.J{1,1}                 = sparse(J1);                                        % Jacobian
             obj.dy(:,1)                = NaN(size(J1,1),1);                                 % Initialised. Gets correctly filled by IF_arch_data
             obj.newton_flag(1,1)       = newton_flag;                                       % Exitflag of fsolve
             obj.arclength(1,1)         = 0;                                                 % Set arclength of first curve point to zero
@@ -55,7 +55,7 @@ classdef SOL_QPS_SHM < Solution
             
             obj.s(:,end+1)          = CON.p_y1(1:(end-1-DYN.n_auto),1);                     % solution method vector
             obj.mu(1,end+1)         = CON.p_y1(end,1);                                      % continuation parameter
-            obj.J(:,:,end+1)        = CON.p_J1;                                             % Jacobian matrix
+            obj.J{1,end+1}          = sparse(CON.p_J1);                                     % Jacobian matrix
             obj.dy(:,end:end+1)     = [CON.dy0, NaN(size(CON.dy0))];                        % Direction vector of the predictor
             obj.newton_flag(1,end+1)= CON.p_newton_flag;                                    % Exitflag of fsolve
             obj.step_width(1,end+1) = CON.step_width;                                       % Current step width
@@ -81,9 +81,9 @@ classdef SOL_QPS_SHM < Solution
 
             obj.s(:,end+1)          = CON.p_y_bfp(1:(end-1-DYN.n_auto),1);                      %approximation method vector
             obj.mu(1,end+1)         = CON.p_y_bfp(end,1);                                       %continuation parameter
-            obj.J(:,:,end+1)        = CON.p_J_bfp;                                              %Jacobian matrix
+            obj.J{1,end+1}          = sparse(CON.p_J_bfp);                                      %Jacobian matrix
             obj.dy(:,end:end+1)     = [NaN(size(CON.dy0)), NaN(size(CON.dy0))];                 %Direction vector of the predictor
-            obj.newton_flag(1,end+1)= NaN;                                                      %Exit-flag is unknown as it is not saved as a Stability class property
+            obj.newton_flag(1,end+1)= CON.p_newton_flag_bfp;                                    %Exit-flag of corrector (fsolve);                                                      %Exit-flag is unknown as it is not saved as a Stability class property
             obj.step_width(1,end+1) = CON.step_width;
             obj.arclength(1,end+1)  = CON.p_arclength_bfp;
 
@@ -95,8 +95,8 @@ classdef SOL_QPS_SHM < Solution
                 obj.freq(:,end+1) = [CON.p_y1(end-2,1);CON.p_y1(end-1,1)];                  % Full-autonomous case both autonomous frequency by solution vector
             end 
 
-            obj.multipliers(:,end+1)    = CON.p_multipliers_bfp;                    %
-            obj.vectors(:,:,end+1)      = CON.p_vectors_bfp;                        %
+            obj.multipliers(:,end+1)    = CON.p_multipliers_bfp;                    % Ljapunov exponents
+            obj.vectors(:,:,end+1)      = CON.p_vectors_bfp;                        % There are no vectors related to Ljapunov exponents, so this is empty
             obj.n_unstable(1,end+1)     = obj.n_unstable(1,end);                    % Indiacting number of unstable multipliers. Definition: The number in the point is equal to the number before the bfp 
             obj.stability_flag(1,end+1) = CON.p_stability_flag;                     % Exitflag of stability computation
 

@@ -20,9 +20,9 @@ Ik = [0,2.*pi./Omega(1,index(1,1))];                                            
 Theta = mod(phi(index(1,2),:) + Ik(2)*Omega(1,index(1,2)),2*pi);                            % Calculate end values of characteristics and map back to 0,2pi square
 [B0(1,:),I0(1,:)] = sort(Theta);                                                            % Sort remapped values in ascending order
 
-Z0 = reshape(y(1:dim*n_char),2,[]);
+Z0 = reshape(y(1:dim*n_char),dim,n_char);
 dx = sqrt(eps)*(1 + max(abs(y(1:end-1,1)),[],1));                                           % Calculate differential to calculate Jacobian
-INIT = repmat(reshape(Z0,[dim,n_char]),[1,1,dim+1]);                                        % Set initial values
+INIT = repmat(Z0,[1,1,dim+1]);                                                              % Set initial values
 for kk = 1:dim
     INIT(kk,:,kk+1) = Z0(kk,:) + dx;                                                        % Set initial values of perturbated characteristics
 end

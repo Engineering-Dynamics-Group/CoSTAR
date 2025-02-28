@@ -42,7 +42,7 @@ else    % Recompute the solution with shooting algorithm to get the monodromy ma
         x0 = [x0; y(end-1)];                    % Add the autonomous frequency if system is autonomous
     end
     
-    J = eye(dim*n_shoot);                       % Preallocate Jacobian
+    J = eye(dim*n_shoot+n_auto);                % Preallocate Jacobian
     try
         [~,~,stability_flag,~,J] = fsolve(@(x) PS_SHM_ST_residuum(obj,x,x0,mu,DYN), x0, obj.fsolve_opts);   % Reshoot the solution to get J
     catch

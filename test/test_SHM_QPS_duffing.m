@@ -35,12 +35,12 @@ load('workspace_test_SHM_QPS_duffing.mat')              %Contains s0 of difficul
 
 %% Properties
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);                                               %Properties of the system
-options.opt_sol  = costaropts('stability','on','cont','on','non_auto_freq',non_auto_freq,'sol_type','quasiperiodic','approx_method','shooting','act_param',active_parameter); %Properties of the solution
+options.opt_sol  = costaropts('stability','on','cont','on','non_auto_freq',non_auto_freq,'sol_type','quasiperiodic','approx_method','shooting','act_param',active_parameter,'display','iter-detailed'); %Properties of the solution
 options.opt_cont = costaropts('step_control','angle','pred','cubic','subspace','pseudo-arc','mu_limit',mu_limit);       %Properties for continuation
-options.opt_approx_method = costaropts('solver','ode45','n_char',30);                                                   %Properties for the approximation method
+options.opt_approx_method = costaropts('solver','ode45','n_char',50);                                                   %Properties for the approximation method
 options.opt_init = costaropts('iv',s_easy_mu_2);                                                                        %Properties for initial value
 % options.opt_init = costaropts('c1_matrix',C1_mat,'s1_matrix',S1_mat);
-options.opt_stability = costaropts('iterate_bfp','on');                                                                 %Properties for stability
+options.opt_stability = costaropts('iterate_bfp','on','n_char_st',75,'n_map',1e3);                                      %Properties for stability
 
 options.opt_cont.step_width = 0.25;                     %Initial step width    
 options.opt_cont.step_control_param = [2, 5];           %Step control parameters

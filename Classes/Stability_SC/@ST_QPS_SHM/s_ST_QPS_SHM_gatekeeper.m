@@ -13,8 +13,8 @@ function s_ST_QPS_SHM_gatekeeper(GC,system,opt_sol,opt_stability)
 
     % Check if all mandatory fields are given and check if all given fields are allowed
     %%%%%%%%%%%%%%%%%%%%
-    opt_stability_mandatory_fieldnames  = {};                                                           % Mandatory fildsnames in the opt_stability structure
-    opt_stability_allowed_fieldnames    = {'abstol_multiplier','max_iter','iterate_bfp','solver'};      % Allowed fieldsnames in the opt_stability structure
+    opt_stability_mandatory_fieldnames  = {};                                                                           % Mandatory fildsnames in the opt_stability structure
+    opt_stability_allowed_fieldnames    = {'abstol_multiplier','max_iter','iterate_bfp','solver','n_char_st','n_map'};  % Allowed fieldsnames in the opt_stability structure
     
     GC.check_fields(opt_stability,'opt_stability',opt_stability_mandatory_fieldnames,opt_stability_allowed_fieldnames);
     
@@ -27,10 +27,9 @@ function s_ST_QPS_SHM_gatekeeper(GC,system,opt_sol,opt_stability)
 
     % Check the optional fields now 
     %%%%%%%%%%%%%%%%%%%%
-    if isfield(opt_stability,'abstol_multiplier');  GC.check_data(opt_stability.abstol_multiplier,  'opt_stability.abstol_multiplier',  'double',   'scalar',   'positive'); end
-    if isfield(opt_stability,'max_iter');           GC.check_data(opt_stability.max_iter,           'opt_stability.max_iter',           'double',   'scalar',   'positive'); end
+    if isfield(opt_stability,'abstol_multiplier');  GC.check_data(opt_stability.abstol_multiplier,  'opt_stability.abstol_multiplier',  'double',   'scalar',   'positive');   end
+    if isfield(opt_stability,'max_iter');           GC.check_data(opt_stability.max_iter,           'opt_stability.max_iter',           'double',   'scalar',   'positive');   end
     if isfield(opt_stability,'iterate_bfp');        GC.check_data(opt_stability.iterate_bfp,        'opt_stability.iterate_bfp',        'char',     [],         {'on','off'}); end
-    
     GC.speak();
     
     if isfield(opt_stability,'solver')
@@ -42,9 +41,30 @@ function s_ST_QPS_SHM_gatekeeper(GC,system,opt_sol,opt_stability)
         end
         solver_allowed_fieldvalues = {'ode45','ode78','ode89','ode23','ode113','ode15s','ode23s','ode23t','ode23tb'};
         GC.check_data(opt_stability.solver, 'opt_stability.solver', 'char', [], solver_allowed_fieldvalues); 
+        GC.speak();
     end
-    
-    GC.speak();
+
+    if isfield(opt_stability,'n_char_st')   
+        GC.check_data(opt_stability.n_char_st, 'opt_stability.n_char_st', 'double', 'scalar', 'positive');
+        if mod(opt_stability.n_char_st,1)~=0
+            GC.error_msg{1,end+1} = append('The value of the options field opt_stability.n_char_st is ',num2str(opt_stability.n_char_st),', but it must be an integer!');
+        end
+        if opt_stability.n_char_st == 0
+            GC.error_msg{1,end+1} = append('The value of the options field opt_stability.n_char_st is 0, but it must be a positive integer (> 0)!');
+        end
+        GC.speak();
+    end
+
+    if isfield(opt_stability,'n_map')   
+        GC.check_data(opt_stability.n_map, 'opt_stability.n_char_st', 'double', 'scalar', 'positive');
+        if mod(opt_stability.n_map,1)~=0
+            GC.error_msg{1,end+1} = append('The value of the options field opt_stability.n_map is ',num2str(opt_stability.n_map),', but it must be an integer!');
+        end
+        if opt_stability.n_map == 0
+            GC.error_msg{1,end+1} = append('The value of the options field opt_stability.n_map is 0, but it must be a positive integer (> 0)!');
+        end
+        GC.speak();
+    end
 
 
 end

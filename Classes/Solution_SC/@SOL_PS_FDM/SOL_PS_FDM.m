@@ -101,7 +101,7 @@ classdef SOL_PS_FDM < Solution
             obj.mu(1,end+1)         = CON.p_y_bfp(end,1);                                       % Continuation parameter
             obj.J{1,end+1}          = sparse(CON.p_J_bfp);                                      % Jacobian matrix
             obj.dy(:,end:end+1)     = [NaN(size(CON.dy0)), NaN(size(CON.dy0))];                 % Direction vector of the predictor
-            obj.newton_flag(1,end+1)= NaN;                                                      % Exit-flag is unknown as it is not saved as a Stability class property 
+            obj.newton_flag(1,end+1)= CON.p_newton_flag_bfp;                                    % Exit-flag of corrector (fsolve)
             obj.step_width(1,end+1) = CON.step_width;                                           % Step width
             obj.arclength(1,end+1)  = CON.p_arclength_bfp;                                      % Arc length
 
