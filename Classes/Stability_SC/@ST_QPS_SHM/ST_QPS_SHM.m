@@ -83,14 +83,13 @@ classdef ST_QPS_SHM < Stability
 
 
     methods(Access = protected)
-            cm = crit_multi(obj,DYN,multipliers);                       % This function returns the absolute value -1  of the given Floquet multipliers. 
+        cm = crit_multi(obj,DYN,multipliers);                           % This function returns the absolute value -1  of the given Floquet multipliers. 
     end
 
 
     methods(Static)                                                     % Static: Method can be called without creating an object of subclass ST_EQ;
         s_ST_QPS_SHM_gatekeeper(GC,system,opt_sol,opt_stability);       % Gatekeeper for the Stability subclass options
         help_struct = s_help_opt_stability_QPS_SHM();                   % Help function for the opt_stability struct
-
     end
 
 

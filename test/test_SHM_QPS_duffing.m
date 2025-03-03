@@ -28,14 +28,14 @@ IC = 0.1.*ones(2,1);                                    %initial condition
 % load('workspace_test_duffing_QPS_shooting.mat')       % OLD. Throws warning 'Could not find appropriate function on path loading function handle C:\Users\Admin\Desktop\FG-Code_aktuell\v2.1.1.15\test\test_Shooting_duffing_QPS.m>@(mu)[mu,mu*Omega]' after test files have been renamed, altough path was not existing even before
 load('workspace_test_SHM_QPS_duffing.mat')              %Contains s0 of difficult and easy parameters at mu_limit(2) since DYN_init stored in workspace_test_duffing_QPS_shooting throws warning
 
-% C1_mat = [  0,     0,   0;                      % Fourier coefficients to create an initial value for fsolve to find the first point on the curve at mu = 2
+% C1_mat = [  0,     0,   0;                            % Fourier coefficients to create an initial value for fsolve to find the first point on the curve at mu = 2
 %           -0.2, -0.07, 0];
 % S1_mat = [-0.1, -0.025, 0;
 %             0,     0,   0];
 
 %% Properties
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);                                               %Properties of the system
-options.opt_sol  = costaropts('stability','on','cont','on','non_auto_freq',non_auto_freq,'sol_type','quasiperiodic','approx_method','shooting','act_param',active_parameter,'display','iter-detailed'); %Properties of the solution
+options.opt_sol  = costaropts('stability','on','cont','on','non_auto_freq',non_auto_freq,'sol_type','quasiperiodic','approx_method','shooting','act_param',active_parameter,'display','iter'); %Properties of the solution
 options.opt_cont = costaropts('step_control','angle','pred','cubic','subspace','pseudo-arc','mu_limit',mu_limit);       %Properties for continuation
 options.opt_approx_method = costaropts('solver','ode45','n_char',50);                                                   %Properties for the approximation method
 options.opt_init = costaropts('iv',s_easy_mu_2);                                                                        %Properties for initial value

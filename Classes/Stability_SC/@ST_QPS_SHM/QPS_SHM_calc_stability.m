@@ -45,7 +45,7 @@ function   [multipliers,vectors,n_unstable,stability_flag] = QPS_SHM_calc_stabil
         mu = y(end);                                % Continuation parameter
         phi = AM_ST.phi;
         AM_ST.IF_up_res_data([x0;mu],DYN);          % Update properties for phase condition
-        J = eye(dim*n_char_st+n_auto);              % Preallocate Jacobian
+        J = speye(dim*n_char_st+n_auto);            % Preallocate Jacobian
         try
             [x,~,stability_flag,~,J] = fsolve(@(x) obj.QPS_SHM_ST_residuum(x,mu), x0, obj.fsolve_opts);      % Reshoot the solution to get J
             y = [x; mu];
@@ -66,97 +66,106 @@ function   [multipliers,vectors,n_unstable,stability_flag] = QPS_SHM_calc_stabil
 
     %% Calculate Ljapunov exponents
     
-    try
+    if stability_flag > 0
 
-        if DYN.n_auto==0
-            Omega = DYN.non_auto_freq(y(end,1));
-            if(Omega(1,1) > Omega(1,2));  index = [1,2]; else;  index = [2,1]; end          % Define integration variable to minimize integration time
-        elseif DYN.n_auto==1
-            index = [1,2];
-            Omega(1,1) = DYN.non_auto_freq(y(end,1));
-            Omega(1,2) = y(end-1,1);
-        elseif DYN.n_auto==2
-            index = [1,2];
-            Omega(1,:) = y(end-2:end-1,1);
-        end
-        Ik = [0,2.*pi./Omega(1,index(1,1))];                                                % Set time span for integration
-        Theta = mod(phi(index(1,2),:) + Ik(2)*Omega(1,index(1,2)),2*pi);                    % Calculate end values of characteristics and map back to 0,2pi square
-        [~,I(1,:)] = sort(Theta);                                                           % Sort remapped values in ascending order
-    
-        %%%%%%%%%%%%
-        dz_int_dz0 = obj.jacobi_int(y,Omega,AM,index);                                      % Derivative dZ0~/dZ0
-        % disp(max(abs(dz_int_dz0),[],'all'))
-        %%%%%%%%%%%%
-        
-        FundMatrix = zeros(dim,dim,n_char_st);                                              % Preallocation for loop
-        for k=1:n_char_st                                                                   % Assemble Fundamental matricies
-            r = I(1,k);
-            FundMatrix(1:dim,1:dim,r) = J(dim*(k-1)+1:k*dim,dim*(r-1)+1:r*dim) + dz_int_dz0(dim*(r-1)+1:r*dim,dim*(k-1)+1:k*dim);
-        end
-        FundMatrixARRAY  = cat(3,FundMatrix,FundMatrix(:,:,1));                             % Add first fundamental matrix for periodicity
+        try
 
-        FundMatrixFUN = cell(dim,dim);                                                      % Preallocation for loop
-        for j=1:dim                                                                         % Function of the fundamental solution
-            for i=1:dim
-                % FundMatrixFUN{i,j} = griddedInterpolant([phi(index(1,2),:),2*pi],permute(FundMatrixARRAY(i,j,:),[1,3,2]),'spline');                      %Doppelte For-Schleife vektorisieren
-                FundMatrixFUN{i,j} = @(x) fnval(csape([phi(index(1,2),:),2*pi],permute(FundMatrixARRAY(i,j,:),[1,3,2]),'periodic'),x);
+            if DYN.n_auto==0
+                Omega = DYN.non_auto_freq(y(end,1));
+                if(Omega(1,1) > Omega(1,2));  index = [1,2]; else;  index = [2,1]; end          % Define integration variable to minimize integration time
+            elseif DYN.n_auto==1
+                index = [1,2];
+                Omega(1,1) = DYN.non_auto_freq(y(end,1));
+                Omega(1,2) = y(end-1,1);
+            elseif DYN.n_auto==2
+                index = [1,2];
+                Omega(1,:) = y(end-2:end-1,1);
             end
+            Ik = [0,2.*pi./Omega(1,index(1,1))];                                                % Set time span for integration
+            Theta = mod(phi(index(1,2),:) + Ik(2)*Omega(1,index(1,2)),2*pi);                    % Calculate end values of characteristics and map back to 0,2pi square
+            [~,I(1,:)] = sort(Theta);                                                           % Sort remapped values in ascending order
+
+            %%%%%%%%%%%%
+            dz_int_dz0 = obj.jacobi_int(y,Omega,AM,index);                                      % Derivative dZ0~/dZ0
+            % disp(max(abs(dz_int_dz0),[],'all'))
+            %%%%%%%%%%%%
+
+            FundMatrix = zeros(dim,dim,n_char_st);                                              % Preallocation for loop
+            for k=1:n_char_st                                                                   % Assemble Fundamental matricies
+                r = I(1,k);
+                FundMatrix(1:dim,1:dim,r) = J(dim*(k-1)+1:k*dim,dim*(r-1)+1:r*dim) + dz_int_dz0(dim*(r-1)+1:r*dim,dim*(k-1)+1:k*dim);
+            end
+            FundMatrixARRAY  = cat(3,FundMatrix,FundMatrix(:,:,1));                             % Add first fundamental matrix for periodicity
+
+            FundMatrixFUN = cell(dim,dim);                                                      % Preallocation for loop
+            for j=1:dim                                                                         % Function of the fundamental solution
+                for i=1:dim
+                    % FundMatrixFUN{i,j} = griddedInterpolant([phi(index(1,2),:),2*pi],permute(FundMatrixARRAY(i,j,:),[1,3,2]),'spline');                      %Doppelte For-Schleife vektorisieren
+                    FundMatrixFUN{i,j} = @(x) fnval(csape([phi(index(1,2),:),2*pi],permute(FundMatrixARRAY(i,j,:),[1,3,2]),'periodic'),x);
+                end
+            end
+            % Modulate function as array output
+            % FundFUN = @(x)cellfun(@(c) c(x),FundMatrixFUN,'UniformOutput',false);
+            FundFUN = @(x)cellfun(@(c) c(x),FundMatrixFUN,'UniformOutput',false);               % Make fundamental matrix function cell function
+
+            % Calculate Ljapunov Exponents
+            d = 1:dim;
+            FundNorm = eye(dim);                                                                % Take triangular matrix instead of identity matrix for columns in the jacobian with only one entry not equal to zero
+
+            % All coordinates of mapping
+            TCR = permute(mod(abs(((1:n_map)-1)*2*pi*(Omega(1,index(1,2)))/(Omega(1,index(1,1)))),2*pi),[1 3 2]);
+            % All fundamental matrices of mapping
+            FundARRAY = cell2mat(FundFUN(TCR));
+            FundARRAYVal = zeros(size(FundARRAY));
+
+            for i=1:n_map                                                                       % Mapping of perturbation
+                FundARRAYVal(:,:,i) = FundARRAY(:,:,i)*FundNorm;                                % Multiplication: current fundamental soultion and normalized solution
+                FundNorm = obj.GSOrthonormalization(FundARRAYVal(:,:,i));                       % Gram-Schmidt orthonormalisation
+            end
+
+            TimesFunc = @(x) FundARRAYVal(:,:,x)'*FundARRAYVal(:,:,x);                          % Multiplication for Gram determinant
+            Vsqr = reshape(cell2mat(arrayfun(TimesFunc, 1:n_map,'UniformOutput',false)),dim,dim,[]);            % Replace
+
+            % Calculate volume
+            detFunc = @(x,y) sqrt(det(Vsqr(1:x,1:x,y)));                                        % Gram determinant
+            Vol = reshape(arrayfun(detFunc,repmat(d,1,n_map),reshape(repmat(1:n_map,dim,1),1,[])),dim,[])';     % Volume of mapped perturbation
+
+            % Catch errror
+            if max(max(imag(Vol))) > sqrt(eps)
+                error('Time interval is too large for stability computation algorithm!')
+            end
+
+            LyExN = real(sum(log(Vol)))./(n_map*Ik(2));                                         % Lyapunov exponents of n-th order
+            Lyp_Values = sort([LyExN(1),diff(LyExN)],'descend');                                % Calculate LEs of first order
+
+
+            % Analyse Lyapunov exponents
+            [LEAbsSortVal,~] = sort(abs(Lyp_Values));                                                       % Sort LE by absolute value
+            LEValwoZero = LEAbsSortVal(n_auto+1:end);                                                       % Extract zeros LE's due to autonomous frequencies
+            LEVal = zeros(size(LEValwoZero,2),1);                                                           % Preallocation
+
+            for i=1:size(LEValwoZero,2)                                                                     % Identify sign's of LE's
+                Idx = [find(Lyp_Values == -LEValwoZero(i)),find(Lyp_Values == LEValwoZero(i))];
+                LEVal(i) = Lyp_Values(Idx);                                                                 % Set LE's for stability determination
+            end
+
+            multipliers = LEVal;                                                                            % Set multipliers to calculated LE's
+            [~,idx] = sort(abs(multipliers));                                                               % Ensure sorting according to norm
+            multipliers = multipliers(idx);                                                                 % Sort LE's
+
+            n_unstable = numel(find(multipliers>10*eps));                                                   % Find number of unstable multipliers
+
+
+        catch   % Unlikely case for this computation
+
+            stability_flag = 0;
+            multipliers = NaN(dim-n_auto,1);
+            n_unstable = NaN;
+
         end
-        % Modulate function as array output
-        % FundFUN = @(x)cellfun(@(c) c(x),FundMatrixFUN,'UniformOutput',false);
-        FundFUN = @(x)cellfun(@(c) c(x),FundMatrixFUN,'UniformOutput',false);               % Make fundamental matrix function cell function
 
-        % Calculate Ljapunov Exponents
-        d = 1:dim;
-        FundNorm = eye(dim);                                                                % Take triangular matrix instead of identity matrix for columns in the jacobian with only one entry not equal to zero
-        
-        % All coordinates of mapping
-        TCR = permute(mod(abs(((1:n_map)-1)*2*pi*(Omega(1,index(1,2)))/(Omega(1,index(1,1)))),2*pi),[1 3 2]);
-        % All fundamental matrices of mapping
-        FundARRAY = cell2mat(FundFUN(TCR));
-        FundARRAYVal = zeros(size(FundARRAY));
+    else
 
-        for i=1:n_map                                                                       % Mapping of perturbation
-            FundARRAYVal(:,:,i) = FundARRAY(:,:,i)*FundNorm;                                % Multiplication: current fundamental soultion and normalized solution
-            FundNorm = obj.GSOrthonormalization(FundARRAYVal(:,:,i));                       % Gram-Schmidt orthonormalisation
-        end
-
-        TimesFunc = @(x) FundARRAYVal(:,:,x)'*FundARRAYVal(:,:,x);                          % Multiplication for Gram determinant
-        Vsqr = reshape(cell2mat(arrayfun(TimesFunc, 1:n_map,'UniformOutput',false)),dim,dim,[]);            % Replace
-
-        % Calculate volume
-        detFunc = @(x,y) sqrt(det(Vsqr(1:x,1:x,y)));                                        % Gram determinant
-        Vol = reshape(arrayfun(detFunc,repmat(d,1,n_map),reshape(repmat(1:n_map,dim,1),1,[])),dim,[])';     % Volume of mapped perturbation
-
-        % Catch errror
-        if max(max(imag(Vol))) > sqrt(eps)
-            error('Time interval is too large for stability computation algorithm!')
-        end
-
-        LyExN = real(sum(log(Vol)))./(n_map*Ik(2));                                         % Lyapunov exponents of n-th order
-        Lyp_Values = sort([LyExN(1),diff(LyExN)],'descend');                                % Calculate LEs of first order
-
-    
-        % Analyse Lyapunov exponents
-        [LEAbsSortVal,~] = sort(abs(Lyp_Values));                                                       % Sort LE by absolute value
-        LEValwoZero = LEAbsSortVal(n_auto+1:end);                                                       % Extract zeros LE's due to autonomous frequencies
-        LEVal = zeros(size(LEValwoZero,2),1);                                                           % Preallocation
-    
-        for i=1:size(LEValwoZero,2)                                                                     % Identify sign's of LE's
-            Idx = [find(Lyp_Values == -LEValwoZero(i)),find(Lyp_Values == LEValwoZero(i))];
-            LEVal(i) = Lyp_Values(Idx);                                                                 % Set LE's for stability determination
-        end
-    
-        multipliers = LEVal;                                                                            % Set multipliers to calculated LE's
-        [~,idx] = sort(abs(multipliers));                                                               % Ensure sorting according to norm
-        multipliers = multipliers(idx);                                                                 % Sort LE's
-    
-        n_unstable = numel(find(multipliers>10*eps));                                                   % Find number of unstable multipliers
-    
-
-    catch   % Unlikely case for this computation
-
-        stability_flag = 0;
         multipliers = NaN(dim-n_auto,1);
         n_unstable = NaN;
 

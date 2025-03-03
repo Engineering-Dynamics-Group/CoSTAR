@@ -197,10 +197,18 @@ is already used as approximation method) and the number of mappings to calculate
         - getIC:
             --> Completely added. Method interpolates the solution vector (i.e. the initial values for the shooting) when n_char ~= n_char_st
         - getIV:
+            --> "n_char+1" changed to "n_char" when theta- or phi-values are calculated using linspace (lines 31, 32, 43, 52, 61, 68, 82, 91, 100, 107 and 117) 
             --> Bug fixed when initial value is created from a Fourier series (lines 115 - 124)
         - IF_up_res_data:
             --> Second input argument now depends on which object calls the method. If...else added to distiguish both cases (lines 12 - 20)
             --> Variable p_y0_old removed (former lines 23 and 52) and replaced by y_old (lines 32, 34, 35, 60, 62 and 63)
+            --> "n_char+1" changed to "n_char" when theta- or phi-values are calculated using linspace (lines 33 and 61) 
+        - qp_SHM_ST_auto_fun:
+            --> Jacobian is now stored as sparse matrix (line 88)
+        - qp_SHM_ST_mixed_fun:
+            --> Jacobian is now stored as sparse matrix (line 95)
+        - qp_SHM_ST_non_auto_fun:
+            --> Jacobian is now stored as sparse matrix (line 62)
         - s_QPS_SHM_gatekeeper:
             --> Check for field 'n_char' moved to lines 37 - 47. Added check that it is an integer > 0 (lines 40 - 45)
             --> Check for field 'solver' moved to lines 31 - 35
@@ -244,6 +252,7 @@ is already used as approximation method) and the number of mappings to calculate
         - jacobi_int:
             --> Reshape of y corrected (line 23)
             --> Reshape of Z0 in line 25 removed
+            --> Added preallocation of Z0_int (line 38)
         - qp_SHM_ST_auto_fun:
             --> Completely added. This is the residuum function to reshoot a solution of a fully autonomous system
         - qp_SHM_ST_mixed_fun:
@@ -253,8 +262,9 @@ is already used as approximation method) and the number of mappings to calculate
         - QPS_SHM_calc_stability:
             --> Parameter definitions adapted (lines 18 - 24) and variable names changed accordingly
             --> Reshooting of a solution added if approximation method is FDM or FGM or if n_char ~= n_char_st (lines 29 - 55)
-            --> Derivative dZ0~/dZ0 activated (lines 87 and 94)
-            --> Variables multipliers and n_unstable added to second catch statement (lines 160 and 161)
+            --> if...else added for calculation of Ljapunov exponents. Computation is done only if stability_flag > 0 now (lines 69 and 167 - 172)
+            --> Derivative dZ0~/dZ0 activated (lines 89 and 96)
+            --> Variables multipliers and n_unstable added to second catch statement (lines 162 and 163)
         - s_help_opt_stability_QPS_SHM:
             --> Method restructured
             --> Help text added for 'n_char_st' and 'n_map' (lines 18 - 23)
@@ -283,13 +293,28 @@ is already used as approximation method) and the number of mappings to calculate
 
     test:
         --> Stability computation enabled and/or options added in test files for quasi-periodic solutions. Changes affect:
-        - test_FDM_QPS_cvdP (line 31)
-        - test_FDM_QPS_duffing (lines 46 and 53)
-        - test_FDM_QPS_laval (lines 34 and 40)
-        - test_FDM_QPS_vdP (lines 28, 36, 96 and 104)
-        - test_FGM_QPS_cvdP (lines 27 and 31)
-        - test_FGM_QPS_duffing (lines 46 and 51)
-        - test_FGM_QPS_laval (lines 29 and 33)
-        - test_SHM_QPS_cvdP (lines 40 and 55)
-        - test_SHM_QPS_duffing (lines 40 and 43)
-        - test_SHM_QPS_vdP (line 36)
+            - test_FDM_QPS_cvdP (line 31)
+            - test_FDM_QPS_duffing (lines 46 and 53)
+            - test_FDM_QPS_laval (lines 34 and 40)
+            - test_FDM_QPS_vdP (lines 28, 36, 96 and 104)
+            - test_FGM_QPS_cvdP (lines 27 and 31)
+            - test_FGM_QPS_duffing (lines 46 and 51)
+            - test_FGM_QPS_laval (lines 29 and 33)
+            - test_SHM_QPS_cvdP (lines 40 and 55)
+            - test_SHM_QPS_duffing (lines 40 and 43)
+            - test_SHM_QPS_vdP (line 36)
+
+    Tutorials:
+        --> Updated tutorials and enabled stability computation for FDM and FGM. Changes affect:
+            - Tutorial_QPS_FDM
+            - Tutorial_QPS_FGM
+            - Tutorial_QPS_SHM
+          
+
+----------  
+
+Bugfixes:
+
+    @Stability:
+        - update_curve_container_bfp:
+            --> Added if...else to deal with the case when stability computation has failed and n_unstable = NaN (lines 39 - 42 and 47)

@@ -24,7 +24,7 @@ X = reshape(x(1:end-1),dim,n_char_st);                                          
 AM_ST = obj.AM_ST;                                                                  % Object of AM_QPS_SHM
 
 f = zeros(dim*n_char_st+1,1);                                                       % Initialize residual vector
-J = zeros(dim*n_char_st+1,dim*n_char_st+1);                                         % Initialize Jacobian
+J = zeros(dim*n_char_st+1);                                                         % Initialize Jacobian
 
 F1 = AM_ST.Y_old{1,3};                                                              % Gradient of reference solution
 reso_phase = AM_ST.reso_phase;                                                      % Time resolution of phase condition
@@ -97,6 +97,6 @@ end
 %% Compute residuals and Jacobian
 G1 = [G,G(:,1)]-[H,H1];                                                             % Set G1 to difference of start and end values (shooting residual)
 f(1:end-1,1) = G1(:,1);                                                             % Set residual vector
-J(1:end-1,:) = (G1(:,2:end)-G1(:,1))./dx;                                           % Calculate Jacobian
+J(1:end-1,:) = sparse((G1(:,2:end)-G1(:,1))./dx);                                   % Calculate Jacobian
 
 end

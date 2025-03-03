@@ -59,7 +59,7 @@ H = reshape(H_temp,[n_char*dim+1,n_char*dim]).';                                
 %% Compute residuals and Jacobian
 G1 = G-H;                                                                           % Set G1 to difference of start and end values (shooting residual)
 f = G1(:,1);                                                                        % Set residual vector
-J = (G1(:,2:end)-G1(:,1))./dx;                                                      % Calculate Jacobian
+J = sparse((G1(:,2:end)-G1(:,1))./dx);                                                      % Calculate Jacobian
 
 end
 

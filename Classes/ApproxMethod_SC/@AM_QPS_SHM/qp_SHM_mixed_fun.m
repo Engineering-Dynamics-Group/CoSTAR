@@ -19,7 +19,7 @@ Omega(1,2) = y(end-1,1);                                                        
 dim = DYN.dim;                                                                      % Get dimension of state-space
 n_char = obj.n_char;                                                                % Get number of characteristics
 f = zeros(dim*n_char+1,1);                                                          % Initialize residual vector
-J = zeros(dim*n_char+1,dim*n_char+1);                                               % Initialize Jacobian
+J = zeros(dim*n_char+1);                                                            % Initialize Jacobian
 
 x0 = reshape(y(1:end-2,1),[dim,n_char]);                                            % reshape solution vector
 F1 = obj.Y_old{1,3};                                                                % Gradient of reference solution
@@ -92,7 +92,7 @@ end
 %% Compute residuals and Jacobian
 G1 = [G,G(:,1)]-[H,H1];                                                             % Set G1 to difference of start and end values (shooting residual)
 f(1:end-1,1) = G1(:,1);                                                             % Set residual vector
-J(1:end-1,:) = (G1(:,2:end)-G1(:,1))./dx;                                           % Calculate Jacobian
+J(1:end-1,:) = sparse((G1(:,2:end)-G1(:,1))./dx);                                   % Calculate Jacobian
 
 end
 

@@ -30,7 +30,7 @@ if(DYN.n_auto==1)
     
     param = DYN.param;                                                              % Set parameter vector
     param{DYN.act_param} = y_old(end,1);                                            % Set active parameter
-    Xchar = linspace(0,2*pi*(1-1/(n_char+1)),n_char);                               % Define interval for gradient
+    Xchar = linspace(0,2*pi*(1-1/n_char),n_char);                                   % Define interval for gradient
     IV = reshape(y_old(1:end-2,1),[dim,n_char]);                                    % Fetch initial conditions
     Omega = [DYN.non_auto_freq(y_old(end,1)),y_old(end-1,1)];                       % Set Omega according to autonomous frequency and bifurcation parameter
     T_char = linspace(0,2*pi/Omega(1,1),reso);                                      % Integration time for characteristics
@@ -58,7 +58,7 @@ elseif(DYN.n_auto==2)
     
     param = DYN.param;                                                              % Set parameter vector
     param{DYN.act_param} = y_old(end,1);                                            % Set active parameter
-    Xchar = linspace(0,2*pi*(1-1/(n_char+1)),n_char);                               % Define interval for gradient
+    Xchar = linspace(0,2*pi*(1-1/n_char),n_char);                                   % Define interval for gradient
     IV = reshape(y_old(1:end-3,1),[dim,n_char]);                                    % Fetch initial conditions
     Omega = [y_old(end-2,1),y_old(end-1,1)];                                        % Set Omega according to autonomous frequency and bifurcation parameter
     T_char = linspace(0,2*pi/Omega(1,1),reso);                                      % Integration time for characteristics

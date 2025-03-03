@@ -28,8 +28,8 @@ if isfield(DYN.opt_init,'iv')
     iv = reshape(DYN.opt_init.iv,[],1);                                                         % Supplied initial value. Make it a column vector if it is a row vector
     n_char_iv =  numel(iv)/dim;                                                                 % n_char of iv
     if n_char_iv ~= n_char                                                                      % If iv was calculated using a different number of characteristics (~= n_char)
-        phi_0_iv = linspace(0,2*pi*(1-1/(n_char_iv+1)),n_char_iv);                              % Define the spacing of the characteristics of iv
-        phi_0 = linspace(0,2*pi*(1-1/(n_char+1)),n_char);                                       % Define the spacing of the characteristics
+        phi_0_iv = linspace(0,2*pi*(1-1/n_char_iv),n_char_iv);                                  % Define the spacing of the characteristics of iv
+        phi_0 = linspace(0,2*pi*(1-1/n_char),n_char);                                           % Define the spacing of the characteristics
         iv_interp = csape([phi_0_iv,2*pi],[reshape(iv,dim,n_char_iv),iv(1:dim)],'periodic');    % Interpolate initial values
         IV = reshape(fnval(iv_interp,phi_0),dim*n_char,1);                                      % Evaluate interpolated iv at phi_0 and reshape output to a vector
     else                                                                                        % If iv was calculated using n_char
@@ -40,7 +40,7 @@ if isfield(DYN.opt_init,'iv')
         Omega = DYN.non_auto_freq(mu0);
         if(Omega(1,1)>Omega(1,2)); s1=1; s2=0; else; s1=0; s2=1; end                            % Check which "direction" for time-integration is best
         T = s1.*2*pi/Omega(1,1) + s2.*2*pi/Omega(1,2);                                          % Define period
-        phi_0 = linspace(0,2*pi*(1-1/(n_char+1)),n_char);                                       % Define the spacing of the characteristics
+        phi_0 = linspace(0,2*pi*(1-1/n_char),n_char);                                           % Define the spacing of the characteristics
         PHI(1,:) = s1.*obj.phi(1,1)*ones(1,length(phi_0)) + s2.*(obj.phi(1,1) + phi_0);         % Generate the values for the phase shift for either excitation
         PHI(2,:) = s2.*obj.phi(2,1)*ones(1,length(phi_0)) + s1.*(obj.phi(2,1) + phi_0);
         obj.phi = PHI;                                                                          % Set obj.phi to calculated spacing
@@ -49,7 +49,7 @@ if isfield(DYN.opt_init,'iv')
         Omega(1,1) = DYN.non_auto_freq(mu0);                                                    % Set Omega1 to non-autonomous frequency
         Omega(1,2) = DYN.auto_freq;                                                             % Set Omega2 to provided autonomous frequency
         T = 2*pi/Omega(1,1);                                                                    % Define Integration period
-        phi_0 = linspace(0,2*pi*(1-1/(n_char+1)),n_char);                                       % Define the spacing of the characteristics
+        phi_0 = linspace(0,2*pi*(1-1/n_char),n_char);                                           % Define the spacing of the characteristics
         PHI(1,:) = obj.phi(1,1)*ones(1,length(phi_0));                                          % Generate the values for the phase shift for either excitation
         PHI(2,:) = obj.phi(2,1) + phi_0;
         obj.phi = PHI;                                                                          % Set obj.phi to calculated spacing
@@ -58,14 +58,14 @@ if isfield(DYN.opt_init,'iv')
         Omega(1,1) = DYN.auto_freq(1);                                                          % Set Omega1 to first provided autonomous frequency
         Omega(1,2) = DYN.auto_freq(2);                                                          % Set Omega2 to second provided autonomous frequency
         T = 2*pi/Omega(1,1);                                                                    % Define Integration period
-        phi_0 = linspace(0,2*pi*(1-1/(n_char+1)),n_char);                                       % Define the spacing of the characteristics
+        phi_0 = linspace(0,2*pi*(1-1/n_char),n_char);                                           % Define the spacing of the characteristics
         PHI(1,:) = obj.phi(1,1)*ones(1,length(phi_0));                                          % Generate the values for the phase shift for either excitation
         PHI(2,:) = obj.phi(2,1) + phi_0;
         obj.phi = PHI;                                                                          % Set obj.phi to calculated spacing
     
     end
 
-    Xchar = linspace(0,2*pi*(1-1/(n_char+1)),n_char);
+    Xchar = linspace(0,2*pi*(1-1/n_char),n_char);
     obj.Ik = [0,T];
 
     
@@ -79,7 +79,7 @@ else
         Omega = DYN.non_auto_freq(mu0);
         if(Omega(1,1)>Omega(1,2)); s1=1; s2=0; else; s1=0; s2=1; end                            % Check which "direction" for time-integration is best
         T = s1.*2*pi/Omega(1,1) + s2.*2*pi/Omega(1,2);                                          % Define period
-        phi_0 = linspace(0,2*pi*(1-1/(n_char+1)),n_char);                                       % Define the spacing of the characteristics
+        phi_0 = linspace(0,2*pi*(1-1/n_char),n_char);                                           % Define the spacing of the characteristics
         PHI(1,:) = s1.*obj.phi(1,1)*ones(1,length(phi_0)) + s2.*(obj.phi(1,1) + phi_0);         % Generate the values for the phase shift for either excitation
         PHI(2,:) = s2.*obj.phi(2,1)*ones(1,length(phi_0)) + s1.*(obj.phi(2,1) + phi_0);
         obj.phi = PHI;                                                                          % Set obj.phi to calculated spacing
@@ -88,7 +88,7 @@ else
         Omega(1,1) = DYN.non_auto_freq(mu0);                                                    % Set Omega1 to non-autonomous frequency
         Omega(1,2) = DYN.auto_freq;                                                             % Set Omega2 to provided autonomous frequency
         T = 2*pi/Omega(1,1);                                                                    % Define Integration period
-        phi_0 = linspace(0,2*pi*(1-1/(n_char+1)),n_char);                                       % Define the spacing of the characteristics
+        phi_0 = linspace(0,2*pi*(1-1/n_char),n_char);                                           % Define the spacing of the characteristics
         PHI(1,:) = obj.phi(1,1)*ones(1,length(phi_0));                                          % Generate the values for the phase shift for either excitation
         PHI(2,:) = obj.phi(2,1) + phi_0;
         obj.phi = PHI;                                                                          % Set obj.phi to calculated spacing
@@ -97,14 +97,14 @@ else
         Omega(1,1) = DYN.auto_freq(1);                                                          % Set Omega1 to first provided autonomous frequency
         Omega(1,2) = DYN.auto_freq(2);                                                          % Set Omega2 to second provided autonomous frequency
         T = 2*pi/Omega(1,1);                                                                    % Define Integration period
-        phi_0 = linspace(0,2*pi*(1-1/(n_char+1)),n_char);                                       % Define the spacing of the characteristics
+        phi_0 = linspace(0,2*pi*(1-1/n_char),n_char);                                           % Define the spacing of the characteristics
         PHI(1,:) = obj.phi(1,1)*ones(1,length(phi_0));                                          % Generate the values for the phase shift for either excitation
         PHI(2,:) = obj.phi(2,1) + phi_0;
         obj.phi = PHI;                                                                          % Set obj.phi to calculated spacing
 
     end
 
-    Xchar = linspace(0,2*pi*(1-1/(n_char+1)),n_char);
+    Xchar = linspace(0,2*pi*(1-1/n_char),n_char);
     obj.Ik = [0,T];
 
 
@@ -114,7 +114,7 @@ else
 
     % Calculate the initial values from a Fourier series
     theta_1 = zeros(1,n_char);                                                                  % We only need the values for theta_1 = 0 
-    theta_2 = linspace(0,2*pi*(1-1/(n_char+1)),n_char);                                         % Use n_char points in theta_2 - direction
+    theta_2 = linspace(0,2*pi*(1-1/n_char),n_char);                                             % Use n_char points in theta_2 - direction
 
     % Create a matrix which stores the state space vectors z(theta_1=0,theta_2) for the initial value for fsolve
     % The state space vectors are arranged as follows: Z = [z(0,theta_2(1)), ... , z(0,theta_2(end))]
