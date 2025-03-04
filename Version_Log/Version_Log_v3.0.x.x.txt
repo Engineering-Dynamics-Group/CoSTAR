@@ -309,7 +309,27 @@ is already used as approximation method) and the number of mappings to calculate
             - Tutorial_QPS_FDM
             - Tutorial_QPS_FGM
             - Tutorial_QPS_SHM
-          
+           
+
+----------  
+
+Improvement to calculation of Jacobian of periodic shooting method:
+The derivative dg/domega can be explicitly calculated. An integration using perturbed time intervals is not necessary.
+
+    @AM_PS_SHM:
+        - PS_SHM_residuum:
+            --> Formerly needed variables deleted (former lines 71 - 81)
+            --> Time integration using perturbed time intervals for autonomous systems removed (former lines 106 - 114)
+            --> Old calculation of dg/domega using forward/central finite difference removed (former lines 172, 173 and 176)
+            --> Calculation of dg/domega added (lines 148 and 149)
+
+    @ST_PS_SHM:
+        - PS_SHM_ST_residuum:
+            --> Formerly needed variables deleted (former lines 49 - 61)
+            --> Time integration using perturbed time intervals for autonomous systems removed (former lines 77 - 83)
+            --> Old calculation of dg/domega using forward/central finite difference removed (former line 122)
+            --> Calculation of dg/domega added (lines 102 and 103) 
+
 
 ----------  
 
