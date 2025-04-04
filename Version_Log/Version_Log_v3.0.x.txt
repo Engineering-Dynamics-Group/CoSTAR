@@ -335,6 +335,20 @@ The derivative dg/domega can be explicitly calculated. An integration using pert
 
 Bugfixes:
 
+    @Continuation:
+        - bifurcation_stability:
+            --> The curve-container-index of the bifurcation point (needed to save the arc length) is now commputed correctly (line 77)
+
+    @AM_PS_SHM:
+        - getIV:
+            --> An exception for n_shoot = 2 was added to correctly get the initial values from the ODE data (lines 30 - 32 and 53 - 55)
+        - PS_SHM_residuum:
+            --> Changed how the matrix I_mat is created: It works for older MATLAB versions now and the Kronecker product was removed (line 130)
+
+    @SOL_QPS_FDM:
+        - SOL_QPS_FDM:
+            --> Added the "_bfp" to correctly store the multipliers of the bifurcation point (line 120)
+
     @Stability:
         - update_curve_container_bfp:
             --> Added if...else to deal with the case when stability computation has failed and n_unstable = NaN (lines 39 - 42 and 47)

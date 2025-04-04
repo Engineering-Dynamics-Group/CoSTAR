@@ -127,10 +127,10 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
     end
     dZ_ds_mat = kron(speye(n_shoot),spones(ones(dim)));                 % Create a [n_shoot*dim x n_shoot*dim] block diagonal matrix with ones(dim)
     dZ_ds_mat(logical(dZ_ds_mat)) = dZ_ds;                              % Replace all ones in dZ_ds_mat with the derivatives dz(t_(i+1),z_i,mu)/dz_i
-    I_mat = kron(spdiags([0 1],0:1,n_shoot,n_shoot),eye(dim));          % Create a matrix where eye(dim) is placed on the first upper right secondary diagonal
+    I_mat = spdiags(ones(n_shoot*dim,1),dim,n_shoot*dim,n_shoot*dim);   % Create a matrix where "1" are placed on the "dim"-th upper right secondary diagonal
     I_mat(end-dim+1:end,1:dim) = eye(dim);                              % eye(dim) needs to be added in the bottom left corner
     dg_ds = dZ_ds_mat - I_mat;                                          % dg/ds
-    
+
     
     % Now calculate dg/dmu
     if calc_stability                                                   % Use central finite difference

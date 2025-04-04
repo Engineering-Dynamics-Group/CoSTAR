@@ -117,7 +117,7 @@ classdef SOL_QPS_FDM < Solution
                 obj.freq(:,end+1) = CON.p_y_bfp(end-2:end-1,1);                                     % Frequencies if system is fully autonomous
             end
 
-            obj.multipliers(:,end+1)    = CON.p_multipliers;                        % Ljapunov exponents
+            obj.multipliers(:,end+1)    = CON.p_multipliers_bfp;                    % Ljapunov exponents
             obj.vectors(:,:,end+1)      = CON.p_vectors_bfp;                        % There are no vectors related to Ljapunov exponents, so this is empty
             obj.n_unstable(1,end+1)     = obj.n_unstable(1,end);                    % Indiacting number of unstable multipliers. Definition: The number in the point is equal to the number before the bfp
             obj.stability_flag(1,end+1) = CON.p_stability_flag;                     % Exitflag of stability computation 

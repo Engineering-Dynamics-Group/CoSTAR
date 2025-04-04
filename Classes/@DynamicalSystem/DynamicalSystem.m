@@ -7,7 +7,7 @@ classdef DynamicalSystem
     %% Properties    
     properties(Constant)
         % Constant properties cannot be changed (read-only)
-        costar_version = '3.0.3';
+        costar_version = ' 3.1 ';
     end
 
 
