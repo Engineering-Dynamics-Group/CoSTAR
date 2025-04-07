@@ -27,6 +27,9 @@ function obj = getIV(obj,DYN)
                     
             [~,Z] = obj.solver_function(@(t,z) Fcn(t,z,param), t, z0, obj.odeOpts);     % Integration to get required shooting points
 
+            if n_shoot == 2             % In this case, t is a [1x2] vector and is therefore interpreted as [t_start, t_end] by the solver
+                Z = Z([1,end],:);       % Thus, Z stores the values at all computed time points, but we only need the Z values at t
+            end
             obj.iv = reshape(Z.',dim*n_shoot,1);                                        % Reshape to a vector
 
         else  
@@ -47,6 +50,9 @@ function obj = getIV(obj,DYN)
         
             [~,Z] = obj.solver_function(@(t,z) Fcn(t,z,param), t, z0, obj.odeOpts);     % Integration to get required shooting points
 
+            if n_shoot == 2             % In this case, t is a [1x2] vector and is therefore interpreted as [t_start, t_end] by the solver
+                Z = Z([1,end],:);       % Thus, Z stores the values at all computed time points, but we only need the Z values at t
+            end
             obj.iv = [reshape(Z.',dim*n_shoot,1); omega];                               % Reshape to a vector
     
         else 

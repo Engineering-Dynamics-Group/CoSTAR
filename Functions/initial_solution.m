@@ -18,10 +18,11 @@ end
 
 
 % Set function and options for fsolve
-newtonOpts = optimoptions('fsolve','Display','iter-detailed','MaxFunEvals',1e5,'FiniteDifferenceType','forward');
+newtonOpts = optimoptions('fsolve','Display','iter-detailed','MaxFunEvals',1e5,'MaxIter',1e3,'FiniteDifferenceType','forward');
 y0 = [AM.iv;DYN.param{DYN.act_param}];
 
 if strcmpi(DYN.approx_method,'shooting')
+    newtonOpts.MaxIter = 50;
     Fcn = @(y) AM.fun_Jac_wrapper_init(y,y0);                           % Function wrapper for initial solution, if Jacobian is supplied
     newtonOpts.SpecifyObjectiveGradient = true;                         % newtonOpts.CheckGradients = true; can be used to automatically check the Jacobian matrix -> Since R2023b: checkGradients is recommended
 

@@ -14,7 +14,7 @@ function  [multipliers,vectors,n_unstable] = check_stability_values(obj,multipli
 
         if any(isinf(multipliers))||any(isnan(multipliers))||(stabi_flag==0)
             multipliers = NaN(size(multipliers));
-            vectors = NaN(numel(multipliers));
+            vectors = NaN(size(vectors));
             n_unstable = NaN;
         end
 

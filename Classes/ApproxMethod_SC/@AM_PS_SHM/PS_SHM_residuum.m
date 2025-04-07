@@ -68,17 +68,6 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
     elseif n_auto == 1                                  % Autonomous case           
         T_int_mu_plus  = T_int;                                                 % omega cannot be the mu and thus the time intervals remain constant
         T_int_mu_minus = T_int;                                                 % omega cannot be the mu and thus the time intervals remain constant
-        delta_omega = h*(1+abs(omega));                                         % Step width for numerical differentiation with respect to omega
-        T_omega_plus  = 2*pi./(omega+delta_omega);                              % Perturbed periodic time by "+ delta"
-        T_omega_minus = 2*pi./(omega-delta_omega);                              % Perturbed periodic time by "- delta"
-        dT_omega_plus  = T_omega_plus/n_shoot;                                  % Perturbed time span by "+ delta" for each shooting operation (integration)
-        dT_omega_minus = T_omega_minus/n_shoot;                                 % Perturbed time span by "- delta" for each shooting operation (integration)
-        T_int_omega_plus  = [0:dT_omega_plus:(n_shoot-1)*dT_omega_plus;         % Define time intervals for the shooting operation (integration)
-                             dT_omega_plus:dT_omega_plus:n_shoot*dT_omega_plus].';   
-        T_int_omega_minus = [0:dT_omega_minus:(n_shoot-1)*dT_omega_minus;       % Define time intervals for the shooting operation (integration)
-                            dT_omega_minus:dT_omega_minus:n_shoot*dT_omega_minus].';   
-        Z_end_omega_plus  = zeros(dim,n_shoot);                                 % Stores the end points of shooting with "+ delta" perturbed omega
-        Z_end_omega_minus = zeros(dim,n_shoot);                                 % Stores the end points of shooting with "- delta" perturbed omega
     end
 
 
@@ -103,15 +92,6 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
             [~,Z_mu_minus] = obj.solver_function(@(t,z) Fcn(t,z,param_mu_minus), T_int_mu_minus(k,:), z0_mat(:,k), obj.odeOpts); 
             Z_end_mu_minus(:,k) = Z_mu_minus(end,:).';              % Take the "- delta" perturbed mu state vectors at t_end
         end
-        if n_auto == 1                                              % Additionally required when system is autonomous
-            % Do a fourth/five integration with perturbed omega-value (needed for Jacobian - can be deactivated when it is calculated by fsolve)
-            [~,Z_omega_plus]  = obj.solver_function(@(t,z) Fcn(t,z,param), T_int_omega_plus(k,:),  z0_mat(:,k), obj.odeOpts); 
-            Z_end_omega_plus(:,k) = Z_omega_plus(end,:).';          % Take the "+ delta" perturbed omega state vectors at t_end
-            if calc_stability                                       % Only required when using central finite difference for Jacobian
-                [~,Z_omega_minus] = obj.solver_function(@(t,z) Fcn(t,z,param), T_int_omega_minus(k,:), z0_mat(:,k), obj.odeOpts);
-                Z_end_omega_minus(:,k) = Z_omega_minus(end,:).';    % Take the "- delta" perturbed omega state vectors at t_end
-            end
-        end
     end
 
 
@@ -121,9 +101,9 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
     if n_auto == 0
         res = s_end - s_perm;                           % Residuum
     elseif n_auto == 1
-        f = reshape(Fcn(0,reshape(s_p,dim,n_shoot),param),dim*n_shoot,1);   % Evaluate the RHS at predictor point s_p
+        f_p = reshape(Fcn(0,reshape(s_p,dim,n_shoot),param),dim*n_shoot,1);     % Evaluate the RHS at predictor point s_p
         res = [s_end - s_perm;                          % Residuum
-               f.' * (s - s_p)];                        % Poincare phase condition ( = pc)
+               f_p.' * (s - s_p)];                      % Poincare phase condition ( = pc)
     end
     
 
@@ -147,36 +127,36 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
     end
     dZ_ds_mat = kron(speye(n_shoot),spones(ones(dim)));                 % Create a [n_shoot*dim x n_shoot*dim] block diagonal matrix with ones(dim)
     dZ_ds_mat(logical(dZ_ds_mat)) = dZ_ds;                              % Replace all ones in dZ_ds_mat with the derivatives dz(t_(i+1),z_i,mu)/dz_i
-    I_mat = kron(spdiags([0 1],0:1,n_shoot,n_shoot),eye(dim));          % Create a matrix where eye(dim) is placed on the first upper right secondary diagonal
+    I_mat = spdiags(ones(n_shoot*dim,1),dim,n_shoot*dim,n_shoot*dim);   % Create a matrix where "1" are placed on the "dim"-th upper right secondary diagonal
     I_mat(end-dim+1:end,1:dim) = eye(dim);                              % eye(dim) needs to be added in the bottom left corner
     dg_ds = dZ_ds_mat - I_mat;                                          % dg/ds
-    
+
     
     % Now calculate dg/dmu
-    if calc_stability                                               % Use central finite difference
+    if calc_stability                                                   % Use central finite difference
         dg_dmu = reshape( (Z_end_mu_plus - Z_end_mu_minus) ./ (2*delta_mu) , dim*n_shoot, 1);
-    else                                                            % Use forward finite difference
+    else                                                                % Use forward finite difference
         dg_dmu = reshape( (Z_end_mu_plus - Z_end) ./ delta_mu , dim*n_shoot, 1);
     end
 
 
     % Build the Jacobian matrix J_res
-    if n_auto == 0                                                      % Non-autonomous system
+    if n_auto == 0                                      % Non-autonomous system
         J_res = [dg_ds,  dg_dmu];                                       % Build the Jacobian matrix
     
-    elseif n_auto == 1                                                  % Autonomous system   
-        dpc_ds = f.';                                                   % dpc/ds (pc: Poincare phase condition, see above)
+    elseif n_auto == 1                                  % Autonomous system 
+        f_end = Fcn(0,Z_end,param);                                     % Evaluate RHS at end points of integration
+        dg_domega = - 2*pi / (n_shoot * omega^2) .* reshape(f_end,dim*n_shoot,1);                   % dg/domega
+        dpc_ds = f_p.';                                                 % dpc/ds (pc: Poincare phase condition, see above)
         dpc_domega = 0;                                                 % dpc/domega = 0 (phase condition is independent of the frequency)
         f_mu_plus = reshape(Fcn(0,reshape(s_p,dim,n_shoot),param_mu_plus),dim*n_shoot,1);           % Evaluate the RHS at predictor point s_p with perturbed mu
         if calc_stability                                               % Use central finite difference
-            f_mu_minus = reshape(Fcn(0,reshape(s_p,dim,n_shoot),param_mu_minus),dim*n_shoot,1);     % Evaluate the RHS at predictor point s_p with perturbed mu
-            dg_domega = reshape( (Z_end_omega_plus - Z_end_omega_minus)./(2*delta_omega) , dim*n_shoot, 1);     % dg/domega
+            f_mu_minus = reshape(Fcn(0,reshape(s_p,dim,n_shoot),param_mu_minus),dim*n_shoot,1);     % Evaluate the RHS at predictor point s_p with perturbed mu   
             dpc_dmu = (f_mu_plus - f_mu_minus).' * (s - s_p) / (2*delta_mu);                        % dpc/dmu
         else                                                            % Use forward finite difference
-            dg_domega = reshape( (Z_end_omega_plus - Z_end) ./ delta_omega , dim*n_shoot, 1);       % dg/domega
-            dpc_dmu = (f_mu_plus - f).' * (s - s_p) / delta_mu;                                     % dpc/dmu
+            dpc_dmu = (f_mu_plus - f_p).' * (s - s_p) / delta_mu;                                   % dpc/dmu
         end
-
+        
         J_res = [dg_ds,  dg_domega,  dg_dmu;                            % Build the Jacobian matrix
                  dpc_ds, dpc_domega, dpc_dmu];                          % Build the Jacobian matrix
 

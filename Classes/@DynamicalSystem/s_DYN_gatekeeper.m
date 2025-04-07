@@ -219,14 +219,6 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
         GC.check_data(opt_sol.approx_method,'opt_sol.approx_method','char', [],qp_approx_method_allowed_fieldvalues);
         GC.speak();    
 
-        %%%%%%%%%%%%%%%%
-        %Check that the approximation method is shooting if calculation of stability is desired (not available for FGM and FDM yet)
-        if strcmpi(opt_sol.stability,'on') && ~(strcmpi(opt_sol.approx_method,'shooting') || strcmpi(opt_sol.approx_method,'shm'))
-            GC.error_msg{1,end+1} = append('Calculation of stability of quasi-periodic solutions approximated by ', opt_sol.approx_method, ' method is not available yet.');
-            GC.error_msg{1,end+1} = 'If you wish to calculate the stability of quasi-periodic solutions, please use shooting as approximation method.';
-        end
-        GC.speak();
-
         %%%%%%%%%%%%%%
         %Check freq_limit
         if isfield(opt_sol,'freq_limit')

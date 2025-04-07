@@ -7,7 +7,7 @@
 
 function help_struct = s_help_opt_stability_EQ()
 
-    help_struct.info = 'opt_stability --- equilibrium'; 
+    help_struct.info = 'opt_stability --- equilibrium solution'; 
 
     help_struct.mandatory = [];
    

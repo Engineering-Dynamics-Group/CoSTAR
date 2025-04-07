@@ -123,12 +123,14 @@ classdef SOL_PS_FGM < Solution
             obj.J{1,end+1}          = CON.p_J_bfp;                                              %Jacobian matrix
             obj.dy{1,end}           = NaN(size(CON.dy0));                                       %direction vector of the predictor (this one belongs to the previous point)
             obj.dy{1,end+1}         = NaN(size(CON.dy0));                                       %expand dy by a NaN vector which can be filled with the direction vector in the next loop
-            obj.newton_flag(1,end+1)= NaN;                                                      %Exit-flag is unknown as it is not saved as a Stability class property
+            obj.newton_flag(1,end+1)= CON.p_newton_flag_bfp;                                    %Exit-flag of corrector (fsolve)
             obj.step_width(1,end+1) = CON.step_width;
             obj.arclength(1,end+1)  = CON.p_arclength_bfp;
             obj.hmatrix{1,end+1}    = AM.hmatrix;                                               %This is the same as the one of the newest point (due to a update_sol_dim statement in the ST.update_curve_container method)                                       
             obj.n_hh(1,end+1)       = numel(AM.hmatrix);
-            obj.error(1,end+1)      = CON.p_error_bfp;                                          %error at the bifurcation point
+            if strcmpi(AM.error_control,'on')
+                obj.error(1,end+1)  = CON.p_error_bfp;                                          %error at the bifurcation point
+            end
 
             if DYN.n_auto == 0                                                                   %Solution is periodic - if this is true: non-autonomous
                 obj.freq(1,end+1) = DYN.non_auto_freq(CON.p_y_bfp(end,1));

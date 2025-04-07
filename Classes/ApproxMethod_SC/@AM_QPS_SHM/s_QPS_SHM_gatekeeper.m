@@ -16,29 +16,52 @@ opt_approx_method_allowed_fieldnames    = {'solver','n_char'};              %all
 opt_init_mandatory_fieldnames  = {};                                        %mandatory fieldsnames in the opt_init structure
 opt_init_allowed_fieldnames    = {'iv','c0','c1_matrix','s1_matrix'};       %allowed fieldsnames in the opt_init structure
 
-%% Check the opt_approx_method ans opt_init_method structure
-GC.check_fields(opt_approx_method,'opt_approx_method',opt_approx_method_mandatory_fieldnames,opt_approx_method_allowed_fieldnames);
-GC.check_fields(opt_init,'opt_init',opt_init_mandatory_fieldnames,opt_init_allowed_fieldnames);
-GC.speak();
 
-%% Check the entries
+%% Check the opt_approx_method structure
+GC.check_fields(opt_approx_method,'opt_approx_method',opt_approx_method_mandatory_fieldnames,opt_approx_method_allowed_fieldnames);
+
 solver_allowed_fieldvalues = {'ode45','ode78','ode89','ode23','ode113','ode15s','ode23s','ode23t','ode23tb'};
-%Check the mandatory fields first (these are defintively present)
+
+% Check the mandatory fields first (these are defintively present)
 %%%%%%%%%%%%%%%%%%%%
 
-%Check the optional fields now
+% Check the optional fields now
+%%%%%%%%%%%%%%%%%%%%
+
+% Field 'solver'
+if isfield(opt_approx_method,'solver')
+    GC.check_data(opt_approx_method.solver,'opt_approx_method.solver','char',[],solver_allowed_fieldvalues); 
+    GC.speak();
+end
+
+% Field 'n_char'
+if isfield(opt_approx_method,'n_char')
+    GC.check_data(opt_approx_method.n_char,'opt_approx_method.n_char','double','scalar','positive');
+    if mod(opt_approx_method.n_char,1)~=0
+        GC.error_msg{1,end+1} = append('The value of the options field opt_approx_method.n_char is ',num2str(opt_approx_method.n_char),', but it must be an integer!');
+    end
+    if opt_approx_method.n_char == 0
+        GC.error_msg{1,end+1} = append('The value of the options field opt_approx_method.n_char is 0, but it must be a positive integer (> 0)!');
+    end
+    GC.speak();
+end
+
+
+%% Check the the opt_init_method structure
+GC.check_fields(opt_init,'opt_init',opt_init_mandatory_fieldnames,opt_init_allowed_fieldnames);
+
+% Check the mandatory fields first (these are defintively present)
+%%%%%%%%%%%%%%%%%%%%
+
+% Check the optional fields now
 %%%%%%%%%%%%%%%%%%%%
 if((isfield(opt_init,'c0')||isfield(opt_init,'c1')||isfield(opt_init,'s1'))&&isfield(opt_init,'iv'))
-    GC.error_msg{1,end+1} = 'You supplied a fourier series and "iv", but you must supply only one or none!';
+    GC.error_msg{1,end+1} = 'You supplied a Fourier series and ''iv'', but it is only allowed to supply either a Fourier series OR ''iv'' OR none of them!';
+    GC.speak();
 end
 
-% If no initial conditions are provided, set fourier-series to zeros
-if(~(isfield(opt_init,'c0')||isfield(opt_init,'c1')||isfield(opt_init,'s1')||isfield(opt_init,'iv')))
-    opt_init.c0 = zeros(system.dim,1); 
-end
-
-
-if(isfield(opt_init,'iv'))
+% Field 'iv'
+if isfield(opt_init,'iv')
     GC.check_data(opt_init.iv,'opt_init.iv','double','vector',[]);
     if mod(numel(opt_init.iv)/system.dim,1) ~= 0        % n_char_iv = numel(opt_init.iv)/system.dim must be an integer
         GC.error_msg{1,end+1} = append('You supplied "iv", which has size [',num2str(size(opt_init.iv,1)),' x 1]. However, the number of characteristics of "iv" equals');
@@ -49,6 +72,7 @@ if(isfield(opt_init,'iv'))
     % if(size(opt_init.iv,1)~=(system.dim*opt_approx_method.n_char))
     %     GC.error_msg{1,end+1} = append('You supplied "iv" which has size ',num2str(size(opt_init.iv,1)),' x 1 but should be ',num2str(system.dim*opt_approx_method.n_char),' x 1!');
     % end
+    GC.speak();
 end
 
 % Field 'c0'
@@ -84,9 +108,5 @@ if isfield(opt_init,'s1_matrix')
     end
     GC.speak();
 end
-
-if isfield(opt_approx_method,'solver'); GC.check_data(opt_approx_method.solver,'opt_approx_method.solver','char',[],solver_allowed_fieldvalues); end
-if isfield(opt_approx_method,'n_char'); GC.check_data(opt_approx_method.n_char,'opt_approx_method.n_char','double','scalar',[]); end
-GC.speak;
 
 end

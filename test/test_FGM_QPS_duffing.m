@@ -43,12 +43,15 @@ s_max2 = [-0.1, -0.025;
 
 %% Properties
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);                                                   % Properties of the System
-options.opt_sol  = costaropts('stability','off','cont','on','non_auto_freq',non_auto_freq,'sol_type','quasiperiodic',...
-                              'approx_method','fourier-galerkin','act_param',active_parameter,'display','step-control');    % Properties of the solution
+options.opt_sol  = costaropts('stability','on','cont','on','non_auto_freq',non_auto_freq,'sol_type','quasiperiodic',...
+                              'approx_method','fourier-galerkin','act_param',active_parameter,'display','error-control');   % Properties of the solution
 options.opt_init = costaropts('C0',zeros(2,1),'Cmatrix',c_max2,'Smatrix',s_max2,'Hmatrix',K3);
 options.opt_approx_method = costaropts('n_FFT',2^6,'error_limit',[1e-3 1e-2]);                                              % Properties for approx_method
 options.opt_cont = costaropts('pred','parable','mu_limit',mu_limit,'direction',-1);                                         % Properties for continuation
+options.opt_stability = costaropts('iterate_bfp','on','n_char_st',50,'n_map',5e3);                                          % Properties for stability
 
+
+%% Continuation
 timer = tic;                                    % Record current time
 [S,DYN] = costar(options);                      % Calculate initial solution and continue the curve
 time = toc(timer);                              % Display elapsed time since tic

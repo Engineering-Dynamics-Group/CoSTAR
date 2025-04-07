@@ -26,7 +26,7 @@ classdef SOL_PS_SHM < Solution
             obj.y0                     = y1;
             obj.s(:,1)                 = y1(1:(end-1-DYN.n_auto),1);                    % Approximation method vector 
             obj.mu(1,1)                = y1(end,1);                                     % Continuation parameter 
-            obj.J(:,:,1)               = J1;                                            % Jacobian matrix
+            obj.J{1,1}                 = sparse(J1);                                    % Jacobian matrix
             obj.dy(:,1)                = NaN(size(J1,1),1);                             % Initialised. Gets correctly filled by IF_arch_data
             obj.newton_flag(1,1)       = newton_flag;
             obj.arclength(1,1)         = 0;                                             % Set arc length of first curve point to zero
@@ -51,7 +51,7 @@ classdef SOL_PS_SHM < Solution
             
             obj.s(:,end+1)          = CON.p_y1(1:(end-1-DYN.n_auto),1);                 % Approximation method vector 
             obj.mu(1,end+1)         = CON.p_y1(end,1);                                  % Continuation parameter 
-            obj.J(:,:,end+1)        = CON.p_J1;                                         % Jacobian matrix
+            obj.J{1,end+1}          = sparse(CON.p_J1);                                 % Jacobian matrix
             obj.dy(:,end:end+1)     = [CON.dy0, NaN(size(CON.dy0))];                    % Direction vector of the predictor
             obj.newton_flag(1,end+1)= CON.p_newton_flag;                                % Exit-flag of corrector (fsolve)
             obj.step_width(1,end+1) = CON.step_width;
@@ -77,9 +77,9 @@ classdef SOL_PS_SHM < Solution
 
             obj.s(:,end+1)          = CON.p_y_bfp(1:(end-1-DYN.n_auto),1);              % Approximation method vector
             obj.mu(1,end+1)         = CON.p_y_bfp(end,1);                               % Continuation parameter
-            obj.J(:,:,end+1)        = CON.p_J_bfp;                                      % Jacobian matrix
+            obj.J{1,end+1}          = sparse(CON.p_J_bfp);                              % Jacobian matrix
             obj.dy(:,end:end+1)     = [NaN(size(CON.dy0)), NaN(size(CON.dy0))];         % Direction vector of the predictor
-            obj.newton_flag(1,end+1)= NaN;                                              % Exit-flag is unknown as it is not saved as a Stability class property
+            obj.newton_flag(1,end+1)= CON.p_newton_flag_bfp;                            % Exit-flag of corrector (fsolve)
             obj.step_width(1,end+1) = CON.step_width;
             obj.arclength(1,end+1)  = CON.p_arclength_bfp;
 

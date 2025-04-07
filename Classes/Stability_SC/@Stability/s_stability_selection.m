@@ -37,19 +37,9 @@ function ST = s_stability_selection(DYN,AM)
        
 
         %%%%%%%%%%% SHOOTING %%%%%%%%%%%
-        if strcmpi(DYN.approx_method,'shooting')
-
-            ST = ST_QPS_SHM(DYN);
-            ST.calc_stability = @(y,J) ST.QPS_SHM_calc_stability(y,J,DYN,AM);           % Stability method for quasi-periodic shooting
-            ST.test_functions = @(multipliers) NaN;                                     % There is no test function in the quasi-periodic case
-        
-
-        %%%%%%%%%%% FGM & FDM %%%%%%%%%%
-        else
-
-            ST = struct;        % Stability computation of quasi-periodic solutions only possible for SHM at the moment
-
-        end
+        ST = ST_QPS_SHM(DYN,AM);
+        ST.calc_stability = @(y,J) ST.QPS_SHM_calc_stability(y,J,DYN,AM);           % Stability method for quasi-periodic shooting
+        ST.test_functions = @(multipliers) NaN;                                     % There is no test function in the quasi-periodic case
 
         
     end

@@ -36,11 +36,15 @@ function update_curve_container_bfp(obj,y,multipliers,n_unstable)
     %The element before and after the change of stability are excluded and stay
     %in the container (obviously...). We delete the element with the largest index distance
     %to the element before the change of stability.
-    idx2     = find(diff(cell2mat(tmp2(3,:))));   
-    idx_val  = setdiff(1:size(obj.curve_container,2)+1,[idx2,idx2+1]); % +1 since the newly iterated curve point has been found
-    [~,idx3] = max(abs(idx_val-idx2)); %idx3 is the index of the element farest away from the posc. This element is deleted.
-    
-    tmp2(:,idx_val(idx3)) = [];
+    if isnan(n_unstable)                            % When stability computation failed and n_unstable is NaN, the code below "else" does not work
+        idx2 = isnan(cell2mat(tmp2(3,:)));
+        tmp2(:,idx2) = [];                          % Delete the solution where stability computation
+    else
+        idx2     = find(diff(cell2mat(tmp2(3,:))));   
+        idx_val  = setdiff(1:size(obj.curve_container,2)+1,[idx2,idx2+1]); % +1 since the newly iterated curve point has been found
+        [~,idx3] = max(abs(idx_val-idx2));          % idx3 is the index of the element farest away from the posc. This element is deleted.
+        tmp2(:,idx_val(idx3)) = [];                 % Delete unnecessaary solution in curve_container
+    end
     obj.curve_container = tmp2;
    
 end
