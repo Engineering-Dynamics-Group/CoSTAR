@@ -75,19 +75,18 @@ while  obj.p_contDo
 
 
     %%%%%%%%%%%%%%%%%%%%%%  CORRECTOR  %%%%%%%%%%%%%%%%%%%%
-    if(strcmpi(DYN.sol_type,'quasiperiodic')&&strcmpi(DYN.approx_method,'shooting'))                %special corrector function for quasi-periodic shooting
+    if strcmpi(DYN.approx_method,'shooting')                                    %special corrector function for quasi-periodic shooting
         obj.fsolve_opts.MaxIter = 50;
-        AM.IF_up_res_data(obj,DYN);                                                                 %pass information to the ApproxMethod object
-        AM.y_old = obj.yp;                                                                          %if autonomous y_old contains predicted solution
-        Fcn = @(y)AM.fun_Jac_wrapper(y,DYN,obj);                                                    %set functionwrapper to provide Jacobian
-        obj.fsolve_opts.SpecifyObjectiveGradient = true;                                            %Jacobian matrix is passed by the user
-    elseif strcmpi(DYN.approx_method,'finite-difference')                                           %special corrector function for FDM due to specification of Jacobian matrix
-        AM.IF_up_res_data(obj);                                                                     %pass information to the ApproxMethod object
-        obj.fsolve_opts.SpecifyObjectiveGradient = true;                                            %Jacobian matrix is passed by the user
-        Fcn = @(y) AM.corr_fun_FDM(y,obj);                                                          %set corrector-function
+        AM.IF_up_res_data(obj,DYN);                                             %pass information to the ApproxMethod object
+        Fcn = @(y) AM.fun_Jac_wrapper(y,obj);                                   %set functionwrapper to provide Jacobian
+        obj.fsolve_opts.SpecifyObjectiveGradient = true;                        %Jacobian matrix is passed by the user
+    elseif strcmpi(DYN.approx_method,'finite-difference')                       %special corrector function for FDM due to specification of Jacobian matrix
+        AM.IF_up_res_data(obj);                                                 %pass information to the ApproxMethod object
+        obj.fsolve_opts.SpecifyObjectiveGradient = true;                        %Jacobian matrix is passed by the user
+        Fcn = @(y) AM.corr_fun_FDM(y,obj);                                      %set corrector-function
     else
-        AM.IF_up_res_data(obj);                                                                     %pass information to the ApproxMethod object
-        Fcn = @(y)[AM.res(y);obj.sub_con(y,obj)];                                                   %define corrector-function containing the residual function and the subspace-constraint
+        AM.IF_up_res_data(obj);                                                 %pass information to the ApproxMethod object
+        Fcn = @(y)[AM.res(y);obj.sub_con(y,obj)];                               %define corrector-function containing the residual function and the subspace-constraint
     end
     
     [obj.p_y1,~,obj.p_newton_flag,obj.p_output,obj.p_J1] = fsolve(Fcn,obj.yp,obj.fsolve_opts);      %solve corrector function
@@ -122,7 +121,7 @@ while  obj.p_contDo
     %%%%%%%%%%%%%%%%%%  FSOLVE CONVERGED  %%%%%%%%%%%%%%%%%
     else
         %FDM: Check the Jacobian matrix -> Since R2023b: checkGradients is recommended instead of obj.fsolve_opts.CheckGradients = true
-        % checkGradients_opts = optimoptions('fsolve',FiniteDifferenceType='forward'); checkGradients(Fcn,obj.p_y1,checkGradients_opts,Display='on',Tolerance=1e-6);
+        % checkGradients_opts = optimoptions('fsolve',FiniteDifferenceType='forward'); checkGradients(Fcn,obj.p_y1,checkGradients_opts,Display='on',Tolerance=1e-5);
 
         if obj.p_newton_flag == 3
             warn_text = append('Equation solved for Iter = ',num2str(obj.p_local_cont_counter+1),', but change in residual is smaller than specified tolerance!');

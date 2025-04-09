@@ -54,10 +54,10 @@ classdef SOL_QPS_FDM < Solution
             obj.local_gridpoint_weights_2 = AM.weights_2';                      % Weights related to local grid point indices in theta_2-direction
 
             if strcmpi(DYN.stability,'on')
-                obj.multipliers(:,1)    = varargin{1,1}{1,2};
-                obj.vectors(:,:,1)      = varargin{1,1}{1,5};
-                obj.n_unstable(1,1)     = varargin{1,1}{1,3};
-                obj.stability_flag(1,1) = varargin{1,1}{1,4};
+                obj.multipliers(:,1)    = varargin{1,1}{1,2};                   % Floquet multipliers
+                obj.vectors(:,:,1)      = varargin{1,1}{1,5};                   % Eigenvectors related to Floquet multipliers
+                obj.n_unstable(1,1)     = varargin{1,1}{1,3};                   % Number of unstable multipliers
+                obj.stability_flag(1,1) = varargin{1,1}{1,4};                   % Exitflag of stability computation
             end
 
         end
@@ -86,8 +86,8 @@ classdef SOL_QPS_FDM < Solution
             end
 
             if strcmpi(DYN.stability,'on')
-                obj.multipliers(:,end+1)    = CON.p_multipliers;                    % 
-                obj.vectors(:,:,end+1)      = CON.p_vectors;                        % 
+                obj.multipliers(:,end+1)    = CON.p_multipliers;                    % Floquet multipliers
+                obj.vectors(:,:,end+1)      = CON.p_vectors;                        % Eigenvectors related to Floquet multipliers
                 obj.n_unstable(1,end+1)     = CON.p_n_unstable_1;                   % Number of unstable multipliers
                 obj.stability_flag(1,end+1) = CON.p_stability_flag;                 % Exitflag of stability computation
             end
@@ -99,32 +99,32 @@ classdef SOL_QPS_FDM < Solution
         %@CON:  Continuation class object
         %@DYN:  DynamicalSystem class object
         %@AM:   AM_QPS_FDM class object
-        function IF_arch_bfp_data(obj,CON,DYN,AM,ST)    % NOT WORKING CURRENTLY: Interface method for archiving the data of an iterated bifurcation point
+        function IF_arch_bfp_data(obj,CON,DYN,AM,ST)
 
-            % obj.s(:,end+1)          = CON.p_y_bfp(1:(end-1-DYN.n_auto),1);                      % Solution vector of approximation method
-            % obj.mu(1,end+1)         = CON.p_y_bfp(end,1);                                       % Continuation parameter
-            % obj.J(:,:,end+1)        = CON.p_J_bfp;                                              % Jacobian matrix
-            % obj.dy(:,end:end+1)     = [NaN(size(CON.dy0)), NaN(size(CON.dy0))];                 % Direction vector of the predictor
-            % obj.newton_flag(1,end+1)= NaN;                                                      % Exit-flag is unknown as it is not saved as a Stability class property 
-            % obj.step_width(1,end+1) = CON.step_width;                                           % Step width
-            % obj.arclength(1,end+1)  = CON.p_arclength_bfp;                                      % Arc length
-            % 
-            % if DYN.n_auto == 0
-            %     obj.freq(:,end+1) = reshape(DYN.non_auto_freq(CON.p_y_bfp(end,1)),2,1);             % Frequencies if system is non-autonomous
-            % elseif DYN.n_auto == 1
-            %     obj.freq(:,end+1) = [DYN.non_auto_freq(CON.p_y_bfp(end,1)); CON.p_y_bfp(end-1,1)];  % Frequencies if system is partly autonomous
-            % elseif DYN.n_auto == 2
-            %     obj.freq(:,end+1) = CON.p_y_bfp(end-2:end-1,1);                                     % Frequencies if system is fully autonomous
-            % end
-            % 
-            % obj.multipliers(:,end+1)    = CON.p_multipliers;                % 
-            % obj.vectors(:,:,end+1)      = CON.p_vectors_bfp;                % 
-            % obj.n_unstable(1,end+1)     = obj.n_unstable(1,end);            % Indiacting number of unstable multipliers. Definition: The number in the point is equal to the number before the bfp
-            % obj.stability_flag(1,end+1) = CON.p_stability_flag;             % Exitflag of stability computation 
-            %
-            % % Fill the table for the bifurcations 
-            % [label,msg] = ST.identify_bifurcation();
-            % obj.bifurcation = [obj.bifurcation;{label,numel(obj.mu),msg}];
+            obj.s(:,end+1)              = CON.p_y_bfp(1:(end-1-DYN.n_auto),1);                      % Solution vector of approximation method
+            obj.mu(1,end+1)             = CON.p_y_bfp(end,1);                                       % Continuation parameter
+            obj.J{1,end+1}              = sparse(CON.p_J_bfp);                                      % Jacobian matrix
+            obj.dy(:,end:end+1)         = [NaN(size(CON.dy0)), NaN(size(CON.dy0))];                 % Direction vector of the predictor
+            obj.newton_flag(1,end+1)    = CON.p_newton_flag_bfp;                                    % Exit-flag of corrector (fsolve)
+            obj.step_width(1,end+1)     = CON.step_width;                                           % Step width
+            obj.arclength(1,end+1)      = CON.p_arclength_bfp;                                      % Arc length
+
+            if DYN.n_auto == 0
+                obj.freq(:,end+1) = reshape(DYN.non_auto_freq(CON.p_y_bfp(end,1)),2,1);             % Frequencies if system is non-autonomous
+            elseif DYN.n_auto == 1
+                obj.freq(:,end+1) = [DYN.non_auto_freq(CON.p_y_bfp(end,1)); CON.p_y_bfp(end-1,1)];  % Frequencies if system is partly autonomous
+            elseif DYN.n_auto == 2
+                obj.freq(:,end+1) = CON.p_y_bfp(end-2:end-1,1);                                     % Frequencies if system is fully autonomous
+            end
+
+            obj.multipliers(:,end+1)    = CON.p_multipliers_bfp;                    % Ljapunov exponents
+            obj.vectors(:,:,end+1)      = CON.p_vectors_bfp;                        % There are no vectors related to Ljapunov exponents, so this is empty
+            obj.n_unstable(1,end+1)     = obj.n_unstable(1,end);                    % Indiacting number of unstable multipliers. Definition: The number in the point is equal to the number before the bfp
+            obj.stability_flag(1,end+1) = CON.p_stability_flag;                     % Exitflag of stability computation 
+
+            % Fill the table for the bifurcations 
+            [label,msg] = ST.identify_bifurcation();
+            obj.bifurcation = [obj.bifurcation;{label,numel(obj.mu),msg}];
         
         end
 

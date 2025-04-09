@@ -9,22 +9,25 @@
 
 function IC = getIC(obj,y,DYN,n_shoot)
 
-dim = DYN.dim;                                                              % Dimension of the state space
-s = y(1:end-1-DYN.n_auto);                                                  % Get the Fourier-Coefficients
-n_hh = (size(s,1)/dim-1)/2+1;                                               % Compute the number of higher harmonics
-if(DYN.n_auto>0)
-    Omega = y(end-1,1);
-else
-    Omega = DYN.non_auto_freq(y(end,1));
-end
+    dim = DYN.dim;                                          % Dimension of the state space
+    n_auto = DYN.n_auto;                                    % Number of autonomous frequencies
+    s = y(1:end-1-DYN.n_auto);                              % Get the Fourier-Coefficients
+    n_hh = (size(s,1)/dim-1)/2+1;                           % Compute the number of higher harmonics
 
-FC = [s(1:dim,1);s((dim+1):(n_hh)*dim,1)-1i.*s(((n_hh)*dim+1):end)];        % Assemble complex Fourrier vector
-FC = reshape(FC,dim,n_hh);
+    if n_auto == 0
+        omega = DYN.non_auto_freq(y(end,1));                % Get the frequency
+    elseif n_auto == 1
+        omega = y(end-1);                                   % Get the frequency
+    end
 
-T = linspace(0,2*pi/Omega,n_shoot+1);                                       % Define shooting points
-chf =  exp(1i.*Omega.*obj.hmatrix'.*T);                                     % Evaluate compex Fourier series at shooting points
+    FC = [s(1:dim,1);s((dim+1):(n_hh)*dim,1)-1i.*s(((n_hh)*dim+1):end)];        % Assemble complex Fourier vector
+    FC = reshape(FC,dim,n_hh);
 
-s_out = real(pagemtimes(FC,chf));                                           % Extract real Fourier coefficients
-IC = reshape(s_out(:,1:end-1),[dim*n_shoot, 1]);                            % Extract intitial values for multiple shooting
+    T = 2.*pi/omega;                                        % Periodic time
+    t = linspace(0,T*(1-1/n_shoot),n_shoot);                % Time vector at shooting points
+    chf =  exp(1i.*omega.*obj.hmatrix'.*t);                 % Evaluate complex Fourier series at shooting points
+
+    s_out = real(pagemtimes(FC,chf));                       % Extract real Fourier coefficients
+    IC = reshape(s_out,dim*n_shoot,1);                      % Extract state space values for multiple shooting
 
 end

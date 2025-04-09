@@ -33,6 +33,7 @@ options.opt_cont = costaropts('step_control','corrector_iterations','pred','tang
 options.opt_approx_method = costaropts('solver','ode45','n_char',50);                                                                             %Properties for sol_method (e.g. Shoot)
 options.opt_init = costaropts('iv',s0); 
 % options.opt_init = costaropts('c1_matrix',C1_mat,'s1_matrix',S1_mat);
+options.opt_stability = costaropts('iterate_bfp','on','n_char_st',50,'n_map',1e4);                                      %Properties for stability
 
 options.opt_cont.step_width = 0.5;                                                        %Initial step width
 options.opt_cont.direction = -1;                                                        %Changes the direction of continuation 

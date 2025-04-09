@@ -37,9 +37,9 @@ function obj = bifurcation_stability(obj,DYN,AM,S,ST)
                         obj.yp = ST.approx_posc(DYN);                   % Function approximates the point of stability change based on the curve_container; output needs to be assigned to yp for the up_res_data method to work
         
                         % Correct
-                        if(strcmpi(DYN.sol_type,'quasiperiodic')&&strcmpi(DYN.approx_method,'shooting'))
+                        if strcmpi(DYN.approx_method,'shooting')
                             AM.IF_up_res_data(obj,DYN);
-                            Fcn = @(y)AM.fun_Jac_wrapper(y,DYN,obj);                % Set functionwrapper to provide Jacobian
+                            Fcn = @(y) AM.fun_Jac_wrapper(y,obj);       % Set function wrapper to provide Jacobian
                             obj.fsolve_opts.SpecifyObjectiveGradient = true;
                         elseif strcmpi(DYN.approx_method,'finite-difference')
                             AM.IF_up_res_data(obj);
@@ -74,8 +74,8 @@ function obj = bifurcation_stability(obj,DYN,AM,S,ST)
                     if (obj.p_newton_flag_bfp > 0) && (obj.p_newton_flag_bfp ~= 2) && (obj.p_stability_flag > 0)
                         
                         % Get the arc-length of the bifurcation point (for solution object)
-                        [~,idx] = min(abs(cell2mat(ST.curve_container(3,:))));      % This should identify the (approximated) bifurcation point
-                        obj.p_arclength_bfp = ST.curve_container{2,idx};            % This is the arclength of the (approximated) bifurcation point
+                        [~,idx] = find(cell2mat(ST.curve_container(1,:)) == obj.p_y_bfp,1);     % Get the curve-container-index of the BFP
+                        obj.p_arclength_bfp = ST.curve_container{2,idx};                        % This is the arclength of the (approximated) bifurcation point
                         
                         if strcmpi(AM.error_control,'on')
                             obj.p_error_bfp = AM.IF_estimate_error(obj.p_y_bfp,DYN); 

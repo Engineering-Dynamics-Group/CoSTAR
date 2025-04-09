@@ -10,7 +10,7 @@ classdef ST_PS_SHM < Stability
         solver string = 'ode45';
         n_shoot = 5;
         solver_function function_handle
-        fsolve_opts = optimoptions('fsolve','Display','none','UseParallel',false,'MaxFunctionEvaluations', 20000,'MaxIter',1e3);    % Options for fsolve to solve corrector-equation
+        fsolve_opts = optimoptions('fsolve','Display','none','MaxIter',50,'UseParallel',false,'SpecifyObjectiveGradient',true);    % Options for fsolve to solve corrector-equation
 
         bifurc_label = {'FB','PDB','NSB','BF'};                                             % Labels for bifurcation, which correspond to the test_functions.
         msg_label = {'This is a fold, pitchfork or transcritical bifurcation.',...          % The last entry is a safety measure, for the case when a bifurcation
@@ -27,24 +27,21 @@ classdef ST_PS_SHM < Stability
         % Constructor
         function obj = ST_PS_SHM(DYN)
 
-            obj = updateoptions(obj,DYN.opt_stability);                 % updateoptions method is a general function
-
-            % Use the solver of the approximation method if given and if not specified in the opt_stability
+            % Reset the default value for the solver if shooting is the approximation method and solver was not defined in opt_stability
             if ~isfield(DYN.opt_stability,'solver')
                 if isfield(DYN.opt_approx_method,'solver')
                     obj.solver = DYN.opt_approx_method.solver;
                 end
             end
             obj = setSolver(obj,obj.solver);                            % Set the solver for the shooting for the monodromy matrix
+            
+            obj = updateoptions(obj,DYN.opt_stability);                 % updateoptions method is a general function
 
         end
 
-        [multipliers,vectors,stable,max_mult] = PS_SHM_calc_stability_non_auto(obj,y,J,DYN,AM);     % Function for calculating Floquet multipliers for a non-autonomous periodic solution for different approximation methods
-        [multipliers,vectors,stable,max_mult] = PS_SHM_calc_stability_auto(obj,y,J,DYN,AM);         % Function for calculating Floquet multipliers for an autonomous periodic solution for different approximation methods                                         
-
-        res = SHM_fun(obj,x,mu,DYN);                                    % ODE integration function for use in a shooting method for non-autonomous systems: Here, for usage in computing Floquet multipliers
-        res = SHM_auto_fun(obj,x,x0,mu,DYN);                            % ODE integration function for use in a shooting method for autonomous systems: Here, for usage in computing Floquet multipliers
-
+        [res,J_res] = PS_SHM_ST_residuum(obj,x,x0,mu,DYN);              % Residuum function
+        [multipliers,vectors,stable,max_mult] = PS_SHM_calc_stability(obj,y,J,DYN,AM);      % Function for calculating Floquet multipliers for different approximation methods
+        
     end
 
     %%%%%%%%%%%%%%%

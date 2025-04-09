@@ -8,7 +8,7 @@
 function help_struct = s_help_opt_approx_method_EQ()
 
 
-    help_struct.info = ['opt_approx_method --- equilibrium \n\n', ...
+    help_struct.info = ['opt_approx_method --- equilibrium solution \n\n', ...
                         ' To calculate equilibrium solutions, no approximation method is required.\n Thus, there are no options to set.'];
 
     help_struct.mandatory = [];

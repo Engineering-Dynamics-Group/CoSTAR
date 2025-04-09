@@ -57,8 +57,8 @@ function s_ST_PS_SHM_gatekeeper(GC,system,opt_sol,opt_stability)
         if mod(opt_stability.n_shoot,1)~=0
             GC.error_msg{1,end+1} = append('The value of the options field opt_stability.n_shoot is ',num2str(opt_stability.n_shoot),', but it must be an integer!');
         end
-        if opt_approx_method.n_shoot == 0
-            GC.error_msg{1,end+1} = append('The value of the options field opt_approx_method.n_shoot is 0, but it must be a positive integer (> 0)!');
+        if opt_stability.n_shoot == 0
+            GC.error_msg{1,end+1} = append('The value of the options field opt_stability.n_shoot is 0, but it must be a positive integer (> 0)!');
         end
     end
     
