@@ -1,0 +1,27 @@
+--------------------------------------------
+------------------ v3.1.1 ------------------
+--------------------------------------------
+
+Bugfixes:
+    
+    @AM_PS_FGM:
+        - AM_PS_FGM:
+            --> Switched the sum() and vecnorm() function for the calculation of the error. It is now computed similar to the quasi-periodic case (line 137)
+
+    @AM_QPS_FGM:
+        - s_QPS_FGM_gatekeeper:
+            --> Removed the restriction that the fields 'cmatrix' and 'smatrix' must be matrices. This is important when dimension of system is only one (lines 89 and 90)
+
+    @AM_QPS_SHM:
+        - AM_QPS_SHM:
+            --> The property phi is not initialised correctly (line 47)
+
+    @Solution:
+        - solplot:
+            --> Adapted the zlabel for quasi-periodic hypertime plots. The "Z" is now a capital letter and the theta is depicted in bold (line 316)
+
+    @SOL_QPS_FDM:
+        - evalsol_hypertime: 
+            --> Changed the "ismatrix" condition in line 84 to "dim == 1"
+        - evalsol_time:
+            --> Added an exception for dim = 1 to extract the correct values from Z_i_eval (lines 92 - 97)

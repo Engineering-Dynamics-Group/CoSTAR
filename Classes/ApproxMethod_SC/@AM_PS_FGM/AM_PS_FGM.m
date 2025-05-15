@@ -134,8 +134,7 @@ classdef AM_PS_FGM < ApproxMethod
         function err = IF_estimate_error(obj,y1,DYN)    
 
                 proj = obj.residuum_projection(y1,DYN);
-                err  = vecnorm(sum(abs(proj),2),2,1)./vecnorm(y1,2);        %Normalised Norm of errror in frequency space 
-
+                err = sum(vecnorm(abs(proj),2,1))./vecnorm(y1,2);           %Normalised Norm of errror in frequency space 
 
         end
 
