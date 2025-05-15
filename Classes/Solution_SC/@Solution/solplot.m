@@ -313,7 +313,7 @@ function output = solplot(obj,DYN,options)
                             xlabel('$\theta_1$','Interpreter','latex')          % Omit 'Hypertime' in axes label if there are more than 1 plots
                             ylabel('$\theta_2$','Interpreter','latex')          % Omit 'Hypertime' in axes label if there are more than 1 plots
                         end
-                        zlabel('$z_i (\theta)$','Interpreter','latex');
+                        zlabel('$Z_i (\mbox{\boldmath$\theta$})$','Interpreter','latex');
                         view([-30,50]);     
 
                     end

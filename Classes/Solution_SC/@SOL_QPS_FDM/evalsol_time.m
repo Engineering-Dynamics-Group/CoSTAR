@@ -89,8 +89,12 @@ function  [s,mu,t] = evalsol_time(obj,DYN,options)
 
         % fnval has evaluated the interpolated hypertime map for all theta_1_i_eval and theta_2_i_eval, i.e. the output Z_i_eval is a map again ( size(Z_i_eval) = [dim x res x res] )
         % For time evaluation, only the state vectors on the main diagonal of Z_i_map(j,:,:) (j = 1,...,dim) are needed
-        s_i_eval = Z_i_eval(:,1:res+1:end);             % This extracts the state vectors from the main diagonal of Z_i_eval(j,:,:)
-        s(:,:,i) = s_i_eval';                           % Transponse s_i_eval since size(s_i_eval) = [dim x res]
+        if dim == 1                                 % Exception for dim = 1: size(Z_i_eval) = [res x res]
+            s_i_eval = diag(Z_i_eval);              % The diagonal of a matrix can be extracted via diag()
+        else                                        % In all other cases: size(Z_i_eval) = [dim x res x res]
+            s_i_eval = Z_i_eval(:,1:res+1:end);     % Extract the state vectors from the main diagonal of Z_i_eval(j,:,:)
+        end
+        s(:,:,i) = s_i_eval';                       % Transponse s_i_eval since size(s_i_eval) = [dim x res]
 
     end
 
