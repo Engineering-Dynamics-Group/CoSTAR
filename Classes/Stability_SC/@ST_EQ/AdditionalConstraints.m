@@ -15,7 +15,7 @@ n = size(J,1);
 dim = n-1;
 if(idx0==1)
     s = svd(J(1:end-1,:));                  % Do an SVD of the extended Jacobian [df/ds,df/dmu]
-    tol = n*max(abs(s),[],'all')*eps;    % Define tolerance below which value is assumed equal to zero
+    tol = n*max(abs(s),[],'all')*eps;       % Define tolerance below which value is assumed equal to zero
     s(abs(s) < tol) = 0;                    % Set all values less than tol equal to zero
 
     rkJext = sum(abs(sign(s)),1);           % Determine the rank of the extended Jacobian
