@@ -6,7 +6,7 @@
     
         properties
     
-            bifurc_label = {'FB','HB','BF'};                                                                % Labels for bifurcation, which correspond to the test_functions. 
+            bifurc_label = {'FB','HB','TCB/PFB','BF'};                                                                % Labels for bifurcation, which correspond to the test_functions. 
             msg_label = { 'This is a fold, pitchfork or transcritical bifurcation.',...                     % The last entry is a safety measure, for the case when a bifurcation
                           'This is a Hopf bifurcation.',...                                                 % has been detected (due to a change in the number of unstable multipliers),
                           'A bifurcation has occurred for which a test function does not exist yet.'};      % but no test function was active.
