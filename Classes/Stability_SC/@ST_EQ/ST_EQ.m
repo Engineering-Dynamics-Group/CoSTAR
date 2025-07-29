@@ -34,6 +34,7 @@
         
         methods(Access = protected)
             cm = crit_multi(obj,DYN,multipliers);                                       %This function returns the real part of the given eigenvalues. 
+            idx = AdditionalConstraints(obj,idx,J);                                     % Checks whether fold-bifurcation is transcritical or pitchfork
         end
 
     end
