@@ -66,7 +66,7 @@ classdef SOL_EQ < Solution
             obj.stability_flag(1,end+1) = CON.p_stability_flag;                     %Exitflag of stability computation
 
             %Fill the table for the bifurcations 
-            [label,msg] = ST.identify_bifurcation();
+            [label,msg] = ST.identify_bifurcation(obj.J(:,:,end));
             obj.bifurcation = [obj.bifurcation;{label,numel(obj.mu),msg}];
         
         end

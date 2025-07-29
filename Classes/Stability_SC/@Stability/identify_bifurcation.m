@@ -7,7 +7,7 @@
 
 
 
-function [label,msg] = identify_bifurcation(obj)
+function [label,msg] = identify_bifurcation(obj,J)
 
     curve_container = obj.curve_container;
     
@@ -17,6 +17,7 @@ function [label,msg] = identify_bifurcation(obj)
         
         if ~isempty(idx)    %Is there a sign change in the test functions? If not - use the multipliers
             idx = idx(1);
+            idx = obj.AdditionalConstraints(idx,J);
             label = obj.bifurc_label{1,idx};
             msg = obj.msg_label{1,idx};
         else

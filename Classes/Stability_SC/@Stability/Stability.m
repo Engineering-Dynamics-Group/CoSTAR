@@ -38,11 +38,12 @@
             update_curve_container_bfp(obj,y_bf,multipliers,n_unstable);            %Updates the curve_container with a curve point from a bifurcation point iteration
             clean_curve_container(obj);                                             %Deletes all elements before the stability change
             y = approx_posc(obj,DYN);                                               %Function approximates the point of stability change based on the curve_container
-            [label,msg] = identify_bifurcation(obj);                                %Function give back a string identifying the detected bifurcation
+            [label,msg] = identify_bifurcation(obj,J);                              %Function give back a string identifying the detected bifurcation
         end
 
         methods(Abstract, Access = protected) 
             crit_multi(obj,DYN,multipliers);                                                    %Function that needs to be implemented in every subclass: Returns the critical multiplier parts (Real Part, Absolute Value -1, Lyapunov values)
+            AdditionalConstraints(obj,idx,J);
         end
 
     
