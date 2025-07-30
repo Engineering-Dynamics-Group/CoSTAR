@@ -84,6 +84,8 @@ classdef ST_QPS_SHM < Stability
 
     methods(Access = protected)
         cm = crit_multi(obj,DYN,multipliers);                           % This function returns the absolute value -1  of the given Floquet multipliers. 
+        idx = AdditionalConstraints(obj,idx,J);                         % Checks additional crtiteria for bifurcations
+
     end
 
 
