@@ -7,7 +7,7 @@ classdef DynamicalSystem
     %% Properties    
     properties(Constant)
         % Constant properties cannot be changed (read-only)
-        costar_version = '3.1.2';                                       %release versions (e.g. 3.1) should be defined as ' 3.1 ' (see the space between the ' and the numbers)
+        costar_version = '3.1.3';                                       %release versions (e.g. 3.1) should be defined as ' 3.1 ' (see the space between the ' and the numbers)
     end
 
 

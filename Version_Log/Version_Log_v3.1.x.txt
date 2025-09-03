@@ -56,3 +56,45 @@ RHS:
 
     - math_pendulum:
         --> Added
+
+
+
+--------------------------------------------
+------------------ v3.1.3 ------------------
+--------------------------------------------
+
+Added the integral phase condition to the periodic shooting method. Changes affect:
+
+    @AM_PS_SHM:
+        - AM_PS_SHM:
+            --> Removed the property y_old (former line 11)
+            --> Added the property phase_condition with default value 'poincare' (line 11)
+            --> Added opt_sol to input arguments of s_PS_SHM_gatekeeper (line 21)
+        - IF_up_res_data:
+            --> Updated method description and removed old comments (lines 1 - 5 and former lines 8 - 10)
+            --> Added if condition around existing (obj.iv = ...) code line (lines 9 - 13)
+        - PS_SHM_residuum:
+            --> Added variable n_time (line 18)
+            --> Replaced variable s_p by s_p_mat (lines 26, 122, 123, 181, 183, 184 and 186)
+            --> Added initialisation of variables Z_traj and Z_p to section "Preparation for integration", moved Z_end to this section (lines 43 - 45)
+            --> Added initialisation of variables Z_traj_plus, Z_traj_minus, Z_traj_mu_plus, Z_traj_mu_minus, Z_p_mu_plus and Z_p_mu_minus to section 
+                "Preparation for integration: needed for calculating the Jacobian" and moved Z_end_plus and Z_end_minus to this section (lines 53 - 56, 62, 63, 66 and 67)
+            --> Adapted integration: Replaced [t_start, t_end] by vector of time points, added shooting points at predictor point to initial conditions 
+                                     and save trajectories (lines 91 - 109)
+            --> Added integral phase condition and switch to decide between Poincare and integral phase condition (lines 120, 121, 124 - 129 and 131)
+            --> Restructured computation of Jacobian for autonomous systems and added computation of derivative of integral phase condition (lines 167 - 254)
+            --> Moved construction of Jacobian to lines 259 - 264
+        - s_help_opt_approx_method_PS_SHM:
+            --> Added description for field 'phase_condition' (lines 21 - 23)
+        - s_PS_SHM_gatekeeper:
+            --> Added 'phase_conditon' to allowed fieldnames (line 14)
+            --> Added GC.speak in line 31 and removed former empty line 41
+            --> Added checks for field 'phase_condition' (lines 44 - 52)
+
+    @ApproxMethod:
+        - s_AM_gatekeeper:
+            --> Added opt_sol to input arguments of AM_PS_SHM.s_PS_SHM_gatekeeper (line 23)
+
+    Test:
+        - test_SHM_PS_vdP:
+            --> Added the field 'phase_condition' to options.opt_approx_method (lines 21 and 35)

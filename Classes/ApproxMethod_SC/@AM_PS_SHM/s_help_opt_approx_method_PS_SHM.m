@@ -18,5 +18,8 @@ function help_struct = s_help_opt_approx_method_PS_SHM()
     help_struct.optional.n_shoot.value  = 'positive integer \n e.g.: 1, 2, 3, 4, ... \n Default: 2';
     help_struct.optional.n_shoot.text   = 'Number of intervals into which the period of a solution is divided for multiple shooting. n_shoot = 1 is denoted as single shooting method, while n_shoot > 1 represents multiple shooting.';
     
+    help_struct.optional.phase_condition.value  = '''poincare'' or ''integral''\n Default: ''poincare''';
+    help_struct.optional.phase_condition.text   = ['Defines the phase condition (PC), which is only allowed for autonomous systems. The PC is required to compute the frequency, which is an unknown variable for autonomous systems.\n' ...
+                                                   'The Poincare PC is easier to compute, while the Integral PC is said to minimise shifts in the solution profile.'];
     
 end
