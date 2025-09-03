@@ -55,8 +55,18 @@ GC.speak;
 
 %Check the mandatory fields first (these are definitively present)
 %%%%%%%%%%%%%%%%%%%%
-GC.check_data(opt_init.ic,'opt_init.ic','double',[system.dim,1],[]);
+GC.check_data(opt_init.ic,'opt_init.ic','double','vector',[]);
 GC.speak;
+if ~isfield(opt_approx_method,'n_shoot');       n_shoot = 5;
+else;                                           n_shoot = opt_approx_method.n_shoot;
+end
+if ~((numel(opt_init.ic) == system.dim) || (numel(opt_init.ic) == system.dim*n_shoot))
+    GC.error_msg{1,end+1} = append('The options field opt_init.ic is a ',num2str(numel(opt_init.ic)),'-dimensional vector.');
+    GC.error_msg{1,end+1} = 'However, the length of opt_init.ic must be equal either to the dimension dim of the system or to dim*n_shoot, ';
+    GC.error_msg{1,end+1} = 'where n_shoot is the number of shooting points.';
+end
+GC.speak;
+
 
 % Check the optional fields now
 %%%%%%%%%%%%%%%%%%%%

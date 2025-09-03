@@ -25,3 +25,34 @@ Bugfixes:
             --> Changed the "ismatrix" condition in line 84 to "dim == 1"
         - evalsol_time:
             --> Added an exception for dim = 1 to extract the correct values from Z_i_eval (lines 92 - 97)
+
+
+
+--------------------------------------------
+------------------ v3.1.2 ------------------
+--------------------------------------------
+
+The periodic shooting method now accepts the method solution vector s (or an arbitrary vector of the same size) as initial value. Changes affect:
+
+    @AM_PS_SHM:
+        - getIV:
+            --> Several changes in many lines. Method was adapted to work with a [dim x 1] vector as well as a [dim*n_shoot x 1] vector for DYN.opt_init.ic 
+        - s_help_opt_init_PS_SHM:
+            --> Added nomenclature to the info (lines 11 - 14)
+            --> Adapted description of field 'ic' (lines 17 - 21)
+        - s_PS_SHM_gatekeeper:
+            --> Adapted check for opt_init.ic (lines 58 - 68)
+          
+
+----------  
+
+@Continuation:
+
+    - stepcontrol:
+        --> Text "step_width" replaced by "stepwidth" (lines 16 and 186)
+
+
+RHS:
+
+    - math_pendulum:
+        --> Added

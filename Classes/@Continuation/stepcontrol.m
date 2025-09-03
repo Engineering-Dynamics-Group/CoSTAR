@@ -13,7 +13,7 @@ switch obj.step_control
 
         if obj.p_convergence == 0                                                                   % If corrector did not converge previously
             obj.step_width = obj.p_step_width_init;                                                 % Reset step-width to initial step width
-            info_text = append('Step width reset to step_width = ',num2str(obj.step_width));        % Set info text
+            info_text = append('Step width reset to stepwidth = ',num2str(obj.step_width));         % Set info text
             write_log(DYN,info_text)                                                                % Write info text in log file
             if strcmpi(DYN.display,'step-control') || strcmpi(DYN.display,'full')
                 disp(info_text);                                                                    % Display information
@@ -183,7 +183,7 @@ switch obj.step_control
                 step_control_info = append('Step width not adapted since step width is optimal (r_pre = ', num2str(r_pre), '). ', display_message_info);
             end
         else                                                        % If step width has been adapted
-            step_control_info = append('Step width adapted to step_width = ', num2str(obj.step_width), ' by factor r = ', num2str(obj.p_r), '. r_pre = ', num2str(r_pre), ', ', display_message_info);
+            step_control_info = append('Step width adapted to stepwidth = ', num2str(obj.step_width), ' by factor r = ', num2str(obj.p_r), '. r_pre = ', num2str(r_pre), ', ', display_message_info);
         end
         write_log(DYN,step_control_info)                            % Write step control info in log file
 
