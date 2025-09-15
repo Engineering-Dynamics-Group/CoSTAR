@@ -1,7 +1,7 @@
 # CoSTAR - Continuation of Solution Torus AppRoximations
 
 © 2024 Engineering Dynamics Group (Prof. Dr. Hartmut Hetzler), Institute of Mechanics, University of Kassel  
-CoSTAR has been developed by Dr. Simon Bäuerle, Alexander Seifert, Julian Vogelei, Dr. Jonas Kappauf
+CoSTAR has been developed by Dr. Simon Bäuerle, Alexander Seifert, Julian Vogelei, Dr. Jonas Kappauf, Mitja Rosenboom
 
 CoSTAR (Continuation of Solution Torus AppRoximations) is a MATLAB toolbox developed by the Engineering Dynamics Group at the University of Kassel. It enables the efficient computation and analysis of stationary (equilibria, periodic and quasi-periodic) solutions of dynamic systems. The toolbox is designed to calculate bifurcation diagrams using modular predictor-corrector methods that combine various approximation approaches. This modular structure supports both research and application needs by facilitating method comparisons and problem-specific adaptations within a unified framework.
 
