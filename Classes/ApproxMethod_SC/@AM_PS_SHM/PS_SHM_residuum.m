@@ -23,7 +23,6 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
         omega = DYN.non_auto_freq(mu);                  % Angular frequency (non-autonomous system)
     elseif n_auto == 1
         omega = y(end-1);                               % Angular frequency (autonomous system)
-        s_p_mat = reshape(obj.iv(1:end-1),dim,n_shoot); % Matrix of shooting points at the predictor point (obj.iv(end) is the autonomous frequency at the predictor point)
     end
 
     param = DYN.param;                                  % Parameter array
@@ -40,6 +39,7 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
     dT = T/n_shoot;                                     % Time span for each shooting operation (integration)
     T_int = [0:dT:(n_shoot-1)*dT; dT:dT:n_shoot*dT].';  % Define time intervals for the shooting operation (integration)
     z0_mat = reshape(s,dim,n_shoot);                    % Reshape s to a matrix of size [dim x n_shoot]
+    s_p_mat = reshape(obj.iv(1:end-n_auto),dim,n_shoot);% Matrix of shooting points at the predictor point (obj.iv(end) is the autonomous frequency if present)
     Z_traj = zeros(dim,n_time,n_shoot);                 % Stores the trajectory for evaluating the integral phase condition
     Z_end = zeros(dim,n_shoot);                         % Stores the end points of integration (could be stored in Z_traj as well, but using Z_end is more convenient)
     Z_p = zeros(dim,n_time,n_shoot);                    % Stores the trajectory of the predictor point for evaluating the integral phase condition

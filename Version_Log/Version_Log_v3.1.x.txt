@@ -98,3 +98,25 @@ Added the integral phase condition to the periodic shooting method. Changes affe
     Test:
         - test_SHM_PS_vdP:
             --> Added the field 'phase_condition' to options.opt_approx_method (lines 21 and 35)
+      
+
+----------  
+
+Added a coefficient for the linear stiffness to the duffing_ap function. 
+Tests and tutorials were adapted accordingly. Changes affect:
+
+    RHS:
+        - duffing_ap:
+            --> Added parameter c as fifth element of the "param" array (new line 13)
+            --> Added parameter c as coefficient for the linear stiffness (line 17)
+
+    test:
+        - test_FDM_PS_duffing       - test_FGM_PS_duffing       - test_SHM_PS_duffing
+
+    Tutorials:
+        - Example_Postprocessing_contplot           - Tutorial_Postprocessing_contplot
+        - Example_Postprocessing_solget             - Tutorial_Postprocessing_solget
+        - Example_Postprocessing_solplot            - Tutorial_Postprocessing_solplot
+        - Example_PS_FDM                            - Tutorial_PS_FDM
+        - Example_PS_FGM                            - Tutorial_PS_FGM
+        - Example_PS_SHM                            - Tutorial_PS_SHM

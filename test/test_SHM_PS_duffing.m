@@ -5,6 +5,7 @@
 
 
 %% Parameters
+c = 1;
 kappa = 0.3;        % kappa = 1.5
 D = 0.05;           % D = 0.2
 g = 1;
@@ -13,7 +14,7 @@ IC = [0;1];                                     % Initial condition for starting
 mu_limit = [0.01,2.5];                          % Limits of continuation diagram | [0.1,2.5];
 non_auto_freq = @(mu) mu;                       % Non autonomous frequency, either as function of bifurcation parameter or as a constant e.g. non_auto_freq = 2*pi
 
-param = {kappa,D,mu_limit(1),g};                % Parameter vector, all constant parameters are set here, the bifurcation parameter gets its starting value (here the left corner of bifurcation diagram)
+param = {kappa,D,mu_limit(1),g,c};              % Parameter vector, all constant parameters are set here, the bifurcation parameter gets its starting value (here the left corner of bifurcation diagram)
 active_parameter = 3;                           % Which parameter is the bifurcation parameter?
 Fcn = @(t,z,param)duffing_ap(t,z,param);        % Right-hand-side of ODE
 
