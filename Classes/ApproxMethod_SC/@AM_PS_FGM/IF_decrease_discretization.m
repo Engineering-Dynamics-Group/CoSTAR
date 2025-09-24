@@ -15,7 +15,8 @@
     
     %Storing the hmatrix to an additional property: This is needed for the IF_update_sol_dim method to have a reference point, which higher harmonics were
     %eliminated. 
-    obj.p_hmatrix_old = obj.hmatrix;          
+    % obj.p_hmatrix_old = obj.hmatrix;  
+    obj.ec_prop_save.hmatrix = hhm0;
 
     %reshape Fourier coefficients
     tmp = reshape(y(1:end-DYN.n_auto-1,1),DYN.dim,[]);
@@ -40,12 +41,12 @@
     
     if isempty(idx_min)     %Check if an idx was found, there are any inf's or nan's and if the new matrix is unique
         yp = y;
-        flag = 0;
+        flag = false;
     else
         idx = [1:(idx_min-1),(idx_min+1):numel(hhm0)-1];
         obj.hmatrix = [0,hhm0(1,idx+1)];
         yp = [c0; reshape(cmatrix(:,idx),[],1); reshape(smatrix(:,idx),[],1);y(end-DYN.n_auto:end)];
-        flag = 1;
+        flag = true;
     end
     
     end

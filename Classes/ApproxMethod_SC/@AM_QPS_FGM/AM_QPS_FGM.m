@@ -16,16 +16,18 @@ classdef AM_QPS_FGM < ApproxMethod
         phasecond = 'int_poincare'      %Phase condition 
 
         %Everything for error control
-        error_limit = [1e-3,1e-1];      %Limit for the spectral error 
-        ec_iter_max = 10;               %Maximal iteration number for error control
-        n_hh_max      = Inf;          %Maximum number of higher harmonics (for automatic increase by error_control)
+        error_limit  = [1e-3,1e-1];     %Limit for the spectral error 
+        ec_iter_max  = 10;              %Maximal iteration number for error control
+        n_hh_max     = Inf;             %Maximum number of higher harmonics (for automatic increase by error_control)
+        ec_prop_save = struct('iv',[],'hmatrix',[],'n_fft',[]);     %saves properties that are modified by the error control. If error control fails, the properties are resetted to the values stored in this struct
+
     end
     
     properties(Access=private)
         p_n_hh                      %Number of higher harmonics
         p_arg_val                   %Argument vector of base frequency (length is p_n_hh) for evaluation
         p_chf                       %complex harmonic function for building up the fourier series
-        p_hmatrix_old               %hmatrix of the last iteration. This is needed for the error_control 
+        % p_hmatrix_old               %hmatrix of the last iteration. This is needed for the error_control 
 
 
     end

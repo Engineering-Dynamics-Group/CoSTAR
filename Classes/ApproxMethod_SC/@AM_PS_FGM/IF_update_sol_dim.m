@@ -36,7 +36,8 @@ function varargout = IF_update_sol_dim(obj,DYN,new_dim, varargin)
 
         %p_hmatrix_old is the old hmatrix of the last iteration in the CON.error_control loop. You can't use S.hmatrix{1,end} here, since this is the state before
         %the error_control loop began. However, for multiple loops within the error_control, the state of the last loop of hmatrix is needed.
-        hhmold = obj.p_hmatrix_old;
+        % hhmold = obj.p_hmatrix_old;
+        hhmold = obj.ec_prop_save.hmatrix;
 
         tmp_hh = setdiff(hhmold,obj.hmatrix);
         if ~isempty(tmp_hh); idx = find(hhmold == tmp_hh); idx = idx-1;  end

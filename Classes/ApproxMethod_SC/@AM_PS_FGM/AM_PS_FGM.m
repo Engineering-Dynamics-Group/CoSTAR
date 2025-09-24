@@ -35,9 +35,10 @@ classdef AM_PS_FGM < ApproxMethod
         
 
         %Everything for error control
-        error_limit = [1e-3,1e-1];      %Limit for the spectral error 
-        ec_iter_max = 10;               %Maximal iteration number for error control
-        n_hh_max      = Inf;          %Maximum number of higher harmonics (for automatic increase by error_control)
+        error_limit  = [1e-3,1e-1];     %Limit for the spectral error 
+        ec_iter_max  = 10;              %Maximal iteration number for error control
+        n_hh_max     = Inf;             %Maximum number of higher harmonics (for automatic increase by error_control)
+        ec_prop_save = struct('iv',[],'hmatrix',[],'n_fft',[]);     %saves properties that are modified by the error control. If error control fails, the properties are resetted to the values stored in this struct
         
     end
 
@@ -50,7 +51,8 @@ classdef AM_PS_FGM < ApproxMethod
         p_n_hh                                                      %number of higher harmonics
         p_arg_val                                                   %argument vector of base frequency (length is p_n_hh) for evaluation
         p_chf                                                       %complex harmonic function for building up the fourier series
-        p_hmatrix_old                                               %hmatrix of the last iteration. This is needed for the error_control 
+        % p_hmatrix_old                                               %hmatrix of the last iteration. This is needed for the error_control 
+
 
     end
     %%%%%%%%%%%%%%%
@@ -98,7 +100,7 @@ classdef AM_PS_FGM < ApproxMethod
 
         %% Set Methods: These set methods guarantee that the value of p_n_hh, p_chf and p_arg_val are always updated/refreshed values.
 
-        function obj = set.hmatrix(obj,value)
+        function set.hmatrix(obj,value)
             obj.hmatrix = value;
             obj.p_n_hh  = numel(value);
             obj.p_chf   = exp(1i.*value'*obj.p_arg_val);
@@ -110,7 +112,7 @@ classdef AM_PS_FGM < ApproxMethod
         
         end
 
-        function obj = set.n_fft(obj,value)
+        function set.n_fft(obj,value)
             obj.n_fft       = value;
             obj.p_arg_val   = 0:(2*pi/value):(2*pi-2*pi/value);
             obj.p_chf       = exp(1i.*obj.hmatrix'*obj.p_arg_val);

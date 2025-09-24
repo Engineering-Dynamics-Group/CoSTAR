@@ -82,6 +82,7 @@ classdef Continuation < handle
         p_convergence = 1;                                                    %Set to zero if fsolve did not converge and step_width is reduced
         p_step_width_init                                                     %Storage for initial step_width
         p_limit                                                               %needed for plotting
+        p_ec_prop_save = struct('yp',[],'y0',[],'dy0',[]);                    %saves properties that are modified by error control (ec). If ec fails, they are resetted to the values stored in p_ec_prop_save
         p_r = 1;                                                              %Factor which adapts step width
         p_e = 1;                                                              %Used for PID step control
         p_dx_dmu                                                              %Used for PID step control
@@ -127,6 +128,7 @@ classdef Continuation < handle
         
         obj = plot_contplot(obj,S,DYN);                                     %Method for plotting a live continuation plot
         obj = error_control(obj,S,AM,DYN);                                  %Method for controlling the error by adapting the discretisation scheme
+        obj = ec_save_reset_props(obj,AM,save_or_reset);                    %Method for saving and resetting properties that are modified by the error control. Needed in case that error control fails
         obj = bifurcation_stability(obj,DYN,AM,S,ST);                       %Method for calculating the stability and determining bifurcation points
 
         %% Get Method
