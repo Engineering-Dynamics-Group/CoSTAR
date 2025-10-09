@@ -56,11 +56,11 @@ end
 % No initial solution found or solution found but Jacobian can be undefined
 if (newton_flag < 1) || (newton_flag == 2)
     if newton_flag < 1
-        error_text = 'ERROR: No initial solution found!';                       % Set error text
-        stopping_msg = 'CoSTAR stopped because corrector did not converge.';    % Set stopping message
+        error_text = append('ERROR: No initial solution found (fsolve exit_flag = ',num2str(newton_flag),')!');             % Set error text
+        stopping_msg = 'CoSTAR stopped because corrector did not converge.';                                                % Set stopping message
     elseif newton_flag == 2
-        error_text = 'ERROR: Equation solved, but change in y smaller than the specified tolerance, or Jacobian at y is undefined!';    % Set error text
-        stopping_msg = 'CoSTAR stopped because Jacobian can be undefined at initial solution.';                                         % Set stopping message
+        error_text = 'ERROR: Equation solved, but change in y smaller than the specified tolerance, or Jacobian at y is undefined (fsolve exit_flag = 2)!';     % Set error text
+        stopping_msg = 'CoSTAR stopped because Jacobian can be undefined at initial solution.';                             % Set stopping message
     end
     write_log(DYN,error_text)                                           % Write error text in log file
     write_log(DYN,'finalize_error',stopping_msg)                        % Finalize log file with error message
@@ -75,10 +75,10 @@ if (newton_flag < 1) || (newton_flag == 2)
 
 % Initial solution found, but fsolve exitflag is not default exitflag
 elseif newton_flag == 3
-    warn_msg{end+1} = 'WARNING: Equation solved, but change in residual is smaller than specified tolerance!';
+    warn_msg{end+1} = 'WARNING: Equation solved, but change in residual is smaller than specified tolerance (fsolve exit_flag = 3)!';
     S.warnings{end+1} = warn_msg{end}(10:end);                          % Save warning in Solution object
 elseif newton_flag == 4
-    warn_msg{end+1} = 'WARNING: Equation solved, but magnitude of search direction is smaller than specified tolerance!';
+    warn_msg{end+1} = 'WARNING: Equation solved, but magnitude of search direction is smaller than specified tolerance (fsolve exit_flag = 4)!';
     S.warnings{end+1} = warn_msg{end}(10:end);                          % Save warning in Solution object
 end
 
@@ -120,6 +120,7 @@ else
             end
             write_log(DYN,err_control_text)
 
+            %%%%%%%%%% Error is too high %%%%%%%%%%
             if (err > AM.error_limit(2)) && (counter < AM.ec_iter_max+1) && increase
                 err_control_text = append('Increase Discretization (Iteration: ',num2str(counter),')');
                 if ~(strcmpi(DYN.display,'off') || strcmpi(DYN.display,'final'))
@@ -128,6 +129,7 @@ else
                 write_log(DYN,err_control_text)
                 [y0,iterate] =  AM.IF_increase_discretization(y,DYN); %this might also update properties in AM
                 decrease = 0;
+            %%%%%%%%%% Error is too low %%%%%%%%%%
             elseif (err < AM.error_limit(1)) && (counter < AM.ec_iter_max+1) && decrease
                 err_control_text = append('Decrease Discretization (Iteration: ',num2str(counter),')');
                 if ~(strcmpi(DYN.display,'off') || strcmpi(DYN.display,'final'))
@@ -136,38 +138,77 @@ else
                 write_log(DYN,err_control_text)
                 [y0,iterate] = AM.IF_decrease_discretization(y,DYN); %this might also update properties in AM
                 increase = 0;
+            %%%%%%%%%% Error is fine %%%%%%%%%%
             else
-                iterate = 0;
+                break           % Stop the loop since the error is fine
             end
 
-            if iterate          % Recalculate a new curve point with de-/increased discretisation
-                % If autonomous y_old contains predicted solution
+            %%%%%%%%%% Recompute solution with in-/decreased discretization %%%%%%%%%%
+            if iterate == 1
+                % Corrector
                 if(strcmpi(DYN.sol_type,'quasiperiodic')&&strcmpi(DYN.approx_method,'shooting'))
-                    AM.IF_up_res_data(obj,DYN);                     % !!! Check this line if error_control becomes available for quasiperiodic shooting !!!
-                    AM.y_old = y0;
-                    Fcn = @(y)AM.fun_Jac_wrapper_init(y,y0,DYN);    % Function wrapper for initial solution, if Jacobian is supplied
-                    newtonOpts.SpecifyObjectiveGradient = true;
+                    AM.IF_up_res_data(y0(1:(end-1)),DYN);                       % Update AM properties and set y0 as initial value
+                    Fcn = @(y)AM.fun_Jac_wrapper_init(y,y0,DYN);                % Function wrapper for initial solution, if Jacobian is supplied
+                elseif strcmpi(DYN.approx_method,'finite-difference')           % Special corrector function for FDM due to specification of Jacobian matrix
+                    AM.IF_up_res_data(y0(1:(end-1)));                           % Update AM properties and set y0 as initial value
+                    Fcn = @(y) AM.corr_fun_init_FDM(y,y0);                      % Set corrector-function
                 else
-                    AM.iv = y0(1:(end-1));                          % Archive initial solution
-                    Fcn = @(y)[AM.res(y);y(end)-y0(end)];           % Define corrector-function containing the residual function and the subspace-constraint
+                    AM.iv = y0(1:(end-1));                                      % Set y0 as initial value
+                    Fcn = @(y)[AM.res(y);y(end)-y0(end)];                       % Define corrector-function containing the residual function and the subspace-constraint
+                end
+                newtonOpts.Display = 'off';                                     % Deactivate fsolve output
+                [y_ec,~,newton_flag_ec,~,J_ec] = fsolve(Fcn,y0,newtonOpts);     % Solve corrector-function
+
+                % Exit flag handling I
+                if any(newton_flag_ec == [1,3,4])       % Accept the result from fsolve if exitflag is 1, 3 or 4
+                    y = y_ec;
+                    newton_flag = newton_flag_ec;
+                    J = J_ec;
+                    if newton_flag_ec == 3
+                        warn_text = append('Equation solved for new discretization in error control, but change in residual is smaller than specified tolerance (fsolve exit_flag = 3)!');
+                        write_log(DYN,append('WARNING: ',warn_text))                                                % Write warning in log file
+                        S.warnings{end+1} = warn_text;                                                              % Save warning in Solution object
+                        warning(warn_text);                                                                         % Display warning
+                    elseif newton_flag_ec == 4
+                        warn_text = append('Equation solved for new discretization in error control, but magnitude of search direction is smaller than specified tolerance (fsolve exit_flag = 4)!');
+                        write_log(DYN,append('WARNING: ',warn_text))                                                % Write warning in log file
+                        S.warnings{end+1} = warn_text;                                                              % Save warning in Solution object
+                        warning(warn_text);                                                                         % Display warning
+                    end
+                else                                                % If exitflag from fsolve is < 0 or = 2
+                    error_text = append('ERROR: Error control failed at initial solution for iteration ',num2str(counter),', because fsolve returned exit_flag = ',num2str(newton_flag_ec),'!');
+                    % Next: Stop CoSTAR -> Set stopping message, finalize log, display error -> done below since code is identical to the case where in-/decrease of discretization failed
                 end
 
-                newtonOpts.Display = 'off';                         % Deactivate fsolve output
-                [y_er,~,newton_flag_er,~,J_er] = fsolve(Fcn,y0,newtonOpts);  % Solve corrector-function
+            %%%%%%%%%% In-/Decrease of discretization failed %%%%%%%%%%
+            elseif iterate == 0
+                error_text = append('ERROR: In-/Decrease of discretization failed during error control at initial solution!');
+                % Next: Stop CoSTAR -> Set stopping message, finalize log, display error -> done below since code is identical to the case where fsolve failed
 
-                % This if...else below does not work yet!
-                % Reason: AM.iv makes changes to AM object. When fsolve fails and the new solution is not accepted, we need to revert the mentioned changes.
-                %         If we do not revert the changes, there will be an error in stability computation! But how do we revert the changes?
-                % if (newton_flag_er > 0) && (newton_flag_er ~= 2)  % Accept the result from fsolve if exitflag is 1, 3 or 4
-                    y = y_er;
-                    newton_flag = newton_flag_er;
-                    J = J_er;
-                % else                                                % If exitflag from fsolve is < 0 or = 2
-                %     warn_msg{end+1} = 'WARNING: Error control stopped early or failed for initial solution!';
-                %     S.warnings{end+1} = warn_msg{end}(10:end);      % Save warning in Solution object
-                %     break                                           % Immediately break the loop. The last accepted solution is returned
-                % end
+            %%%%%%%%%% Decreasing not possible: Minimum discretization reached %%%%%%%%%%
+            elseif iterate == -1
+                info_text = 'Number of harmonics cannot be reduced any further since minimum number has been reached.';        % Set info text
+                write_log(DYN,info_text)                                        % Write info text in log file
+                if strcmpi(DYN.display,'error-control') || strcmpi(DYN.display,'full')
+                    disp(info_text);                                            % Display information
+                end
+                break               % We can exit the error control loop since we cannot reduce the discretization any further and error is already below the bottom threshold
 
+            end
+
+            %%%%%%%%%% Exit flag handling II: Termination if error control failed %%%%%%%%%%
+            if iterate == 0 || ~any(newton_flag_ec == [1,3,4])
+                stopping_msg = 'CoSTAR stopped because error control failed at initial solution.';  % Set stopping message
+                write_log(DYN,error_text)                                           % Write error text in log file
+                write_log(DYN,'finalize_error',stopping_msg)                        % Finalize log file with error message
+                if ~strcmpi(DYN.display,'off')
+                    disp(error_text); disp(' '); disp(stopping_msg); disp(' ')      % Display error text and message
+                    disp('-----------------------------------------------------')
+                    disp('--------------  Finished with error!  ---------------');
+                    disp('-----------------------------------------------------')
+                    disp(' ');
+                end
+                error(append(error_text(8:end),' ',stopping_msg))                   % Throw error
             end
 
         end

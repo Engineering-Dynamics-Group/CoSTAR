@@ -6,7 +6,7 @@
 % @AM:             ApproxMethod class object
 % @save_or_reset:  char determining whether to save or to reset the properties
 
-function obj = ec_save_reset_props(obj,AM,save_or_reset)
+function obj = IF_ec_save_reset_props(obj,AM,save_or_reset)
 
     fieldnames_AM_struct = fieldnames(AM.ec_prop_save);
     

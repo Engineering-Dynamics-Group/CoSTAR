@@ -51,7 +51,7 @@ classdef AM_PS_FGM < ApproxMethod
         p_n_hh                                                      %number of higher harmonics
         p_arg_val                                                   %argument vector of base frequency (length is p_n_hh) for evaluation
         p_chf                                                       %complex harmonic function for building up the fourier series
-        % p_hmatrix_old                                               %hmatrix of the last iteration. This is needed for the error_control 
+        p_hmatrix_old                                               %hmatrix of the last iteration. This is needed for the error_control 
 
 
     end

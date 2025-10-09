@@ -32,6 +32,7 @@ classdef Continuation < handle
         p_y1 = 0;                                                             %Initialise for get method of p_arcl_1 to be well defined
         p_J1
         p_newton_flag = 0;                                                    %Exit flag of Newton solver
+        p_ec_flag = 1;                                                        %Exit flag of error control 
         p_stopping_flag                                                       %Exit flag of continuation
         p_arcl_0  = 0;                                                        %arc-length of current point
         p_arcl_1  = 0;                                                        %arc-length of new point: Has its own get method
@@ -128,7 +129,7 @@ classdef Continuation < handle
         
         obj = plot_contplot(obj,S,DYN);                                     %Method for plotting a live continuation plot
         obj = error_control(obj,S,AM,DYN);                                  %Method for controlling the error by adapting the discretisation scheme
-        obj = ec_save_reset_props(obj,AM,save_or_reset);                    %Method for saving and resetting properties that are modified by the error control. Needed in case that error control fails
+        obj = IF_ec_save_reset_props(obj,AM,save_or_reset);                 %Method for saving and resetting properties that are modified by the error control. Needed in case that error control fails
         obj = bifurcation_stability(obj,DYN,AM,S,ST);                       %Method for calculating the stability and determining bifurcation points
 
         %% Get Method

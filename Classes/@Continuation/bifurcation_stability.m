@@ -20,7 +20,7 @@ function obj = bifurcation_stability(obj,DYN,AM,S,ST)
             %% Iteration of bifurcation point
             if strcmpi(ST.iterate_bfp,'on')
         
-                ST.update_curve_container(DYN,AM,obj.p_arcl_1,obj.p_y1,obj.p_multipliers,obj.p_n_unstable_1);       % Save the current solution curve point into the container (FIFO storage of the last n points)
+                ST.update_curve_container(DYN,AM,obj.p_arcl_1,obj.p_y1,obj.y0,obj.p_multipliers,obj.p_n_unstable_1);       % Save the current solution curve point into the container (FIFO storage of the last n points)
         
                 if ~isnan(obj.p_n_unstable_0) && ~(obj.p_n_unstable_0==obj.p_n_unstable_1)            % Change in number of unstable multipliers detected
         

@@ -26,7 +26,6 @@ function varargout = IF_update_sol_dim(obj,DYN,new_dim, varargin)
     cmatrix = tmp(:,2:0.5*(numel(tmp)/DYN.dim+1));          %Gatekeeper has ensured that this computation of dimension is always possible
     smatrix = tmp(:,0.5*(numel(tmp)/DYN.dim+1)+1:end);
 
-   
     if new_dim >numel(y0)
         
         numb = (new_dim-numel(y0))./2;
@@ -34,23 +33,28 @@ function varargout = IF_update_sol_dim(obj,DYN,new_dim, varargin)
    
     elseif new_dim<numel(y0)
 
-        %p_hmatrix_old is the old hmatrix of the last iteration in the CON.error_control loop. You can't use S.hmatrix{1,end} here, since this is the state before
-        %the error_control loop began. However, for multiple loops within the error_control, the state of the last loop of hmatrix is needed.
-        % hhmold = obj.p_hmatrix_old;
-        hhmold = obj.ec_prop_save.hmatrix;
+        % p_hmatrix_old is the old hmatrix of the last iteration in the CON.error_control loop (before decreasing the discretisation).
+        % We need it to decide which elements must be deleted from y0 (can't use S.hmatrix{1,end} since this is the state before the ...
+        % error_control loop began. For multiple loops within the error_control, however, the state of the last loop of hmatrix is needed.)
+        hhmold = obj.p_hmatrix_old;
 
         tmp_hh = setdiff(hhmold,obj.hmatrix);
-        if ~isempty(tmp_hh); idx = find(hhmold == tmp_hh); idx = idx-1;  end
+        if ~isempty(tmp_hh); idx = find(hhmold == tmp_hh); idx = idx-1;  else;  idx = [];  end
         if isempty(idx); idx = size(cmatrix,2)-1; obj.hmatrix = hhmold(1,1:end-1); end %If something goes wrong - simply delete the last harmonic
         idx2= [1:(idx-1),(idx+1):numel(hhmold)-1];
-        
+        % ATTENTION: The code for idx2 works if only one element was deleted (which is true within the error control loop)
+        % HOWEVER: IF_update_sol_dim is also called within update_curve_container in bifurcation_stability to adapt the last solution y0 to the dimension of the new solution y1
+        %          In this case, it is possible that 2 or more elements were deleted with respect to y0. If that happens, the code for idx2 ONLY works if
+        %          all deleted harmonics were the highest harmonics. Exception: The deletion of the last error control loop is arbitrary
 
         varargout{1,1} = [c0(:);reshape(cmatrix(:,idx2),[],1);reshape(smatrix(:,idx2),[],1);y0(end-DYN.n_auto:end)];
         
     else %This case occurs, if no new dimension could be found by the increase or decrease methods
+        
         varargout{1,1} = y0;
 
     end
+
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%% dy0 %%%%%%%%%%%%%%%%%%%%%%%
@@ -77,13 +81,8 @@ function varargout = IF_update_sol_dim(obj,DYN,new_dim, varargin)
             varargout{1,2} = dy0;
 
         end
+
     end
 
 
-
 end
-
-
-
-
-

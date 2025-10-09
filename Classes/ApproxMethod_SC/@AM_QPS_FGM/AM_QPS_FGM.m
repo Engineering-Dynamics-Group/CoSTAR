@@ -27,7 +27,7 @@ classdef AM_QPS_FGM < ApproxMethod
         p_n_hh                      %Number of higher harmonics
         p_arg_val                   %Argument vector of base frequency (length is p_n_hh) for evaluation
         p_chf                       %complex harmonic function for building up the fourier series
-        % p_hmatrix_old               %hmatrix of the last iteration. This is needed for the error_control 
+        p_hmatrix_old               %hmatrix of the last iteration. This is needed for the error_control 
 
 
     end
@@ -84,7 +84,7 @@ classdef AM_QPS_FGM < ApproxMethod
         end
         
          %% Set Methods: These set methods guarantee that the value of p_n_hh, p_chf and p_arg_val are always updated/refreshed values.
-        function obj = set.hmatrix(obj,value)
+        function set.hmatrix(obj,value)
             obj.hmatrix = value;
             obj.p_n_hh  = size(value,2);
             %How does this work?: I am evaluating here the arguments in the cosine or sine functions: cos(H1*theta1+H2*theta2). hmatrix'*p_freq_val is the scalar product
@@ -99,7 +99,7 @@ classdef AM_QPS_FGM < ApproxMethod
         
         end
 
-        function obj = set.n_fft(obj,value)
+        function set.n_fft(obj,value)
             obj.n_fft       = value;
             tmp  = 0:(2*pi/value):(2*pi-2*pi/value);  
             obj.p_arg_val   =  [reshape(repmat(tmp' ,  [1    ,value]),[1,(value)^2]);                       
