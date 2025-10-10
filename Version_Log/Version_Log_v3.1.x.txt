@@ -115,5 +115,38 @@ Improved the behaviour of CoSTAR around the error control. Added and exit flag h
 
 Bugfixes:
 
+    @Continuation:
         - plot_contplot:
             --> Added "drawnow limitrate" at the bottom to render the live plot for MATLAB versions >= 2025a (line 95)
+
+
+
+--------------------------------------------
+------------------ v3.1.5 ------------------
+--------------------------------------------
+
+Periodic shooting method: The Jacobian pattern (for the ODE integrator) is now set if an implicit ODE integrator is used.
+Changes affect:
+
+    @AM_PS_SHM:
+        - PS_SHM_residuum:
+            --> Added variable "odeOpts_1" and if-condition setting the Jacobian pattern (lines 45 - 48)
+            --> Replaced "obj.odeOpts" by "odeOpts_1" in line 88
+
+    @ST_PS_SHM:
+        - ST_PS_SHM:
+            --> Added if-condition setting the Jacobian pattern (lines 36 - 39)
+            --> Combined the if-conditions in former lines 31 and 32 to one if-condition (line 31)
+    
+
+----------  
+
+Bugfixes:
+
+    @ST_PS_SHM:
+        - ST_PS_SHM:
+            --> Moved the call of the function "setSolver" after the call of "updateoptions" (line 41)
+
+    test:
+        - test_FGM_PS_duffing:
+            --> Added "5" to the Hmatrix in line 36. The stability of the upper BFP can now computed again

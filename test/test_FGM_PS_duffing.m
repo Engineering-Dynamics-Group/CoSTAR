@@ -33,7 +33,7 @@ options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);    %Pr
 options.opt_sol  = costaropts('display','iter-detailed','stability','on','cont','on','non_auto_freq',non_auto_freq,'sol_type','periodic','approx_method','fourier-galerkin','act_param',active_parameter);   %Properties of the solution
 options.opt_cont = costaropts('step_control','angle','direction',1,'pred','tangent','subspace','pseudo-arc','mu_limit',mu_limit,'step_width',0.1);                 %Properties for continuation
 options.opt_approx_method = costaropts('n_FFT',2^6,'error_control','off');                                                                                                           %Properties for approx_method (e.g. Shoot)
-options.opt_init = costaropts('C0',zeros(2,1),'Cmatrix',c_max,'Smatrix',s_max,'Hmatrix',[0,1,3]);
+options.opt_init = costaropts('C0',zeros(2,1),'Cmatrix',c_max,'Smatrix',s_max,'Hmatrix',[0,1,3,5]);
 options.opt_stability       = costaropts('iterate_bfp','on');
 
 [S1,DYN1] = costar(options);                                                                                                                              %Calculate initial solution and continue the curve to set limits

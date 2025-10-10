@@ -42,6 +42,10 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
     Z_end = zeros(dim,n_shoot);                         % Initialize array for end points of shooting
     Z_end_plus  = zeros(dim*dim,n_shoot);               % Stores the end points of shooting with "+ delta" perturbed initial conditions
     Z_end_minus = zeros(dim*dim,n_shoot);               % Stores the end points of shooting with "- delta" perturbed initial conditions
+    odeOpts_1 = obj.odeOpts;                            % Use these options for the integrations with perturbed z_i (because that is where the FCN_wrapper is used)
+    if strcmpi(obj.solver,'ode15s') || strcmpi(obj.solver,'ode23s') || strcmpi(obj.solver,'ode23t') || strcmpi(obj.solver,'ode23tb')
+        odeOpts_1.JPattern = kron(speye(2*dim+1),spones(ones(dim)));    % Specify the Jacobian pattern for implicit solvers (used for time step, not corrector step)
+    end
 
     % Preparation for integration: needed for calculating the Jacobian
     Z_dim = reshape(repmat(z0_mat,dim,1),dim,n_shoot*dim);                      % This is a [dim x n_shoot*dim] matrix where each z_i is repeated dim times
@@ -81,7 +85,7 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
     for k=1:n_shoot
         % Create a [dim x (2*dim+1)] matrix Z0_mat storing the initial condition to integrate column-wise
         Z0_mat = [z0_mat(:,k), Z_dim_plus(:,(k-1)*dim+1:k*dim), Z_dim_minus(:,(k-1)*dim+1:k*dim)];   % Take z_i and the perturbed z_i (need to be integrated for J)
-        [~,Z] = obj.solver_function(@(t,Z)FCN_wrapper(t,Z,dim,@(t,z)Fcn(t,z,param)), T_int(k,:), Z0_mat, obj.odeOpts); 
+        [~,Z] = obj.solver_function(@(t,Z)FCN_wrapper(t,Z,dim,@(t,z)Fcn(t,z,param)), T_int(k,:), Z0_mat, odeOpts_1); 
         Z_end(:,k) = Z(end,1:dim).';                                % Take the unperturbed state vectors at t_end
         Z_end_plus(:,k)  = Z(end,dim+1:(dim+1)*dim).';              % Take the "+ delta" perturbed state vectors at t_end
         Z_end_minus(:,k) = Z(end,(dim+1)*dim+1:end).';              % Take the "- delta" perturbed state vectors at t_end
