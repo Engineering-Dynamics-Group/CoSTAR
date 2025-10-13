@@ -5,13 +5,14 @@
 
 
 %% Parameters
+c = 1;                                          % Coefficient of linear stiffness
 kappa = 0.3;                                    % Coefficient of non-linear stiffness
 D = 0.05;                                       % Damping factor
 g = 1;                                          % Amplitude of excitation
 
 mu_limit = [0.01, 2.5];   eta0 = mu_limit(1);   % Limits of continuation diagram and mu-value at start of continuation
 
-param = {kappa, D, eta0, g};                    % Parameter array
+param = {kappa, D, eta0, g, c};                 % Parameter array
 active_parameter = 3;                           % Defines where the continuation parameter is located within param
 
 non_auto_freq = @(mu) mu;                       % Non autonomous frequency
@@ -45,7 +46,7 @@ time = toc(timer);                              % Display elapsed time since tic
 
 
 %% Single solution at eta = 2: Using calculated solution of continuation as initial value, but different discretisation
-options.system.param = {kappa, D, 2, g};
+options.system.param = {kappa, D, 2, g, c};
 options.opt_sol.cont = 'off';
 options.opt_init = costaropts('fdm_sol',S.s(:,146));
 options.opt_approx_method.n_int = 250;

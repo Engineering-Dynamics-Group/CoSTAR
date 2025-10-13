@@ -18,7 +18,7 @@ Fcn = @(t,z,param)vdP_auto_ap(t,z,param);       % Right-hand-side of ODE
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);           % Properties of the system
 options.opt_sol  = costaropts('stability','off','cont','off','auto_freq',auto_freq,'sol_type','periodic','approx_method','shm','act_param',active_parameter);    % Properties of the solution
 options.opt_init = costaropts('ic',IC);                                             % Properties for initial solution
-options.opt_approx_method = costaropts('solver','ode45','n_shoot',10);              % Properties for approximation method
+options.opt_approx_method = costaropts('solver','ode45','n_shoot',10,'phase_condition','poincare');      % Properties for approximation method
 options.opt_stability       = costaropts('iterate_bfp','on');                       % Properties for stability
 
 
@@ -32,7 +32,7 @@ time1 = toc(timer);                             % Display elapsed time since tic
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);                                               % Properties of the system
 options.opt_sol  = costaropts('stability','on','cont','on','auto_freq',auto_freq,'sol_type','periodic','approx_method','shm','act_param',active_parameter);     % Properties of the solution
 options.opt_init = costaropts('ic',IC);                                                                                 % Properties for initial solution
-options.opt_approx_method = costaropts('solver','ode45','n_shoot',25);                                                  % Properties for approximation method
+options.opt_approx_method = costaropts('solver','ode45','n_shoot',25,'phase_condition','integral');                     % Properties for approximation method
 options.opt_cont = costaropts('step_control','angle','direction',-1,'mu_limit',mu_limit,'step_width',0.05);             % Properties for continuation
 options.opt_stability       = costaropts('iterate_bfp','on');                                                           % Properties for stability
 
