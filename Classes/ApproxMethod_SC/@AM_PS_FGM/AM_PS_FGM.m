@@ -120,15 +120,18 @@ classdef AM_PS_FGM < ApproxMethod
        
         %% Interface Methods
         %Interface methods: This is an abstract method and must be defined
-        %Use this interface to pass information between the continuer
-        %algorithm and your AM subclass
-        %@CON: Continuation class object
-        function obj = IF_up_res_data(obj,CON)                                     
-        
-            obj.iv = CON.yp(1:(end-1));             %update the current initial condition. Used for the poincare phase condition.
+        %It passes information between the continuation algrithm and the ApproxMethod subclass
+        %@var1: Continuation class object OR solution vector x whose dimension was updated in the error control
+        function obj = IF_up_res_data(obj,var1)
+
+            if isa(var1,'Continuation')                 % If var1 is an object of Continuation
+                obj.iv = var1.yp(1:(end-1));            % Update the current initial condition. Used for the phase condition
+            elseif isa(var1,'double')                   % var1 should be a solution vector (type double) in all other cases
+                obj.iv = var1;                          % Set iv to given solution vector x0 (only relevant in initial_solution)
+            end
 
         end
-       
+
         %Function for estimating the spectral error
         %@y1:   solution curve point vector
         %@DYN:  DynamicalSystem class object

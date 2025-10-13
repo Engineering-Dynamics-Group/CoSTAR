@@ -92,6 +92,6 @@ function plot_contplot(obj,S,DYN)
     obj.p_limit = max(tmp);
     ylim([0,obj.p_limit])
        
-    drawnow limitrate
+    drawnow
     
 end

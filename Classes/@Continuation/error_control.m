@@ -134,7 +134,7 @@ function obj = error_control(obj,S,AM,DYN)
                 step_width_pre = 0.5.*obj.step_width;                                                       % New preliminary step width
                 obj.step_width = max([step_width_pre,obj.step_width_limit(1)]);                             % Set step_width. If new preliminary step width falls below minimal step width, take minimal step width
                 obj.p_convergence = 0;                                                                      % Set property p_convergence to zero (for resetting the step_width after convergence)
-                info_text = append('Step width adapted to step_width = ',num2str(obj.step_width),', because error control failed! Computing a new solution with reduced step width.');
+                info_text = append('Step width adapted to stepwidth = ',num2str(obj.step_width),', because error control failed! Computing a new solution with reduced step width.');
                 write_log(DYN,info_text)                                                                    %write info text in log file
                 if strcmpi(DYN.display,'step-control') || strcmpi(DYN.display,'full'); disp(info_text); end %display info text
                 obj.p_ec_flag = 0;                                                                          % Set exit flag of error control

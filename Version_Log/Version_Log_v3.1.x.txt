@@ -65,9 +65,10 @@ Improved the behaviour of CoSTAR around the error control. Added and exit flag h
             --> The input argument can now either be a Continuation object or a solution vector x. This is important for the error control in initial_solution
 
     @AM_PS_FGM:
-        - AMP_PS_FGM:
+        - AM_PS_FGM:
             --> Added property "ec_prop_save" and initialised as struct (line 41)
             --> Removed the "obj = " from methods "set.hmatrix" and "set.n_fft" (lines 103 and 115)
+            --> The input argument of method "IF_up_res_data" can now either be a Continuation object or a solution vector x. This is important for the error control in initial_solution
         - IF_decrease_discretization:
             --> Updated description of output variable "flag" (line 10)
             --> Added initialisation of variable "err" (line 27)
@@ -77,14 +78,19 @@ Improved the behaviour of CoSTAR around the error control. Added and exit flag h
             --> Updated and added a few comments (lines 36 - 38 and 45 - 48)
             --> Added else-statement to line 42
 
+    @AM_PS_SHM:
+        - IF_up_res_data:
+            --> The input argument can now either be a Continuation object or a solution vector x. This is important for the error control in initial_solution
+
     @AM_QPS_FDM:
         - IF_up_res_data:
             --> The input argument can now either be a Continuation object or a solution vector x. This is important for the error control in initial_solution
 
     @AM_QPS_FGM:
-        - AMP_QPS_FGM:
+        - AM_QPS_FGM:
             --> Added property "ec_prop_save" and initialised as struct (line 22)
             --> Removed the "obj = " from methods "set.hmatrix" and "set.n_fft" (lines 87 and 102)
+            --> The input argument of method "IF_up_res_data" can now either be a Continuation object or a solution vector x. This is important for the error control in initial_solution
         - IF_decrease_discretization:
             --> Updated description of output variable "flag" (line 10)
             --> Added initialisation of variable "err" (line 27)
@@ -117,7 +123,7 @@ Bugfixes:
 
     @Continuation:
         - plot_contplot:
-            --> Added "drawnow limitrate" at the bottom to render the live plot for MATLAB versions >= 2025a (line 95)
+            --> Added "drawnow" at the bottom to render the live plot for MATLAB versions >= 2025a (line 95)
 
 
 
@@ -148,5 +154,7 @@ Bugfixes:
             --> Moved the call of the function "setSolver" after the call of "updateoptions" (line 41)
 
     test:
+        - check_costar:
+            --> Added if condition to reset default figure window style. It is now reset only for MATLAB versions prior to R2025a (lines 101 - 103)
         - test_FGM_PS_duffing:
             --> Added "5" to the Hmatrix in line 36. The stability of the upper BFP can now computed again

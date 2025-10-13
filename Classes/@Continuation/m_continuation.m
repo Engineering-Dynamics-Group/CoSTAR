@@ -97,7 +97,7 @@ while  obj.p_contDo
     %%%%%%%%%%%%  EXITFLAG < 1 OR EXITFLAG = 2  %%%%%%%%%%%
     if ((obj.p_newton_flag < 1) || (obj.p_newton_flag == 2)) && (obj.step_width <= obj.step_width_limit(1,1))               %if step width is already <= minimal step width 
         if obj.p_newton_flag < 1
-            warn_msg = append('WARNING: No solution found for Iter = ',num2str(obj.p_local_cont_counter+1),'(fsolve exit_flag = ',num2str(obj.p_newton_flag),')!');
+            warn_msg = append('WARNING: No solution found for Iter = ',num2str(obj.p_local_cont_counter+1),' (fsolve exit_flag = ',num2str(obj.p_newton_flag),')!');
             stopping_msg = 'CoSTAR stopped because corrector did not converge and step width has reached minimal value.';   %set stopping message
         elseif obj.p_newton_flag == 2
             warn_msg = append(['WARNING: Equation solved for Iter = ',num2str(obj.p_local_cont_counter+1),', but ' ...      %set warning message
@@ -113,7 +113,7 @@ while  obj.p_contDo
     
     elseif ((obj.p_newton_flag < 1) || (obj.p_newton_flag == 2)) && (obj.step_width > obj.step_width_limit(1,1))            %if fsolve did not converge and step width is above minimal step width 
         if obj.p_newton_flag < 1
-            warn_text = append('No solution found for Iter = ',num2str(obj.p_local_cont_counter+1),'(fsolve exit_flag = ',num2str(obj.p_newton_flag),')!');
+            warn_text = append('No solution found for Iter = ',num2str(obj.p_local_cont_counter+1),' (fsolve exit_flag = ',num2str(obj.p_newton_flag),')!');
         elseif obj.p_newton_flag == 2
             warn_text = append(['Equation solved for Iter = ',num2str(obj.p_local_cont_counter+1),', but ' ...              %set warning message
                                 'change in y smaller than the specified tolerance, or Jacobian at y is undefined (fsolve exit_flag = 2)!']);
@@ -125,7 +125,7 @@ while  obj.p_contDo
         step_width_pre = 0.5.*obj.step_width;                                                       %new preliminary step width
         obj.step_width = max([step_width_pre,obj.step_width_limit(1)]);                             %set step_width. If new preliminary step width falls below minimal step width, take minimal step width
         obj.p_convergence = 0;                                                                      %set property p_convergence to zero (for resetting the step_width after convergence)
-        info_text = append('Step width adapted to step_width = ',num2str(obj.step_width),', because corrector did not converge or Jacobian can be undefined!');
+        info_text = append('Step width adapted to stepwidth = ',num2str(obj.step_width),', because corrector did not converge or Jacobian can be undefined!');
         write_log(DYN,info_text)                                                                    %write info text in log file
         if strcmpi(DYN.display,'step-control') || strcmpi(DYN.display,'full'); disp(info_text); end %display info text
         continue                                                                                    %skip the remaining code and start the next loop (try again with reduced step width)

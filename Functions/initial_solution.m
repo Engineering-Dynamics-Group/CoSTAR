@@ -146,14 +146,14 @@ else
             %%%%%%%%%% Recompute solution with in-/decreased discretization %%%%%%%%%%
             if iterate == 1
                 % Corrector
-                if(strcmpi(DYN.sol_type,'quasiperiodic')&&strcmpi(DYN.approx_method,'shooting'))
+                if strcmpi(DYN.approx_method,'shooting')
                     AM.IF_up_res_data(y0(1:(end-1)),DYN);                       % Update AM properties and set y0 as initial value
                     Fcn = @(y)AM.fun_Jac_wrapper_init(y,y0,DYN);                % Function wrapper for initial solution, if Jacobian is supplied
                 elseif strcmpi(DYN.approx_method,'finite-difference')           % Special corrector function for FDM due to specification of Jacobian matrix
                     AM.IF_up_res_data(y0(1:(end-1)));                           % Update AM properties and set y0 as initial value
                     Fcn = @(y) AM.corr_fun_init_FDM(y,y0);                      % Set corrector-function
                 else
-                    AM.iv = y0(1:(end-1));                                      % Set y0 as initial value
+                    AM.IF_up_res_data(y0(1:(end-1)));                           % Update AM properties and set y0 as initial value
                     Fcn = @(y)[AM.res(y);y(end)-y0(end)];                       % Define corrector-function containing the residual function and the subspace-constraint
                 end
                 newtonOpts.Display = 'off';                                     % Deactivate fsolve output

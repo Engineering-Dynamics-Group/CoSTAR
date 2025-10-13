@@ -98,7 +98,9 @@ function check_costar(varargin)
     end
     
     set(0,'DefaultFigureVisible','on'); %Allow all figure windows
-    set(0,'DefaultFigureWindowStyle','normal')
+    if isMATLABReleaseOlderThan('R2025a')
+        set(0,'DefaultFigureWindowStyle','normal'); %Reset figure window style for all MATLAB versions prior to R2025a
+    end
 
     beep;
     
