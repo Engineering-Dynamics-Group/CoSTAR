@@ -34,7 +34,7 @@
         end
 
         methods
-            update_curve_container(obj,DYN,AM,arcl_1,y,multipliers,n_unstable);     %Adds a new curve point and stability information into the curve container and possibly updates the dimension of the contained solution curve points
+            update_curve_container(obj,DYN,AM,arcl_1,y,y0,multipliers,n_unstable);  %Adds a new curve point and stability information into the curve container and possibly updates the dimension of the contained solution curve points
             update_curve_container_bfp(obj,y_bf,multipliers,n_unstable);            %Updates the curve_container with a curve point from a bifurcation point iteration
             clean_curve_container(obj);                                             %Deletes all elements before the stability change
             y = approx_posc(obj,DYN);                                               %Function approximates the point of stability change based on the curve_container

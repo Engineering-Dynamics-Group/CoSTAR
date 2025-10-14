@@ -35,9 +35,10 @@ classdef AM_PS_FGM < ApproxMethod
         
 
         %Everything for error control
-        error_limit = [1e-3,1e-1];      %Limit for the spectral error 
-        ec_iter_max = 10;               %Maximal iteration number for error control
-        n_hh_max      = Inf;          %Maximum number of higher harmonics (for automatic increase by error_control)
+        error_limit  = [1e-3,1e-1];     %Limit for the spectral error 
+        ec_iter_max  = 10;              %Maximal iteration number for error control
+        n_hh_max     = Inf;             %Maximum number of higher harmonics (for automatic increase by error_control)
+        ec_prop_save = struct('iv',[],'hmatrix',[],'n_fft',[]);     %saves properties that are modified by the error control. If error control fails, the properties are resetted to the values stored in this struct
         
     end
 
@@ -51,6 +52,7 @@ classdef AM_PS_FGM < ApproxMethod
         p_arg_val                                                   %argument vector of base frequency (length is p_n_hh) for evaluation
         p_chf                                                       %complex harmonic function for building up the fourier series
         p_hmatrix_old                                               %hmatrix of the last iteration. This is needed for the error_control 
+
 
     end
     %%%%%%%%%%%%%%%
@@ -98,7 +100,7 @@ classdef AM_PS_FGM < ApproxMethod
 
         %% Set Methods: These set methods guarantee that the value of p_n_hh, p_chf and p_arg_val are always updated/refreshed values.
 
-        function obj = set.hmatrix(obj,value)
+        function set.hmatrix(obj,value)
             obj.hmatrix = value;
             obj.p_n_hh  = numel(value);
             obj.p_chf   = exp(1i.*value'*obj.p_arg_val);
@@ -110,7 +112,7 @@ classdef AM_PS_FGM < ApproxMethod
         
         end
 
-        function obj = set.n_fft(obj,value)
+        function set.n_fft(obj,value)
             obj.n_fft       = value;
             obj.p_arg_val   = 0:(2*pi/value):(2*pi-2*pi/value);
             obj.p_chf       = exp(1i.*obj.hmatrix'*obj.p_arg_val);
@@ -118,15 +120,18 @@ classdef AM_PS_FGM < ApproxMethod
        
         %% Interface Methods
         %Interface methods: This is an abstract method and must be defined
-        %Use this interface to pass information between the continuer
-        %algorithm and your AM subclass
-        %@CON: Continuation class object
-        function obj = IF_up_res_data(obj,CON)                                     
-        
-            obj.iv = CON.yp(1:(end-1));             %update the current initial condition. Used for the poincare phase condition.
+        %It passes information between the continuation algrithm and the ApproxMethod subclass
+        %@var1: Continuation class object OR solution vector x whose dimension was updated in the error control
+        function obj = IF_up_res_data(obj,var1)
+
+            if isa(var1,'Continuation')                 % If var1 is an object of Continuation
+                obj.iv = var1.yp(1:(end-1));            % Update the current initial condition. Used for the phase condition
+            elseif isa(var1,'double')                   % var1 should be a solution vector (type double) in all other cases
+                obj.iv = var1;                          % Set iv to given solution vector x0 (only relevant in initial_solution)
+            end
 
         end
-       
+
         %Function for estimating the spectral error
         %@y1:   solution curve point vector
         %@DYN:  DynamicalSystem class object

@@ -48,13 +48,13 @@ function [yp,flag] = IF_increase_discretization(obj,y,DYN)
     
     if isempty(idx)||sum(isnan(obj.hmatrix),'all')||sum(isinf(obj.hmatrix),'all')||~(size(obj.hmatrix,2)==size(unique(obj.hmatrix.','rows').',2)) %Check if an idx was found, there are any inf's or nan's and if the new matrix is unique
         yp = y;
-        flag = 0;
+        flag = false;
         obj.hmatrix = hhm0;
     else
         s0 = y(1:(end-DYN.n_auto-1),1);           %cut off the autonomous frequencies and the curve parameter at the end of the constant vector (stacked Fourier coefficients)
         [s,obj.hmatrix] = obj.sort_guess_FC(DYN,s0);
         yp = [s;y(end-DYN.n_auto:end)];
-        flag = 1;
+        flag = true;
     end
 
     end

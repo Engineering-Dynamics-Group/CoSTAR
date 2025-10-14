@@ -120,3 +120,136 @@ Tests and tutorials were adapted accordingly. Changes affect:
         - Example_PS_FDM                            - Tutorial_PS_FDM
         - Example_PS_FGM                            - Tutorial_PS_FGM
         - Example_PS_SHM                            - Tutorial_PS_SHM
+        
+        
+        
+--------------------------------------------
+------------------ v3.1.4 ------------------
+--------------------------------------------
+
+Improved the behaviour of CoSTAR around the error control. Added and exit flag handling and warnings if something does not work as intended.
+
+    @Continuation:
+        - bifurcation_stability:
+            --> Added obj.y0 to input arguments of method "ST.update_curve_container" (line 23)
+        - Continuation:
+            --> Added property "p_ec_flag" as exit flag of the error control (line 35)
+            --> Added property "p_ec_prop_save" as struct (line 86)
+            --> Added method "IF_ec_save_reset_props" (line 132)
+        - error_control:
+            --> Added call of "obj.IF_ec_save_reset_props" to line 18
+            --> Moved the update of the solution dimension of obj.p_y0_old{2} and obj.p_y0_old{3} to lines 79 and 80
+            --> Changed "iterate = 0" to "break" (line 52) and added setting of property "obj.p_ec_flag" in line 51
+            --> Updated the if...elseif block before fsolve. It should work for SHM and FDM now (lines 60 - 69)
+            --> Removed the old, not properly working code right after the corrector and added an extensive exit flag handling (lines 73 - 149)
+        - IF_ec_save_reset_props:
+            --> Completely added. Method saves and resets properties of AM and CON that are modified by the error control
+        - m_continuation:
+            --> Added obj.y0 to input arguments of method "ST.update_curve_container" (line 26)
+            --> Updated if condition to call method "obj.stepcontrol" (line 60). Now step control is only executed if error control did not fail
+            --> Added if condition to call method "obj.direction_vector" similar to if condition of "obj.stepcontrol" (lines 56 - 58)
+            --> Added warnings if corrector (fsolve) issued exit flag < 1 or = 2 and step width can be reduced (lines 115 - 124)
+            --> Removed the else-statement in former line 122. Added "continue" and "end" to (new) lines 131 and 133 and adapted the indent of the following code
+            --> Updated the call of the error control. It is now followed by a check of the exit flag (lines 173 - 180)
+            --> Removed the "obj = " from the calls of the methods "obj.direction_vector", "obj.stepcontrol", "obj.predictor", "obj.bifurcation_stability", 
+                "obj.iterate_data" and "obj.check_limits" (lines 57, 61, 65, 186, 196 and 198)
+            --> Added fsolve exit flag numbers to warning messages (lines 100, 104, 116, 119, 141 and 147)
+
+    @AM_PS_FDM:
+        - IF_up_res_data:
+            --> The input argument can now either be a Continuation object or a solution vector x. This is important for the error control in initial_solution
+
+    @AM_PS_FGM:
+        - AM_PS_FGM:
+            --> Added property "ec_prop_save" and initialised as struct (line 41)
+            --> Removed the "obj = " from methods "set.hmatrix" and "set.n_fft" (lines 103 and 115)
+            --> The input argument of method "IF_up_res_data" can now either be a Continuation object or a solution vector x. This is important for the error control in initial_solution
+        - IF_decrease_discretization:
+            --> Updated description of output variable "flag" (line 10)
+            --> Added initialisation of variable "err" (line 27)
+            --> if...else statement "isempty(idx_min)" moved to first if-statement (new lines 39 - 47)
+            --> Changed the code of the outer else-body (former first else-body) to handle the case where decreasing is not possible anymore (lines 50 and 51)
+        - IF_update_sol_dim:
+            --> Updated and added a few comments (lines 36 - 38 and 45 - 48)
+            --> Added else-statement to line 42
+
+    @AM_PS_SHM:
+        - IF_up_res_data:
+            --> The input argument can now either be a Continuation object or a solution vector x. This is important for the error control in initial_solution
+
+    @AM_QPS_FDM:
+        - IF_up_res_data:
+            --> The input argument can now either be a Continuation object or a solution vector x. This is important for the error control in initial_solution
+
+    @AM_QPS_FGM:
+        - AM_QPS_FGM:
+            --> Added property "ec_prop_save" and initialised as struct (line 22)
+            --> Removed the "obj = " from methods "set.hmatrix" and "set.n_fft" (lines 87 and 102)
+            --> The input argument of method "IF_up_res_data" can now either be a Continuation object or a solution vector x. This is important for the error control in initial_solution
+        - IF_decrease_discretization:
+            --> Updated description of output variable "flag" (line 10)
+            --> Added initialisation of variable "err" (line 27)
+            --> if...else statement "isempty(idx_min)" moved to first if-statement (new lines 39 - 47)
+            --> Changed the code of the outer else-body (former first else-body) to handle the case where decreasing is not possible anymore (lines 50 and 51)
+        - IF_update_sol_dim:
+            --> Updated and added a few comments (lines 34 - 36, 43 - 46 and 77)
+            --> Added else-statement to line 40
+
+    @Stability:
+        - Stability:
+            --> Added y0 to input arguments of method "update_curve_container" (line 37)
+        - update_curve_container:
+            --> Added y0 to input arguments (line 14)
+            --> Added if...else statement (lines 32 - 34 and 47): 
+                y0 is now directly used to replace the old y0 in the curve container, which avoids calling IF_update_sol_dim (small bug in this method)
+            --> Added a few comments (lines 24 and 35 - 37) and adapted the position of other comments
+
+    Functions:
+        - initial_solution:
+            --> Added fsolve exit flag numbers to warning messages (lines 59, 62, 78 and 81)
+            --> Changed "iterate = 0" from former line 140 to "break" (line 143)
+            --> Updated the if...elseif block in the error control before fsolve. It should work for SHM and FDM now (lines 147 - 157)
+            --> Removed the old, not properly working code right after the corrector in the error control and added an exit flag handling (lines 161 - 212)
+    
+
+----------  
+
+Bugfixes:
+
+    @Continuation:
+        - plot_contplot:
+            --> Added "drawnow" at the bottom to render the live plot for MATLAB versions >= 2025a (line 95)
+
+
+
+--------------------------------------------
+------------------ v3.1.5 ------------------
+--------------------------------------------
+
+Periodic shooting method: The Jacobian pattern (for the ODE integrator) is now set if an implicit ODE integrator is used.
+Changes affect:
+
+    @AM_PS_SHM:
+        - PS_SHM_residuum:
+            --> Added variable "odeOpts_1" and if-condition setting the Jacobian pattern (lines 45 - 48)
+            --> Replaced "obj.odeOpts" by "odeOpts_1" in line 88
+
+    @ST_PS_SHM:
+        - ST_PS_SHM:
+            --> Added if-condition setting the Jacobian pattern (lines 36 - 39)
+            --> Combined the if-conditions in former lines 31 and 32 to one if-condition (line 31)
+    
+
+----------  
+
+Bugfixes:
+
+    @ST_PS_SHM:
+        - ST_PS_SHM:
+            --> Moved the call of the function "setSolver" after the call of "updateoptions" (line 41)
+
+    test:
+        - check_costar:
+            --> Added if condition to reset default figure window style. It is now reset only for MATLAB versions prior to R2025a (lines 101 - 103)
+        - test_FGM_PS_duffing:
+            --> Added "5" to the Hmatrix in line 36. The stability of the upper BFP can now computed again

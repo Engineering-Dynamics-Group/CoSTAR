@@ -39,10 +39,17 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
     dT = T/n_shoot;                                     % Time span for each shooting operation (integration)
     T_int = [0:dT:(n_shoot-1)*dT; dT:dT:n_shoot*dT].';  % Define time intervals for the shooting operation (integration)
     z0_mat = reshape(s,dim,n_shoot);                    % Reshape s to a matrix of size [dim x n_shoot]
+    Z_end = zeros(dim,n_shoot);                         % Initialize array for end points of shooting
     s_p_mat = reshape(obj.iv(1:end-n_auto),dim,n_shoot);% Matrix of shooting points at the predictor point (obj.iv(end) is the autonomous frequency if present)
     Z_traj = zeros(dim,n_time,n_shoot);                 % Stores the trajectory for evaluating the integral phase condition
     Z_end = zeros(dim,n_shoot);                         % Stores the end points of integration (could be stored in Z_traj as well, but using Z_end is more convenient)
     Z_p = zeros(dim,n_time,n_shoot);                    % Stores the trajectory of the predictor point for evaluating the integral phase condition
+    odeOpts_1 = obj.odeOpts;                            % Use these options for the integrations with perturbed z_i (because that is where the FCN_wrapper is used)
+    odeOpts_2 = obj.odeOpts;                            % Use these options for the integrations with perturbed mu (FCN_wrapper is used as well)
+    if strcmpi(obj.solver,'ode15s') || strcmpi(obj.solver,'ode23s') || strcmpi(obj.solver,'ode23t') || strcmpi(obj.solver,'ode23tb')
+        odeOpts_1.JPattern = kron(speye(2*dim+2),spones(ones(dim)));    % Specify the Jacobian pattern for implicit solvers (used for time step, not corrector step)
+        odeOpts_2.JPattern = kron(speye(2),spones(ones(dim)));          % Specify the Jacobian pattern for implicit solvers (used for time step, not corrector step)
+    end
     
     % Preparation for integration: needed for calculating the Jacobian
     Z_dim = reshape(repmat(z0_mat,dim,1),dim,n_shoot*dim);                      % This is a [dim x n_shoot*dim] matrix where each z_k is repeated dim times
@@ -87,9 +94,9 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
     % when approximating the derivatives and dividing by delta (~ e-8). Thus, the Jacobian can have errors ~ e-1 that eventually causes the corrector ...
     % to need more iterations. Not only does this influence the computation time negatively, it can also lead to the step control reducing the step size.
     for k=1:n_shoot
-        % Create a [dim x (2*dim+1)] matrix Z0_mat storing the initial condition to integrate column-wise
+        % Create a [dim x (2*dim+1)] matrix Z0_mat storing the initial condition to integrate column-wise  
         Z0_mat = [z0_mat(:,k), Z_dim_plus(:,(k-1)*dim+1:k*dim), Z_dim_minus(:,(k-1)*dim+1:k*dim), s_p_mat(:,k)];    % Take z_k, the perturbed z_k and z_k^(P) (z_k at predictor) (need to be integrated for J)
-        [~,Z] = obj.solver_function(@(t,Z) FCN_wrapper(t,Z,dim,@(t,z)Fcn(t,z,param)), linspace(T_int(k,1),T_int(k,2),n_time+1), Z0_mat, obj.odeOpts); 
+        [~,Z] = obj.solver_function(@(t,Z) FCN_wrapper(t,Z,dim,@(t,z)Fcn(t,z,param)), linspace(T_int(k,1),T_int(k,2),n_time+1), Z0_mat, odeOpts_1); 
         Z_traj(:,:,k)       = Z(1:end-1,1:dim).';                   % Save the trajectory (not Z(t_end) because it will be equal to Z(t_start) of the next interval after convergence)
         Z_traj_plus(:,:,k)  = Z(1:end-1,dim+1:(dim+1)*dim).';       % Save the trajectory of the "+ delta" perturbed initial conditions
         Z_traj_minus(:,:,k) = Z(1:end-1,(dim+1)*dim+1:end-dim).';   % Save the trajectory of the "- delta" perturbed initial conditions
@@ -98,12 +105,12 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
         Z_end_plus(:,k)  = Z(end,dim+1:(dim+1)*dim).';              % Take the "+ delta" perturbed state vectors at t_end
         Z_end_minus(:,k) = Z(end,(dim+1)*dim+1:end-dim).';          % Take the "- delta" perturbed state vectors at t_end
         % Now do a second/third integration with perturbed mu-value (needed for Jacobian - can be deactivated when it is calculated by fsolve)
-        [~,Z_mu_plus]  = obj.solver_function(@(t,Z) FCN_wrapper(t,Z,dim,@(t,z)Fcn(t,z,param_mu_plus)), linspace(T_int_mu_plus(k,1),T_int_mu_plus(k,2),n_time+1), [z0_mat(:,k),s_p_mat(:,k)], obj.odeOpts); 
+        [~,Z_mu_plus]  = obj.solver_function(@(t,Z) FCN_wrapper(t,Z,dim,@(t,z)Fcn(t,z,param_mu_plus)), linspace(T_int_mu_plus(k,1),T_int_mu_plus(k,2),n_time+1), [z0_mat(:,k),s_p_mat(:,k)], odeOpts_2); 
         Z_traj_mu_plus(:,:,k) = Z_mu_plus(1:end-1,1:dim).';         % Save the "+ delta" perturbed mu trajectory
         Z_end_mu_plus(:,k) = Z_mu_plus(end,1:dim).';                % Take the state vector of the "+ delta" perturbed mu trajectory at t_end
         Z_p_mu_plus(:,:,k) = Z_mu_plus(1:end-1,dim+1:end).';        % Save the "+ delta" perturbed mu trajectory at the predictor point
         if calc_stability                                           % Only required when using central finite difference for Jacobian
-            [~,Z_mu_minus] = obj.solver_function(@(t,Z) FCN_wrapper(t,Z,dim,@(t,z)Fcn(t,z,param_mu_minus)), linspace(T_int_mu_minus(k,1),T_int_mu_minus(k,2),n_time+1), [z0_mat(:,k),s_p_mat(:,k)], obj.odeOpts);
+            [~,Z_mu_minus] = obj.solver_function(@(t,Z) FCN_wrapper(t,Z,dim,@(t,z)Fcn(t,z,param_mu_minus)), linspace(T_int_mu_minus(k,1),T_int_mu_minus(k,2),n_time+1), [z0_mat(:,k),s_p_mat(:,k)], odeOpts_2);
             Z_traj_mu_minus(:,:,k) = Z_mu_minus(1:end-1,1:dim).';   % Save the "- delta" perturbed mu trajectory
             Z_end_mu_minus(:,k) = Z_mu_minus(end,1:dim).';          % Take the state vector of the "- delta" perturbed mu trajectory at t_end
             Z_p_mu_minus(:,:,k) = Z_mu_minus(1:end-1,dim+1:end).';  % Save the "- delta" perturbed mu trajectory at the predictor point
