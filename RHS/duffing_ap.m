@@ -10,9 +10,10 @@ function f = duffing_ap(t,z,param)
     D = param{2};               % "D" is the second element of the "param" array
     eta = param{3};             % "eta" is the third element of the "param" array
     g = param{4};               % "g" is the fourth element of the "param" array
+    c = param{5};               % "c" is the fifth element of the "param" array
    
     % Duffing equation, rewritten as system of two differential equations of first order:
     f(1,:) =  z2;                                                       % First row is: d(z1)/dt = z2
-    f(2,:) = - 2*D.*z2 - z1 - kappa.*z1.^3  + g.*cos(eta.*t);           % Second row is: d(z2)/dt = ...
+    f(2,:) = - 2*D.*z2 - c.*z1 - kappa.*z1.^3  + g.*cos(eta.*t);        % Second row is: d(z2)/dt = ...
 
 end

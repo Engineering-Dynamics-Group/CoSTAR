@@ -30,10 +30,10 @@
 clear variables; clc; close all;                    % clear workspace; clear command window; close all figures
 
 % Parameters
-D = 0.05;     kappa = 0.3;     g = 1;               % Parameters needed for the Duffing differential equation
+D = 0.05;   c = 1;   kappa = 0.3;   g = 1;          % Parameters needed for the Duffing differential equation
 mu_limit = [0.01, 2.5];                             % Limits of the continuation        
-eta0 = mu_limit(1);                                 % Value of continuation parameter at start of continuation
-param = {kappa, D, eta0, g};                        % Parameter array
+eta0 = mu_limit(1);                                 % Value of continuation parameter at begin of continuation
+param = {kappa, D, eta0, g, c};                     % Parameter array
 active_parameter = 3;                               % Location of continuation parameter within the array
 C0 = zeros(2,1);                                    % Fourier coefficients of the constant term used to create an initial value for fsolve
 Cmatrix = [g; 0];    Smatrix = [0; -eta0*g];        % Fourier coefficients of the cosine and sine terms used to create an initial value for fsolve
@@ -65,7 +65,7 @@ solplot_output_1  = S.solplot(DYN,solplot_options_1);                           
 eta_kappa = 1.5;                                    % Excitation frequency is now fixed
 mu_limit_kappa = [0, 1];                            % New limits of the continuation
 kappa0 = mu_limit_kappa(1);                         % New value of continuation parameter at start of continuation
-param_kappa = {kappa0, D, eta_kappa, g};            % New parameter array
+param_kappa = {kappa0, D, eta_kappa, g, c};         % New parameter array
 active_parameter_kappa = 1;                         % New location of continuation parameter within the array
 Fc0 = cell2mat(S.s(:,1));                           % Fourier series coefficient vector used as an initial value for fsolve
 Hmatrix_kappa = [0, 1, 2, 3, 4, 5];                 % New Hmatrix since no error control is used this time

@@ -1,5 +1,8 @@
-%This methods updates the necessary data of the ApproxMethod object with
-%data from the Continuer object
+% This function is a method of the subclass AM_PS_SHM.
+% It passes information between the continuation algrithm and the ApproxMethod subclass.
+%
+% @obj: ApproxMethod subclass AM_PS_SHM object
+% @CON: Continuation class object
 
 function obj = IF_up_res_data(obj,var1,DYN)
 

@@ -29,10 +29,10 @@
 clear variables; clc; close all;                    % clear workspace; clear command window; close all figures
 
 % Parameters
-D = 0.05;     kappa = 0.3;     g = 1;               % Parameters needed for the Duffing differential equation
+D = 0.05;   c = 1;   kappa = 0.3;   g = 1;          % Parameters needed for the Duffing differential equation
 mu_limit = [0.01, 2.5];                             % Limits of the continuation        
-eta0 = mu_limit(1);                                 % Value of continuation parameter at start of continuation
-param = {kappa, D, eta0, g};                        % Parameter array
+eta0 = mu_limit(1);                                 % Value of continuation parameter at begin of continuation
+param = {kappa, D, eta0, g, c};                     % Parameter array
 active_parameter = 3;                               % Location of continuation parameter within the array
 IC = [1; 0];                                        % Initial condition (point in state space) for fsolve
 
