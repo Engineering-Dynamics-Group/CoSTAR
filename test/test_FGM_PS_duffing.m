@@ -43,9 +43,9 @@ options.opt_stability       = costaropts('iterate_bfp','on');
 %% Continuation 2
 load('workspace_test_duffing_PS_FGM');
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);    %Properties of the System
-options.opt_sol  = costaropts('display','iter','stability','on','cont','on','non_auto_freq',non_auto_freq,'sol_type','periodic','approx_method','fourier-galerkin','act_param',active_parameter);   %Properties of the solution
+options.opt_sol  = costaropts('display','error-control','stability','on','cont','on','non_auto_freq',non_auto_freq,'sol_type','periodic','approx_method','fourier-galerkin','act_param',active_parameter);   %Properties of the solution
 options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.05,'step_control','angle','direction',1,'pred','tangent','subspace','pseudo-arc');                 %Properties for continuation
-options.opt_approx_method = costaropts('n_FFT',2^8,'error_control','on','error_limit',[1e-4,1e-3]);                                                                                                           %Properties for approx_method (e.g. Shoot)
+options.opt_approx_method = costaropts('n_FFT',2^4,'error_control','on','error_limit',[1e-4,1e-3]);                                                                                                           %Properties for approx_method (e.g. Shoot)
 options.opt_init = costaropts('C0',zeros(2,1),'Cmatrix',[c_max,[0.01;0.01]],'Smatrix',[s_max,[0.01;0.01]],'Hmatrix',[0,1,3]);
 options.opt_stability       = costaropts('iterate_bfp','on');
 

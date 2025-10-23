@@ -8,6 +8,7 @@ classdef SOL_QPS_FGM < Solution
         freq            %Property to save the frequency
         hmatrix         %Property to save the higher-harmonics matrix for every continuation step
         n_hh            %Number of higher harmonics
+        n_fft           %Number of FFT evaluation points
             
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -35,6 +36,7 @@ classdef SOL_QPS_FGM < Solution
             obj.arclength(1,1)         = 0;                                                 %Set arclength of first curve point to zero
             obj.hmatrix{1,1}           = AM.hmatrix;
             obj.n_hh(1,1)              = size(AM.hmatrix,2);
+            obj.n_fft(1,1)             = AM.n_fft;
 
             if strcmpi(AM.error_control,'on'); obj.error(1,1)      = varargin{1,1}{1,1}; end
      
@@ -77,6 +79,7 @@ classdef SOL_QPS_FGM < Solution
                 obj.error(1,end+1)  = CON.p_error; 
             end
             obj.n_hh(1,end+1)       = size(AM.hmatrix,2);
+            obj.n_fft(1,end+1)      = AM.n_fft;
 
             if DYN.n_auto == 0                                                              
                  obj.freq(:,end+1) = reshape(DYN.non_auto_freq(CON.p_y1(end,1)),2,1);
@@ -119,6 +122,7 @@ classdef SOL_QPS_FGM < Solution
                 obj.error(1,end+1)  = CON.p_error_bfp;                              % Approximation error
             end
             obj.n_hh(1,end+1)       = size(AM.hmatrix,2);                           % Number of harmonics
+            obj.n_fft(1,end+1)      = AM.n_fft;
 
             if DYN.n_auto == 0
                 obj.freq(:,end+1) = reshape(DYN.non_auto_freq(CON.p_y_bfp(end,1)),2,1);             % Frequencies if system is non-autonomous

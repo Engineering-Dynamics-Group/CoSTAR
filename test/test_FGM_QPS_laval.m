@@ -7,21 +7,17 @@
 %% Parameters
 load('workspace_init_laval_QPS_FGM');
 
-mu_limit = [1.72,2.5];
+Di = 0.2;     Delta = 1/3;     d3 = 0.25;       % Damping parameters
+e = 0.25;                                       % Eccentricity
+Fg = 0.3924;                                    % Weight force
 
-eta = mu_limit(1,2);
-Di = 0.2;
-Delta = 1/3;
-e = 0.25;
-d3 = 0.25;
-Fg = 0.3924;
+mu_limit = [1.72,2.5];    eta = mu_limit(2);    % Limits of continuation diagram and mu-value at start of continuation | NSB at mu = 1.71477
 
-param = {eta,Di,Delta,e,d3,Fg};
+param = {eta, Di, Delta, e, d3, Fg};            % Parameter array
+active_parameter = 1;                           % Defines where the continuation parameter is located within param
 
-cont = 1;
-active_parameter = 1;
-Fcn = @(t,z,param)laval_qp(t,z,param);
-non_auto_freq = @(mu) mu;
+non_auto_freq = @(mu) mu;                       % Non-autonomous frequency
+Fcn = @(t,z,param) laval_qp(t,z,param);         % Right hand side of ODE
 
 
 %% Properties
