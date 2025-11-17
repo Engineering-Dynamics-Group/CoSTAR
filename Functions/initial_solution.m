@@ -53,6 +53,9 @@ elseif strcmpi(DYN.approx_method,'fourier-galerkin')
     end
     Fcn = @(y)[AM.res(y);y(end)-y0(end)];                               % Last entry is not necessary, but this way the Jacobian has the correct dimension
 
+else
+    Fcn = @(y)[AM.res(y);y(end)-y0(end)];
+
 end
 
 

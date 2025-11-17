@@ -30,22 +30,22 @@ solget_output  = S.solget(DYN,solget_options);
 
 %% Contplot
 
-contplot_options = costaropts('zaxis','max2','Color','r');                          % Plot bifurcation diagram using max(norm())
+contplot_options = costaropts('zaxis','max2','Color','r');                                      % Plot bifurcation diagram using max(norm())
 contplot_output  = S.contplot(DYN,contplot_options);
 
-contplot_options = costaropts('zaxis','mean2','figure',gcf,'Color','b');            % Plot bifurcation diagram using mean(norm())
+contplot_options = costaropts('zaxis','mean2','figure',gcf,'Color','b','resolution',55);        % Plot bifurcation diagram using mean(norm())
 contplot_output  = S.contplot(DYN,contplot_options);
 
-contplot_options = costaropts('zaxis','min2','figure',gcf,'Color','g');             % Plot bifurcation diagram using min(norm())
+contplot_options = costaropts('zaxis','min2','figure',gcf,'Color','g','resolution',[45,56]);    % Plot bifurcation diagram using min(norm())
 contplot_output  = S.contplot(DYN,contplot_options);
 
 
-contplot_options = costaropts('zaxis',@(z) max(z(:,:,1),[],'all'),'Color',[0,0,0]); % Plot bifurcation diagram with user-set function
+contplot_options = costaropts('zaxis',@(z) max(z(:,:,1),[],'all'),'Color',[0,0,0]);             % Plot bifurcation diagram with user-set function
 contplot_output  = S.contplot(DYN,contplot_options);
 
 
 %{
-contplot_options = costaropts('zaxis','max2','resolution',50,'index','all');        % Plot for individual checks
+contplot_options = costaropts('zaxis','max2','resolution',50,'index','all');                    % Plot for individual checks
 contplot_output  = S.contplot(DYN,contplot_options);
 %}
 
@@ -53,13 +53,13 @@ contplot_output  = S.contplot(DYN,contplot_options);
 
 %% Solplot
 
-solplot_options = costaropts('zaxis',@(z) z(:,:,1:2),'space','hypertime','resolution',20,'index',index(2:3));     % Plot solution z_1 in hypertime
+solplot_options = costaropts('zaxis',@(z) z(:,:,1:2),'space','hypertime','resolution',25,'index',index(2:3));   % Plot solution z_1 in hypertime
 solplot_output  = S.solplot(DYN,solplot_options);
 
-solplot_options = costaropts('zaxis',@(z) z(:,:,1:2),'space','hypertime','resolution',50,'index',index(2));     % Plot solution z_1 and z_2 in hypertime
+solplot_options = costaropts('zaxis',@(z) z(:,:,1:2),'space','hypertime','index',index(2));                     % Plot solution z_1 and z_2 in hypertime
 solplot_output  = S.solplot(DYN,solplot_options);
 
-solplot_options = costaropts('zaxis','all','space','hypertime','resolution',20,'index',index(2:3));             % Plot all solutions in hypertime
+solplot_options = costaropts('zaxis','all','space','hypertime','resolution',[20,30],'index',index(2:3));        % Plot all solutions in hypertime
 solplot_output  = S.solplot(DYN,solplot_options);
 
 
@@ -82,7 +82,7 @@ solplot_output  = S.solplot(DYN,solplot_options);
 solplot_options = costaropts('zaxis',@(z) z(:,2),'xaxis',@(z) z(:,1),'space','trajectory','mu',S.mu(1,index(2)),'figure',gcf);                                              % Plot trajectory of specific mu-value
 solplot_output  = S.solplot(DYN,solplot_options);
 
-solplot_options = costaropts('zaxis',@(z) z(:,2),'xaxis',@(z) z(:,1),'space','trajectory','resolution',1000,'index',index(2),'interval',[0,30]);                              % Plot interval of trajectory of specific index
+solplot_options = costaropts('zaxis',@(z) z(:,2),'xaxis',@(z) z(:,1),'space','trajectory','resolution',1000,'index',index(2),'interval',[0,30]);                            % Plot interval of trajectory of specific index
 solplot_output  = S.solplot(DYN,solplot_options);
 
 solplot_options = costaropts('zaxis',@(z) z(:,2),'xaxis',@(z) z(:,1),'space','trajectory','resolution',104,'index',index(2),'Color','r','linestyle','--','figure',gcf);     % Plot trajectory of specific index
