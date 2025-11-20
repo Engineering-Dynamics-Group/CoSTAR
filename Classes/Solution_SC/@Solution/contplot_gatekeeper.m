@@ -73,8 +73,8 @@ function options = contplot_gatekeeper(obj,DYN,options)
     end
 
     if isfield(options,'resolution')    % 'resolution' has to be checked here because it is needed for check_fcn_handle
-        % Check data type and dimension. Scalar AND [1x2] array only possible for quasi-periodic hypertime plots using FDM currently
-        if strcmpi(DYN.sol_type,'quasiperiodic') && strcmpi(DYN.approx_method,'finite-difference')
+        % Check data type and dimension. Scalar AND [1x2] array only possible for quasi-periodic hypertime plots
+        if strcmpi(DYN.sol_type,'quasiperiodic')
             GC.check_data(options.resolution,'options.resolution','double',{'scalar','vector'},[]);
             if ~isscalar(options.resolution) && ~isequal(size(options.resolution),[1 2])            % If options.resolution is not a scalar: Check that is a [1x2] array
                 GC.error_msg{1,end+1} = append('The data size of options.resolution is [', num2str(size(options.resolution)), ']. However, only scalars and [1x2] arrays are allowed.');

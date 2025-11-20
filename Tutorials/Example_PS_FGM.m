@@ -41,7 +41,7 @@ Hmatrix = [0, 1];                                   % Harmonics to be used to cr
 
 % Functions
 non_auto_freq = @(mu) mu;                           % Non-autonomous excitation frequency
-Fcn =  @(t,z,param) duffing_ap(t,z,param);          % Right-hand side of dz/dtau = f(tau,z,kappa,D,eta,g)
+Fcn =  @(t,z,param) duffing(t,z,param);             % Right-hand side of dz/dtau = f(tau,z,kappa,D,eta,g)
 
 % Options
 options.system = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','Continuation of Duffing Equation');                   % Properties of the system
@@ -100,7 +100,7 @@ Cmatrix = [2; 0];    Smatrix = [0; -auto_freq*2];   % Fourier coefficients of th
 Hmatrix = [0, 1];                                   % Harmonics to be used to create an initial value for fsolve
 
 % Function
-Fcn = @(t,z,param) vdP_auto_ap(t,z,param);          % Right-hand side of dz/dtau = f(z,epsilon)
+Fcn = @(t,z,param) vdP_auto(t,z,param);             % Right-hand side of dz/dtau = f(z,epsilon)
 
 % Options
 options.system   = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','Continuation of van der Pol Oscillator');       % Properties of the system

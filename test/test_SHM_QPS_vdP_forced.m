@@ -13,9 +13,9 @@ mu_limit = [1.3,1.45];
 non_auto_freq = @(mu) mu;                                                                 %non-autonomous frequencies
 auto_freq = 1;
 
-param = {epsilon,s,mu_limit(1,2)};                                            %Parameter vector, all constant parameters are set here, the bifurcation parameter gets its starting value (here the left corner of bifurcation diagram)
-active_parameter = 3;                                                                   %Index of active parameter
-Fcn = @(t,z,param)vdP_qp(t,z,param);                                        %Right-hand-side of ODE
+param = {epsilon,s,mu_limit(1,2)};                  %Parameter vector, all constant parameters are set here, the bifurcation parameter gets its starting value (here the left corner of bifurcation diagram)
+active_parameter = 3;                               %Index of active parameter
+Fcn = @(t,z,param) vdP_forced(t,z,param);           %Right-hand-side of ODE
 
 % load('workspace_test_vdp_QPS_shooting.mat')       % OLD. Throws warning 'Could not find appropriate function on path loading function handle C:\Users\Admin\Desktop\FG-Code_aktuell\v2.1.1.15\test\test_Shooting_vdP_QPS.m>@(mu)mu' after test files have been renamed, altough path was not existing even before
 load('workspace_test_SHM_QPS_vdp.mat')              %only contains s0 since DYN_init stored in workspace_test_vdp_QPS_shooting throws warning

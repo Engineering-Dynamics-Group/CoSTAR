@@ -13,13 +13,14 @@ function help_struct = s_help_opt_approx_method_PS_FGM()
     help_struct.mandatory = [];
 
     help_struct.optional.n_fft.value            = 'power of two \n  e.g., 2^4, 2^5, 2^6, ... \n  Default: 2^6';
-    help_struct.optional.n_fft.text             = 'Number of evaluation points along periodic orbit for the Fast Fourier Transformation. Always use powers of two for ideal FFT performance! A higher value leads to more accuracy and higher numerical cost.';
+    help_struct.optional.n_fft.text             = ['Number of evaluation points along the periodic orbit for the Fast Fourier Transformation. Always use powers of two for ideal FFT performance! A higher value leads to more accuracy but higher numerical cost.\n' ...
+                                                   'If the error control is enabled, the value of n_fft is automatically adapted, but it is at least as large as defined here.'];
     
     help_struct.optional.phasecond.value        = '''poincare'', ''int_poincare'' \n  Default: ''poincare''';
-    help_struct.optional.phasecond.text         = 'Type of phasecondition for autonomous periodic solutions only(!). The autonomous frequency is in general unknown, which necessitates another equation defined by the phasecondition. Poincare condition is recommend for periodic solutions.';
+    help_struct.optional.phasecond.text         = 'Type of phase condition for autonomous periodic solutions only(!).\n Poincare condition is recommend.';
 
     help_struct.optional.error_control.value    = '''on'', ''off'' \n  Default: ''on''';
-    help_struct.optional.error_control.text     = 'The error_control automatically estimates the error made (in frequency space) in the approximation and adapts the number of harmonics or lowers it.';
+    help_struct.optional.error_control.text     = 'The error control automatically estimates the error (in frequency space) of the approximation and adapts the number of harmonics as well as the number of FFT evaluation points n_fft in accordance with the Nyquist-Shannon theorem.';
 
     help_struct.optional.error_limit.value      = '[1x2] double array \n  Default: [1e-3,0.1]';
     help_struct.optional.error_limit.text       = 'If errror_control is ''on'': error_limit defines the maximal and the minimal error for the error_control: If the estimated error is above the maximum, more harmonics are used, if the error is below minimum, the number of harmonics is reduced.';

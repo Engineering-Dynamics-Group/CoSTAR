@@ -39,7 +39,6 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
     dT = T/n_shoot;                                     % Time span for each shooting operation (integration)
     T_int = [0:dT:(n_shoot-1)*dT; dT:dT:n_shoot*dT].';  % Define time intervals for the shooting operation (integration)
     z0_mat = reshape(s,dim,n_shoot);                    % Reshape s to a matrix of size [dim x n_shoot]
-    Z_end = zeros(dim,n_shoot);                         % Initialize array for end points of shooting
     s_p_mat = reshape(obj.iv(1:end-n_auto),dim,n_shoot);% Matrix of shooting points at the predictor point (obj.iv(end) is the autonomous frequency if present)
     Z_traj = zeros(dim,n_time,n_shoot);                 % Stores the trajectory for evaluating the integral phase condition
     Z_end = zeros(dim,n_shoot);                         % Stores the end points of integration (could be stored in Z_traj as well, but using Z_end is more convenient)

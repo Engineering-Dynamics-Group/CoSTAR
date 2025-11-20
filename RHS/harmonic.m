@@ -1,6 +1,6 @@
 % This is the right-hand side of the periodically forced harmonic oscillator
 
-function dzdt = ho_ap(t,z,param)
+function dzdt = harmonic(t,z,param)
 
     % State variables
     z1 = z(1,:);

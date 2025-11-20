@@ -39,7 +39,7 @@ C1 = [g; 0];     S1 = [0; -g*eta0];                 % Fourier coefficients used 
 
 % Functions
 non_auto_freq = @(mu) mu;                           % Non-autonomous excitation frequency
-Fcn =  @(t,z,param) duffing_ap(t,z,param);          % Right-hand side of dz/dtau = f(tau,z,kappa,D,eta,g)
+Fcn =  @(t,z,param) duffing(t,z,param);             % Right-hand side of dz/dtau = f(tau,z,kappa,D,eta,g)
 
 % Options
 options.system = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','Continuation of Duffing Equation');           % Properties of the system
@@ -95,7 +95,7 @@ auto_freq = 1;                                      % Initial value of the auton
 C1 = [2; 0];             S1 = [0; -2];              % Fourier coefficients used to create an initial value for fsolve
 
 % Function
-Fcn = @(t,z,param) vdP_auto_ap(t,z,param);          % Right-hand side of dz/dtau = f(z,epsilon)
+Fcn = @(t,z,param) vdP_auto(t,z,param);             % Right-hand side of dz/dtau = f(z,epsilon)
 
 % Options
 options.system   = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','Continuation of van der Pol Oscillator');   % Properties of the system

@@ -14,7 +14,7 @@ param = {epsilon, mu0, Omega};                  % Parameter array
 active_parameter = 2;                           % Defines where the continuation parameter is located within param
 
 non_auto_freq = @(mu) Omega;                    % Non-autonomous frequency
-Fcn = @(t,z,param) vdP_qp(t,z,param);           % Right hand side of ODE
+Fcn = @(t,z,param) vdP_forced(t,z,param);       % Right hand side of ODE
 
 auto_freq = 1;                                  % Initial value of autonomous frequency
 C1_mat = [0, 2, 0;                              % Fourier coefficients to create an initial value for fsolve to find the first point on the curve
@@ -82,7 +82,7 @@ param = {epsilon, s, mu0};                      % Parameter array
 active_parameter = 3;                           % Defines where the continuation parameter is located within param
 
 non_auto_freq = @(mu) mu;                       % Non-autonomous frequency
-Fcn = @(t,z,param) vdP_qp(t,z,param);           % Right hand side of ODE
+Fcn = @(t,z,param) vdP_forced(t,z,param);       % Right hand side of ODE
 
 auto_freq = 1;                                  % Initial value of autonomous frequency
 C1_mat = [-0.5, 0;                              % Fourier coefficients to create an initial value for fsolve to find the first point on the curve

@@ -94,7 +94,7 @@ switch obj.step_control
                 else
                     r_alpha = alpha_nom / alpha;                        % Calculate r_alpha using asymptotic expansion of alpha. alpha_nom sets the nominal (desired) angle
                 end
-                display_message_info = append('alpha = ', num2str(alpha), '°', ' corr_it = ', num2str(obj.p_it));   % Set additional display info
+                display_message_info = append('alpha = ', num2str(alpha), '°', ', corr_it = ', num2str(obj.p_it));   % Set additional display info
                 if r_it < 1                                             % If number of corrector iterations exceeds nominal number of corrector iterations ...
                     r_pre = min([r_it,r_alpha]);                        % take the minimum of r_it and r_alpha
                     display_message_info = append(display_message_info, ', r_alpha = ', num2str(r_alpha), ', r_it = ', num2str(r_it));      % Append info

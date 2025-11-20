@@ -1,6 +1,6 @@
 % This is the right-hand side of the non-autonomous (forced) duffing oscillator 
 
-function f = duffing_ap(t,z,param)
+function f = duffing(t,z,param)
 
     z1 = z(1,:);                % z1 is the first state variable
     z2 = z(2,:);                % z2 is the second state variable

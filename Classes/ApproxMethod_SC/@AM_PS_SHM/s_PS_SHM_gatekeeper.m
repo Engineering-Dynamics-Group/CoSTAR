@@ -67,13 +67,10 @@ GC.speak;
 %%%%%%%%%%%%%%%%%%%%
 GC.check_data(opt_init.ic,'opt_init.ic','double','vector',[]);
 GC.speak;
-if ~isfield(opt_approx_method,'n_shoot');       n_shoot = 5;
-else;                                           n_shoot = opt_approx_method.n_shoot;
-end
-if ~((numel(opt_init.ic) == system.dim) || (numel(opt_init.ic) == system.dim*n_shoot))
-    GC.error_msg{1,end+1} = append('The options field opt_init.ic is a ',num2str(numel(opt_init.ic)),'-dimensional vector.');
-    GC.error_msg{1,end+1} = 'However, the length of opt_init.ic must be equal either to the dimension dim of the system or to dim*n_shoot, ';
-    GC.error_msg{1,end+1} = 'where n_shoot is the number of shooting points.';
+if mod(numel(opt_init.ic),system.dim) ~= 0      % Check that the result of numel(ic)/dim (= number of state space values stored in ic) is an integer
+    GC.error_msg{1,end+1} = append('The options field opt_init.ic is a ',num2str(numel(opt_init.ic)),'-dimensional vector. This is not allowed since opt_init.ic must ');
+    GC.error_msg{1,end+1} = append('consist of state space values. Therefore, the dimension of opt_init.ic must be equal to dim*n_shoot_ic, ');
+    GC.error_msg{1,end+1} = append('where dim = ',num2str(system.dim),' is the dimension of the system and n_shoot_ic is a positive integer.');
 end
 GC.speak;
 

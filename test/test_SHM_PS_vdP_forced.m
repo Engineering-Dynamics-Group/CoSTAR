@@ -17,9 +17,9 @@ mu_start = mu_limit(1,2);
 
 
 %% Parameters
-param = {epsilon,mu_start,Omega};               %Parameter vector, all constant parameters are set here, the bifurcation parameter gets its starting value (here the left corner of bifurcation diagram)
-active_parameter = 2;                                                                   %Index of active parameter
-Fcn = @(t,z,param)vdP_qp(t,z,param);                                        %Right-hand-side of ODE
+param = {epsilon,mu_start,Omega};               % Parameter vector, all constant parameters are set here, the bifurcation parameter gets its starting value (here the left corner of bifurcation diagram)
+active_parameter = 2;                           % Index of active parameter
+Fcn = @(t,z,param) vdP_forced(t,z,param);       % Right-hand-side of ODE
 
 %% Properties
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);                                                                                %Properties of the System
