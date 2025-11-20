@@ -13,7 +13,7 @@ IC = 0;     mu_limit = [-1.5,1.5];       mu0 = mu_limit(1);
 
 param = {mu0,gamma};
 active_parameter = 1;
-Fcn =  @(x,param)pitchfork_ap(x,param);
+Fcn =  @(x,param) pitchfork(x,param);
 
 
 %% Properties

@@ -9,7 +9,7 @@ mu_limit = [0.3,2.5];
 auto_freq = 1;   %Period-function for constant period
 
 epsilon = mu_limit(1);     param = {epsilon};     active_parameter = 1;
-Fcn = @(t,z,param)vdP_auto_ap(t,z,param);
+Fcn = @(t,z,param) vdP_auto(t,z,param);
 
 c_max = [2    ,0.1, 0.05,0.01,0.001,0.001,0.001;     0,-0.15,-0.05,-0.01,-0.001,-0.001,-0.001];
 s_max = [-1.98,0.11,0.05,0.01,0.001,0.001,0.001;    -0.007,-0.05,-0.05,-0.01,-0.001,-0.001,-0.001];

@@ -14,7 +14,7 @@ mu_limit = [0.8, 2];   eta = mu_limit(2);       % Limits of continuation diagram
 param = {D,kappa,f1,f2,eta,ratio};
 active_parameter = 5;
 
-Fcn = @(t,z,param)duffing_ap_qp(t,z,param);
+Fcn = @(t,z,param) duffing_qp(t,z,param);
 non_auto_freq = @(mu) [mu,ratio.*mu];
 
 % Init data

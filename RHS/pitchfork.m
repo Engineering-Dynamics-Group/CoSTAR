@@ -1,6 +1,6 @@
 % This is the function of the pitchfork equation
 
-function f = pitchfork_ap(z,param)
+function f = pitchfork(z,param)
 
     z1 = z(1,:);                        % z1 is the only state variable
                                         % IMPORTANT: The state variables z_i ALWAYS have to be defined by z_i = z(i,:), e.g. z_2 = z(2,:)

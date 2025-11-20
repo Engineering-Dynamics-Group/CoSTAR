@@ -16,7 +16,7 @@ param = {kappa, D, eta0, g, c};                 % Parameter array
 active_parameter = 3;                           % Defines where the continuation parameter is located within param
 
 non_auto_freq = @(mu) mu;                       % Non autonomous frequency
-Fcn = @(t,z,param) duffing_ap(t,z,param);       % Right-hand side of ODE
+Fcn = @(t,z,param) duffing(t,z,param);          % Right-hand side of ODE
 
 C1 = [g;0];     S1 = [0;-eta0*g];               % Fourier-coefficients to create an initial value for fsolve to find the first point on the curve
 

@@ -399,7 +399,72 @@ Changes affect:
             --> Updated the description of the field 'resolution'
         - Tutorial_Postprocessing_solplot:
             --> Updated the description of the field 'resolution'
+     
     
+----------  
+   
+Periodic shooting method: It is now possible to define the opt_init field 'ic' as [dim*n_shoot_ic x 1] vector. 
+If the number of shooting points (state space values) in the opt_init-field 'ic' is not equal to one or does not match the desired number of shooting points n_shoot,
+the given shooting points in 'ic' are interpolated to obtain the desired shooting points. Changes affect:
+
+    @AM_PS_SHM:
+        - getIV:
+            --> Renamed z0 to s0 (line 15 and other)
+            --> Restructured the method: Removed the ifelse-block for n_auto == 1 since code was almost identical to the case n_auto == 0. Adapted this case to work for n_auto == 1 as well
+            --> Added if-ifelse-block for the case numel(s0) == dim to get the correct periodic time (lines 22 - 27)
+            --> Added else-block for the case that n_shoot_ic is not equal to one or to n_shoot (lines 44 - 54)
+            --> If system is autonomous, the autonomous frequency is now added at the end of the method (lines 59 - 63)
+        - s_help_opt_init_PS_SHM:
+            --> Updated the general info (lines 11 and 13 - 15)
+            --> Updated the value and text of the field 'ic' (lines 18 and 20 - 22)
+        - s_PS_SHM_gatekeeper
+            --> Check of correct number of elements of field 'ic' replaced by the check that numel(ic)/dim is an integer (lines 70 - 76 replaced by lines 70 - 73)
+
+    test:
+        - test_SHM_PS_duffing:
+            --> For the continuation, the method solution vector of the previously computed single solution is used as 'ic' to test the new code (line 39)
+        - test_SHM_PS_duffing:
+            --> For the continuation, the method solution vector of the previously computed single solution is used as 'ic' to test the new code (line 34)
+
+
+----------  
+
+Renamed the following functions:
+
+    RHS:
+        - duffing_ap  -> duffing        - duffing_qp -> deleted since redundant     - duffing_ap_qp -> duffing_qp
+        - ho_ap       -> harmonic       - ho_ap_qp   -> harmonic_qp                 - pitchfork_ap  -> pitchfork
+        - vdP_auto_ap -> vdP_auto       - coupledvdp -> vdP_coupled                 - vdP_qp        -> vdP_forced
+
+    test:
+        - test_FDM_QPS_cvdP -> test_FDM_QPS_vdP_coupled         - test_FDM_QPS_vdP  -> test_FDM_QPS_vdP_forced
+        - test_FGM_QPS_cvdp -> test_FGM_QPS_vdP_coupled         - test_SHM_PS_fvdP  -> test_SHM_PS_vdP_forced
+        - test_SHM_QPS_cvdP -> test_SHM_QPS_vdP_coupled         - test_SHM_QPS_vdP  -> test_SHM_QPS_vdP_forced
+
+Test files, tutorials and examples were updated accordingly:
+
+    test:
+        - test_EQ_pitchfork (line 16)
+        - test_FDM_PS_duffing (line 19)             - test_FDM_PS_harmonic (line 16)            - test_FDM_PS_vdP (line 14)
+        - test_FDM_QPS_duffing (line 41)            - test_FDM_QPS_harmonic (line 17)           - test_FDM_QPS_vdP_coupled (line 16)  
+        - test_FDM_QPS_vdP_forced (line 17 and 85)
+        - test_FGM_PS_duffing (line 17)             - test_FGM_PS_vdP (line 12)                 - test_FGM_QPS_duffing (line 17)
+        - test_FGM_QPS_vdP_coupled (line 16)
+        - test_SHM_PS_duffing (line 19)             - test_SHM_PS_vdP (line 14)                 - test_SHM_PS_vdP_forced (line 22)
+        - test_SHM_QPS_vdP_coupled (line 21)        - test_SHM_QPS_vdP_forced (line 18)
+
+    Tutorials:
+        - Tutorial_EQ
+        - Tutorial_Postprocessing_contplot          - Tutorial_Postprocessing_solget          - Tutorial_Postprocessing_solplot
+        - Tutorial_PS_FDM (lines 108, 116, 123, 453, 461 and 467)       - Tutorial_QPS_FDM (lines 122, 130, 138, 139, 885, 893 and 900)
+        - Tutorial_PS_FGM (lines 108, 116, 123, 480, 488 and 494)       - Tutorial_QPS_FGM (lines 123, 131, 139, 140, 900, 908 and 915)
+        - Tutorial_PS_SHM (lines 102, 110, 117, 418, 420 and 426)       - Tutorial_QPS_SHM (lines 120, 128, 136, 137, 823, 831 and 838)
+        - Example_EQ (line 65)
+        - Example_Postprocessing_contplot (line 41)     - Example_Postprocessing_solget (line 41)   - Example_Postprocessing_solplot (line 41)
+        - Example_PS_FDM (lines 42 and 98)              - Example_QPS_FDM (lines 47 and 160)
+        - Example_PS_FGM (lines 44 and 103)             - Example_QPS_FGM (lines 50 and 167)
+        - Example_PS_SHM (lines 42 and 98)              - Example_QPS_SHM (lines 47 and 157)
+
 
 ----------  
 
@@ -409,6 +474,23 @@ Bugfixes:
         - PS_SHM_residuum:
             --> Removed the initialisation of Z_end in line 42 since it was initialized twice (same code)
 
+    @AM_QPS_SHM:
+        - s_help_opt_init_QPS_SHM:
+            --> Updated the general info (lines 11 - 15)
+            --> Corrected the info texts of all fields (lines 20 - 22, 25, 28, 32, 35 and 39)
+
     functions:
         - initial_solution:
             --> Added else-block to set the residuum function Fcn for equilibrium solutions (lines 56 and 57)
+
+    test:
+        - check_tutorials:
+            --> Added if condition to reset default figure window style. It is now reset only for MATLAB versions prior to R2025a (lines 119 - 121)
+
+    Tutorials:
+        - Example_QPS_FDM:
+            --> Enabled stability computation for all examples (lines 51, 81, 122 and 164)
+        - Example_QPS_FGM:
+            --> Enabled stability computation for all examples (lines 54, 84, 126 and 171)
+        - Example_QPS_SHM:
+            --> Set 'step_width' to 0.1 for the Jeffcott(-Laval) rotor example in order to match related tutorial (line 124)

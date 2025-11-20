@@ -14,7 +14,7 @@ IC = [1.5;0];     mu_limit = [0.01,2.5];
 non_auto_freq = @(mu) mu;
 
 eta = mu_limit(1);     param = {kappa,D,eta,g,c};     active_parameter = 3;
-Fcn = @(t,z,param)duffing_ap(t,z,param);
+Fcn = @(t,z,param) duffing(t,z,param);
 
 
 %% Single Solution

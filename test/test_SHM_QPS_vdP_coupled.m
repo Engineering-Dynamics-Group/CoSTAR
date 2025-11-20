@@ -18,7 +18,7 @@ mu_start = mu_limit(1,1);
 
 param = {mu_start,alpha,beta};                                            %Parameter vector, all constant parameters are set here, the bifurcation parameter gets its starting value (here the left corner of bifurcation diagram)
 active_parameter = 1;                                                     %Index of active parameter
-Fcn = @(t,z,param)coupledvdp(t,z,param);                                  %Right-hand-side of ODE
+Fcn = @(t,z,param) vdP_coupled(t,z,param);                                %Right-hand-side of ODE
 
 % load('workspace_test_cvdP_QPS_shooting.mat')       % OLD. Throws warning 'Could not find appropriate function on path loading function handle C:\Users\Admin\Desktop\FG-Code_aktuell\v2.1.1.15\test\test_Shooting_cvdP_QPS.m>@(t,z,param)coupledvdp(t,z,param)' after test files have been renamed, altough path was not existing even before
 load('workspace_test_SHM_QPS_cvdP.mat')              %only contains s0 since DYN_init stored in workspace_test_cvdp_QPS_shooting throws warning

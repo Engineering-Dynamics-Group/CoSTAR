@@ -38,7 +38,7 @@ IC = [1; 0];                                        % Initial condition (point i
 
 % Functions
 non_auto_freq = @(mu) mu;                           % Non-autonomous excitation frequency
-Fcn =  @(t,z,param) duffing_ap(t,z,param);          % Right-hand side of dz/dtau = f(tau,z,kappa,D,eta,g)
+Fcn =  @(t,z,param) duffing(t,z,param);             % Right-hand side of dz/dtau = f(tau,z,kappa,D,eta,g)
 
 % Options
 options.system = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','Continuation of Duffing equation');   % Properties of the system

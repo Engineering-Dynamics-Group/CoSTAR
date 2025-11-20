@@ -13,7 +13,7 @@ param = {eps_limit(1),alpha,beta};
 
 cont = 1;
 active_parameter = 1;
-Fcn = @(t,z,param)coupledvdp(t,z,param);
+Fcn = @(t,z,param) vdP_coupled(t,z,param);
 
 load('workspace_init_cvdp_QPS_FGM');
 

@@ -44,11 +44,11 @@ S1_mat = [0.5, 0.5, 0;
 
 % Functions
 non_auto_freq = @(mu) [mu, ratio*mu];               % Non-autonomous excitation frequencies
-Fcn =  @(t,z,param) duffing_ap_qp(t,z,param);       % Right-hand side of dz/dtau = f(tau,z,D,kappa,f1,f2,eta,ratio)
+Fcn =  @(t,z,param) duffing_qp(t,z,param);          % Right-hand side of dz/dtau = f(tau,z,D,kappa,f1,f2,eta,ratio)
 
 % Options
 options.system = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','Continuation of Quasi-Periodic Duffing Equation');    % Properties of the system
-options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','finite-difference','cont','on','stability','off', ...      % Properties of the solution
+options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','finite-difference','cont','on','stability','on', ...       % Properties of the solution
                              'non_auto_freq',non_auto_freq,'act_param',active_parameter);                                           % Properties of the solution
 options.opt_init = costaropts('c1_matrix',C1_mat,'s1_matrix',S1_mat);                                                               % Property for initial solution
 options.opt_approx_method = costaropts('n_int_1',25,'scheme_1','central','approx_order_1',6,...                                     % Properties of approximation method
@@ -78,7 +78,7 @@ non_auto_freq_kappa = @(mu) [eta_kappa, ratio*eta_kappa];              % New non
 
 % New options
 options_kappa.system = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param_kappa,'info','Continuation of Quasi-Periodic Duffing Equation - kappa');   % Properties of the system
-options_kappa.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','finite-difference','cont','on','stability','off', ...    % Properties of the solution
+options_kappa.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','finite-difference','cont','on','stability','on', ...     % Properties of the solution
                                    'non_auto_freq',non_auto_freq_kappa,'act_param',active_parameter_kappa);                             % Properties of the solution
 options_kappa.opt_init = costaropts('fdm_sol',FDM_sol,'n_int_1_fdm_sol',25,'n_int_2_fdm_sol',25);                                       % Property for initial solution
 options_kappa.opt_approx_method = costaropts('n_int_1',30,'points_1',[-3,-2,-1,0,1,2,3],...                                             % Properties of approximation method
@@ -119,7 +119,7 @@ Fcn =  @(t,z,param) laval_qp(t,z,param);            % Right-hand side of dz/dtau
 
 % Options
 options.system = costaropts('order',1,'dim',4,'rhs',Fcn,'param',param,'info','Continuation of Jeffcott-Laval Rotor');               % Properties of the system
-options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','finite-difference','cont','on','stability','off', ...      % Properties of the solution
+options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','finite-difference','cont','on','stability','on', ...       % Properties of the solution
                              'non_auto_freq',non_auto_freq,'auto_freq',auto_freq,'act_param',active_parameter);                     % Properties of the solution
 options.opt_init = costaropts('c0',C0,'c1_matrix',C1_mat,'s1_matrix',S1_mat);                                                       % Properties for initial solution
 options.opt_approx_method = costaropts('n_int_1',30,'scheme_1','central','approx_order_1',6,...                                     % Properties of approximation method
@@ -157,11 +157,11 @@ S1_mat = [2,   0,   0;
           0,  2.1,  0];            
 
 % Function
-Fcn = @(t,z,param) coupledvdp(t,z,param);           % Right-hand side of dz/dtau = f(z,epsilon,alpha,beta)
+Fcn = @(t,z,param) vdP_coupled(t,z,param);          % Right-hand side of dz/dtau = f(z,epsilon,alpha,beta)
 
 % Options
 options.system   = costaropts('order',1,'dim',4,'rhs',Fcn,'param',param,'info','Continuation of Coupled van der Pol Oscillator');   % Properties of the system
-options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','finite-difference','cont','on','stability','off', ...      % Properties of the solution
+options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','finite-difference','cont','on','stability','on', ...       % Properties of the solution
                              'auto_freq',auto_freq,'act_param',active_parameter);                                                   % Properties of the solution
 options.opt_init = costaropts('c1_matrix',C1_mat,'s1_matrix',S1_mat);                                                               % Property for initial solution
 options.opt_approx_method = costaropts('n_int_1',35,'points_1',[-4,-3,-2,-1,0,1,2],...                                              % Properties of approximation method
