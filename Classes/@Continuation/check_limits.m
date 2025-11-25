@@ -85,6 +85,9 @@ elseif(obj.p_local_cont_counter>=obj.max_cont_step)      % Check if maximal numb
 
 else
     write_log(DYN,'\n-------------------------------------')
+    if strcmpi(DYN.display,'error-control') || strcmpi(DYN.display,'step-control') || strcmpi(DYN.display,'full')
+        disp('---------------');
+    end
 
 end
 

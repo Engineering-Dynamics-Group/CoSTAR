@@ -1,6 +1,6 @@
 % This is the right-hand side of the autonomous (unforced) van der Pol oscillator 
 
-function f = vdP_auto_ap(t,z,param)
+function f = vdP_auto(t,z,param)
 
     z1 = z(1,:);                % z1 is the first state variable
     z2 = z(2,:);                % z2 is the second state variable

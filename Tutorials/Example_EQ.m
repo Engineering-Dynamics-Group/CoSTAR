@@ -62,7 +62,7 @@ mu_limit = [-1.5, 1.5];     mu0 = mu_limit(1);      % Limits and value of contin
 param = {mu0, gamma};       active_parameter = 1;   % Parameter array and location of continuation parameter within the array
 
 % Function
-Fcn =  @(z,param) pitchfork_ap(z,param);            % Right hand side of 0 = f(z,mu)
+Fcn =  @(z,param) pitchfork(z,param);               % Right hand side of 0 = f(z,mu)
 
 % Options for continuation 1
 options1.system   = costaropts('order',0,'dim',1,'rhs',Fcn,'param',param,'info','Continuation of Pitchfork Bifurcation - Part 1');  % Properties of the system

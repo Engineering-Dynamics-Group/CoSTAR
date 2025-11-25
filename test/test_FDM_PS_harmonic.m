@@ -13,7 +13,7 @@ param = {D, f, mu0};                            % Parameter array
 active_parameter = 3;                           % Defines where the continuation parameter is located within param
 
 non_auto_freq = @(mu) mu;                       % Non autonomous frequency
-Fcn = @(t,z,param) ho_ap(t,z,param);            % Right-hand side of ODE
+Fcn = @(t,z,param) harmonic(t,z,param);         % Right-hand side of ODE
 
 C1 = [1;0];     S1 = [0;-0.1];                  % Fourier-coefficients to create an initial value for fsolve to find the first point on the curve
 

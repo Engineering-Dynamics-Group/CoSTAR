@@ -38,7 +38,7 @@ param = {D, kappa, f1, f2, mu0, ratio};         % Parameter array
 active_parameter = 5;                           % Defines where the continuation parameter is located within param
 
 non_auto_freq = @(mu) [mu, ratio*mu];           % Non autonomous frequencies
-Fcn = @(t,z,param) duffing_ap_qp(t,z,param);    % Right-hand side of ODE
+Fcn = @(t,z,param) duffing_qp(t,z,param);       % Right-hand side of ODE
 
 
 %% Properties

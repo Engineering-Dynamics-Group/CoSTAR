@@ -47,11 +47,11 @@ Smatrix = [ 0.1,   0.1;                             % Fourier coefficients S_1 a
 
 % Functions
 non_auto_freq = @(mu) [mu, ratio*mu];               % Non-autonomous excitation frequencies
-Fcn =  @(t,z,param) duffing_ap_qp(t,z,param);       % Right-hand side of dz/dtau = f(tau,z,D,kappa,f1,f2,eta,ratio)
+Fcn =  @(t,z,param) duffing_qp(t,z,param);          % Right-hand side of dz/dtau = f(tau,z,D,kappa,f1,f2,eta,ratio)
 
 % Options
 options.system = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','Continuation of Quasi-Periodic Duffing Equation');    % Properties of the system
-options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','fourier-galerkin','cont','on','stability','off', ...       % Properties of the solution
+options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','fourier-galerkin','cont','on','stability','on', ...        % Properties of the solution
                              'non_auto_freq',non_auto_freq,'act_param',active_parameter);                                           % Properties of the solution
 options.opt_init = costaropts('hmatrix',Hmatrix,'c0',C0,'cmatrix',Cmatrix,'smatrix',Smatrix);                                       % Property for initial solution
 options.opt_approx_method = costaropts('n_FFT',2^5,'error_control','on','error_limit',[1e-4,1e-2],'ec_iter_max',10,'n_hh_max',50);  % Properties of approximation method
@@ -81,7 +81,7 @@ non_auto_freq_kappa = @(mu) [eta_kappa, ratio*eta_kappa];              % New non
 
 % New options
 options_kappa.system = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param_kappa,'info','Continuation of Quasi-Periodic Duffing Equation - kappa');       % Properties of the system
-options_kappa.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','fourier-galerkin','cont','on','stability','off', ...         % Properties of the solution
+options_kappa.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','fourier-galerkin','cont','on','stability','on', ...          % Properties of the solution
                                    'non_auto_freq',non_auto_freq_kappa,'act_param',active_parameter_kappa);                                 % Properties of the solution
 options_kappa.opt_init = costaropts('hmatrix',Hmatrix_kappa,'fc0',Fc0);                                                                     % Property for initial solution
 options_kappa.opt_approx_method = costaropts('n_FFT',2^5,'error_control','on','error_limit',[1e-4,1e-2],'ec_iter_max',10,'n_hh_max',50);    % Properties of approximation method
@@ -123,7 +123,7 @@ Fcn =  @(t,z,param) laval_qp(t,z,param);            % Right-hand side of dz/dtau
 
 % Options
 options.system = costaropts('order',1,'dim',4,'rhs',Fcn,'param',param,'info','Continuation of Jeffcott-Laval Rotor');               % Properties of the system
-options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','fourier-galerkin','cont','on','stability','off', ...       % Properties of the solution
+options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','fourier-galerkin','cont','on','stability','on', ...        % Properties of the solution
                              'non_auto_freq',non_auto_freq,'auto_freq',auto_freq,'act_param',active_parameter);                     % Properties of the solution
 options.opt_init = costaropts('hmatrix',Hmatrix,'c0',C0,'cmatrix',Cmatrix,'smatrix',Smatrix);                                       % Property for initial solution
 options.opt_approx_method = costaropts('n_FFT',2^6,'error_control','on','error_limit',[1e-4,1e-2],'ec_iter_max',10, ...             % Properties of the approximation method
@@ -164,11 +164,11 @@ Smatrix = [ 2,   -0.1;                              % Fourier coefficients S_1 a
             0.1,  1.5];          
 
 % Function
-Fcn = @(t,z,param) coupledvdp(t,z,param);           % Right-hand side of dz/dtau = f(z,epsilon,alpha,beta)
+Fcn = @(t,z,param) vdP_coupled(t,z,param);          % Right-hand side of dz/dtau = f(z,epsilon,alpha,beta)
 
 % Options
 options.system   = costaropts('order',1,'dim',4,'rhs',Fcn,'param',param,'info','Continuation of Coupled van der Pol Oscillator');   % Properties of the system
-options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','fourier-galerkin','cont','on','stability','off', ...       % Properties of the solution
+options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','fourier-galerkin','cont','on','stability','on', ...        % Properties of the solution
                              'auto_freq',auto_freq,'act_param',active_parameter);                                                   % Properties of the solution
 options.opt_init = costaropts('hmatrix',Hmatrix,'c0',C0,'cmatrix',Cmatrix,'smatrix',Smatrix);                                       % Property for initial solution
 options.opt_approx_method = costaropts('n_FFT',2^6,'error_control','on','error_limit',[1e-3,1e-1],'ec_iter_max',10, ...             % Properties of the approximation method

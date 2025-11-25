@@ -56,8 +56,8 @@ function options = solget_gatekeeper(obj,DYN,options)
 
     %% Check the optional field values
     if isfield(options,'resolution')        % This check here is only for solget since resolution is checked in solplot_gatekeeper and contplot_gatekeeper as well
-        % Check data type and dimension. Scalar AND [1x2] array only possible for quasi-periodic hypertime plots using FDM currently
-        if strcmpi(DYN.sol_type,'quasiperiodic') && strcmpi(options.space,'hypertime') && strcmpi(DYN.approx_method,'finite-difference')
+        % Check data type and dimension. Scalar AND [1x2] array only possible for quasi-periodic hypertime plots
+        if strcmpi(DYN.sol_type,'quasiperiodic') && strcmpi(options.space,'hypertime')
             GC.check_data(options.resolution,'options.resolution','double',{'scalar','vector'},[]);
             if ~isscalar(options.resolution) && ~isequal(size(options.resolution),[1 2])            % If options.resolution is not a scalar: Check that is a [1x2] array
                 GC.error_msg{1,end+1} = append('The data size of options.resolution is [', num2str(size(options.resolution)), ']. However, only scalars and [1x2] arrays are allowed.');

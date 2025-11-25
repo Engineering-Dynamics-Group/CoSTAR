@@ -16,7 +16,7 @@ non_auto_freq = @(mu) mu;                       % Non autonomous frequency, eith
 
 param = {kappa,D,mu_limit(1),g,c};              % Parameter vector, all constant parameters are set here, the bifurcation parameter gets its starting value (here the left corner of bifurcation diagram)
 active_parameter = 3;                           % Which parameter is the bifurcation parameter?
-Fcn = @(t,z,param)duffing_ap(t,z,param);        % Right-hand-side of ODE
+Fcn = @(t,z,param) duffing(t,z,param);          % Right-hand-side of ODE
 
 
 %% Properties for single solution
@@ -36,7 +36,7 @@ time1 = toc(timer);                             % Display elapsed time since tic
 %% Properties for continuation
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);           % Properties of the system
 options.opt_sol  = costaropts('stability','on','cont','on','non_auto_freq',non_auto_freq,'sol_type','periodic','approx_method','shm','act_param',active_parameter);    % Properties of the solution
-options.opt_init = costaropts('ic',IC);                                             % Properties for initial solution
+options.opt_init = costaropts('ic',S1.s);                                           % Properties for initial solution
 options.opt_approx_method = costaropts('solver','ode45','n_shoot',6);               % Properties for approximation method
 options.opt_cont = costaropts('step_width',0.1,'step_width_limit',[0.02,0.5],'step_control','angle','step_control_param',[2,3],'mu_limit',mu_limit);                    % Properties for continuation
 options.opt_stability = costaropts('iterate_bfp','on');                             % Properties for stability                                                                                      

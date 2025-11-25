@@ -17,8 +17,7 @@ function   obj = getIV(obj,DYN)
         obj.fc0 = [obj.c0(:);obj.cmatrix(:);obj.smatrix(:)];
     end
     
-    [obj.iv,obj.hmatrix] = obj.sort_guess_FC(DYN,obj.fc0);                      %This functionality gets also used by the IF_increase_discretization method
-    
+    [obj.iv,obj.hmatrix] = obj.sort_guess_FC(DYN,obj.fc0);                  %This functionality gets also used by the IF_increase_discretization method
     
     if ~isempty(DYN.auto_freq)                                              %system is (partly) autonomous
         obj.iv = [obj.iv;DYN.auto_freq(:)];                                 %Append the initial_condition vector, if it is an autonomous system.

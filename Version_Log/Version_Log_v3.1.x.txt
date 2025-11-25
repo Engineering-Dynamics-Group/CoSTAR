@@ -120,3 +120,377 @@ Tests and tutorials were adapted accordingly. Changes affect:
         - Example_PS_FDM                            - Tutorial_PS_FDM
         - Example_PS_FGM                            - Tutorial_PS_FGM
         - Example_PS_SHM                            - Tutorial_PS_SHM
+        
+        
+        
+--------------------------------------------
+------------------ v3.1.4 ------------------
+--------------------------------------------
+
+Improved the behaviour of CoSTAR around the error control. Added and exit flag handling and warnings if something does not work as intended.
+
+    @Continuation:
+        - bifurcation_stability:
+            --> Added obj.y0 to input arguments of method "ST.update_curve_container" (line 23)
+        - Continuation:
+            --> Added property "p_ec_flag" as exit flag of the error control (line 35)
+            --> Added property "p_ec_prop_save" as struct (line 86)
+            --> Added method "IF_ec_save_reset_props" (line 132)
+        - error_control:
+            --> Added call of "obj.IF_ec_save_reset_props" to line 18
+            --> Moved the update of the solution dimension of obj.p_y0_old{2} and obj.p_y0_old{3} to lines 79 and 80
+            --> Changed "iterate = 0" to "break" (line 52) and added setting of property "obj.p_ec_flag" in line 51
+            --> Updated the if...elseif block before fsolve. It should work for SHM and FDM now (lines 60 - 69)
+            --> Removed the old, not properly working code right after the corrector and added an extensive exit flag handling (lines 73 - 149)
+        - IF_ec_save_reset_props:
+            --> Completely added. Method saves and resets properties of AM and CON that are modified by the error control
+        - m_continuation:
+            --> Added obj.y0 to input arguments of method "ST.update_curve_container" (line 26)
+            --> Updated if condition to call method "obj.stepcontrol" (line 60). Now step control is only executed if error control did not fail
+            --> Added if condition to call method "obj.direction_vector" similar to if condition of "obj.stepcontrol" (lines 56 - 58)
+            --> Added warnings if corrector (fsolve) issued exit flag < 1 or = 2 and step width can be reduced (lines 115 - 124)
+            --> Removed the else-statement in former line 122. Added "continue" and "end" to (new) lines 131 and 133 and adapted the indent of the following code
+            --> Updated the call of the error control. It is now followed by a check of the exit flag (lines 173 - 180)
+            --> Removed the "obj = " from the calls of the methods "obj.direction_vector", "obj.stepcontrol", "obj.predictor", "obj.bifurcation_stability", 
+                "obj.iterate_data" and "obj.check_limits" (lines 57, 61, 65, 186, 196 and 198)
+            --> Added fsolve exit flag numbers to warning messages (lines 100, 104, 116, 119, 141 and 147)
+
+    @AM_PS_FDM:
+        - IF_up_res_data:
+            --> The input argument can now either be a Continuation object or a solution vector x. This is important for the error control in initial_solution
+
+    @AM_PS_FGM:
+        - AM_PS_FGM:
+            --> Added property "ec_prop_save" and initialised as struct (line 41)
+            --> Removed the "obj = " from methods "set.hmatrix" and "set.n_fft" (lines 103 and 115)
+            --> The input argument of method "IF_up_res_data" can now either be a Continuation object or a solution vector x. This is important for the error control in initial_solution
+        - IF_decrease_discretization:
+            --> Updated description of output variable "flag" (line 10)
+            --> Added initialisation of variable "err" (line 27)
+            --> if...else statement "isempty(idx_min)" moved to first if-statement (new lines 39 - 47)
+            --> Changed the code of the outer else-body (former first else-body) to handle the case where decreasing is not possible anymore (lines 50 and 51)
+        - IF_update_sol_dim:
+            --> Updated and added a few comments (lines 36 - 38 and 45 - 48)
+            --> Added else-statement to line 42
+
+    @AM_PS_SHM:
+        - IF_up_res_data:
+            --> The input argument can now either be a Continuation object or a solution vector x. This is important for the error control in initial_solution
+
+    @AM_QPS_FDM:
+        - IF_up_res_data:
+            --> The input argument can now either be a Continuation object or a solution vector x. This is important for the error control in initial_solution
+
+    @AM_QPS_FGM:
+        - AM_QPS_FGM:
+            --> Added property "ec_prop_save" and initialised as struct (line 22)
+            --> Removed the "obj = " from methods "set.hmatrix" and "set.n_fft" (lines 87 and 102)
+            --> The input argument of method "IF_up_res_data" can now either be a Continuation object or a solution vector x. This is important for the error control in initial_solution
+        - IF_decrease_discretization:
+            --> Updated description of output variable "flag" (line 10)
+            --> Added initialisation of variable "err" (line 27)
+            --> if...else statement "isempty(idx_min)" moved to first if-statement (new lines 39 - 47)
+            --> Changed the code of the outer else-body (former first else-body) to handle the case where decreasing is not possible anymore (lines 50 and 51)
+        - IF_update_sol_dim:
+            --> Updated and added a few comments (lines 34 - 36, 43 - 46 and 77)
+            --> Added else-statement to line 40
+
+    @Stability:
+        - Stability:
+            --> Added y0 to input arguments of method "update_curve_container" (line 37)
+        - update_curve_container:
+            --> Added y0 to input arguments (line 14)
+            --> Added if...else statement (lines 32 - 34 and 47): 
+                y0 is now directly used to replace the old y0 in the curve container, which avoids calling IF_update_sol_dim (small bug in this method)
+            --> Added a few comments (lines 24 and 35 - 37) and adapted the position of other comments
+
+    Functions:
+        - initial_solution:
+            --> Added fsolve exit flag numbers to warning messages (lines 59, 62, 78 and 81)
+            --> Changed "iterate = 0" from former line 140 to "break" (line 143)
+            --> Updated the if...elseif block in the error control before fsolve. It should work for SHM and FDM now (lines 147 - 157)
+            --> Removed the old, not properly working code right after the corrector in the error control and added an exit flag handling (lines 161 - 212)
+    
+
+----------  
+
+Bugfixes:
+
+    @Continuation:
+        - plot_contplot:
+            --> Added "drawnow" at the bottom to render the live plot for MATLAB versions >= 2025a (line 95)
+
+
+
+--------------------------------------------
+------------------ v3.1.5 ------------------
+--------------------------------------------
+
+Periodic shooting method: The Jacobian pattern (for the ODE integrator) is now set if an implicit ODE integrator is used.
+Changes affect:
+
+    @AM_PS_SHM:
+        - PS_SHM_residuum:
+            --> Added variable "odeOpts_1" and if-condition setting the Jacobian pattern (lines 45 - 48)
+            --> Replaced "obj.odeOpts" by "odeOpts_1" in line 88
+
+    @ST_PS_SHM:
+        - ST_PS_SHM:
+            --> Added if-condition setting the Jacobian pattern (lines 36 - 39)
+            --> Combined the if-conditions in former lines 31 and 32 to one if-condition (line 31)
+    
+
+----------  
+
+Bugfixes:
+
+    @ST_PS_SHM:
+        - ST_PS_SHM:
+            --> Moved the call of the function "setSolver" after the call of "updateoptions" (line 41)
+
+    test:
+        - check_costar:
+            --> Added if condition to reset default figure window style. It is now reset only for MATLAB versions prior to R2025a (lines 101 - 103)
+        - test_FGM_PS_duffing:
+            --> Added "5" to the Hmatrix in line 36. The stability of the upper BFP can now computed again
+
+
+
+--------------------------------------------
+------------------ v3.1.6 ------------------
+--------------------------------------------
+
+Bugfixes and improvements for the (Fourier-Galerkin) error control. In- and decreasing the number of harmonics as well as the number of FFT evaluations now works correctly.
+Also improved/fixed the exit flag handling and the display/log messages introduced in v3.1.4. Changes affect:
+
+    @Continuation:
+        - check_limits:
+            --> Added some dashs to the display output for the cases 'error-control', 'step-control' and 'full' to better distinguish the iterations of the continuation loop (lines 88 - 90)
+        - error_control:
+            --> Moved the code that updates yp, y0 and dy0 to after displaying the err_control_text (lines 28 - 30 to 33 - 35 and lines 39 - 41 to 44 - 46) to improve display text order
+            --> Added info for the case that number of iterations of the error loop has been reached (lines 50 - 56)
+            --> Updated the if...elseif block before fsolve. Now the natural parametrization is used and it should also work for SHM and FDM now (lines 66 - 75)
+            --> Added an error check when decreasing the discretization. If the new error is greater than the upper error limit, the new discretization is not accepted (lines 81 - 96)
+            --> Splitted the elseif block "In-/Decrease of discretization failed" and changed the flag for "Increase failed" from 0 to -1 (lines 128 - 130 and 173, 160 - 167 added)
+            --> Added elseif blocks for the case "Increasing not possible: Maximum discretization reached" (lines 137 - 145) and changed the flag for "Decreasing not possible" from -1 to 2 (line 149)
+            --> Bugfix: Added "break" at the end of "Exit flag handling III" since it was missing (line 194)
+
+    @AM_PS_FGM:
+        - AM_PS_FGM:
+            --> Overall a bit restructured, new (header) comments added, comments and code aligned where it is sensible
+            --> Removed the adaption of n_fft if the highest harmonic supplied by the user exceeds the default Nyquist frequency (former lines 91 - 98 removed). This is done in initial_solution now
+            --> Removed the adaption of n_fft in the "set.hmatrix" method. It was superfluous due to the check in initial_solution and the algorithm in IF_increase_discretization (former lines 107 - 111 removed)
+            --> Corrected the input argument "CON" in "IF_increase_discretization" and "IF_decrease_discretization" to "y1" (lines 129 and 130)
+            --> Moved the method getIC to the "%% Functions for residuum and computation" block (line 137)
+        - IF_decrease_discretization:
+            --> Renamed input argument "y" to "y1" to improve code readability (lines 12, 21, 33, 42, 47 and 69)
+            --> Changed the flag for the case "isempty(idx_min)" from 0 to 3 (line 43)
+            --> Added algorithm to decrease n_fft in accordance with the Nyquist-Shannon criterium (lines 49 - 64)
+            --> Changed the flag for the case that the minimum number of harmonics is reached from -1 to 2 (line 70)
+        - IF_increase_discretization:
+            --> Renamed input argument "y" to "y1" to improve code readability (lines 11, 17, 22, 39, 41 and 47)
+            --> Restructured the method:
+                * Moved the if-block to update n_fft down to lines 26 - 38, added info text and corrected the if-condition
+                * Deleted the "else; idx = []; end" in former lines 28 - 30 and added a new "else ... end" including a new exit flag in lines 45 - 50
+            --> Removed the "-1" in line 18 in order for the code to work correctly
+            --> Changed the flag for the case "isempty(idx) || ..." from false to -1 (line 23)
+        - s_help_opt_approx_method_PS_FGM:
+            --> Updated the description of the fields 'n_fft', 'phasecond' and 'error_control' (lines 16, 17, 20 and 23)
+        - s_PS_FGM_gatekeeper:
+            --> Change within the if-condition in line 130 from ">" to ">=" in order to comply with the Nyquist-Shannon criterium
+        - sort_guess_FC:
+            --> Removed the "abs()" function around variables cmatrix and smatrix in lines 65 and 66
+
+    @AM_QPS_FGM:
+        - AM_QPS_FGM:
+            --> Overall a bit restructured, new (header) comments added, comments and code aligned where it is sensible
+            --> Removed the adaption of n_fft if the highest harmonic supplied by the user exceeds the default Nyquist frequency (former lines 75 - 82 removed). This is done in initial_solution now
+            --> Removed the adaption of n_fft in the "set.hmatrix" method. It was superfluous due to the check in initial_solution and the algorithm in IF_increase_discretization (former lines 94 - 98 removed)
+            --> Corrected the input argument "CON" in "IF_increase_discretization" and "IF_decrease_discretization" to "y1" (lines 120 and 121)
+        - IF_decrease_discretization:
+            --> Renamed input argument "y" to "y1" to improve code readability (lines 12, 21, 33, 42, 47 and 69)
+            --> Changed the flag for the case "isempty(idx_min)" from 0 to 3 (line 43)
+            --> Added algorithm to decrease n_fft in accordance with the Nyquist-Shannon criterium (lines 49 - 64)
+            --> Changed the flag for the case that the minimum number of harmonics is reached from -1 to 2 (line 70)
+        - IF_increase_discretization:
+            --> Renamed input argument "y" to "y1" to improve code readability (lines 11, 18, 38, 55, 57 and 63)
+            --> Restructured the method:
+                * Moved the if-block to update n_fft down to lines 42 - 54, added info text and corrected the if-condition
+                * Deleted the "else; idx = []; end" in former lines 42 - 47 and added a new "else ... end" including a new exit flag in lines 61 - 66
+            --> Changed the flag for the case "isempty(idx) || ..." from false to -1 (line 39)
+        - s_help_opt_approx_method_QPS_FGM:
+            --> Updated the description of the fields 'n_fft', 'phasecond' and 'error_control' (lines 15, 16, 19 and 22)
+        - s_QPS_FGM_gatekeeper:
+            --> Change within the if-condition in line 147 from ">" to ">=" in order to comply with the Nyquist-Shannon criterium and deleted former empty line 148
+
+    @SOL_PS_FGM:
+        - SOL_PS_FGM:
+            --> Added saving of n_fft (lines 11, 46, 96 and 134)
+
+    @SOL_QPS_FGM:
+        - SOL_QPS_FGM:
+            --> Added saving of n_fft (lines 11, 39, 82 and 125)
+
+    Functions:
+        - initial_solution:
+            --> Moved the initialization of the log from line 43 to line 10
+            --> Added checks for the number of FFT evaluation points n_fft. If its value does not fit to the highest harmonic, n_fft is increased accordingly (lines 35 - 53)
+            --> Error control: A solution with decreased discretization is not accepted now if the new error is above the limit (lines 192 - 207). Also added dynamic saving of some AM properties (lines 140 - 143)
+            --> Splitted the elseif block "In-/Decrease of discretization failed" and changed the flag for "Increase failed" from 0 to -1 (lines 228 - 230 and 263, 251 - 258 added)
+            --> Added elseif blocks for the case "Increasing not possible: Maximum discretization reached" (lines 233 - 240) and changed the flag for "Decreasing not possible" from -1 to 2 (line 243)
+            --> Changed some "header" comments to begin with "%%" in order to increase oversight and structure of the function by introducing MATLAB sections (lines 22, 62, 79, 112, 124, 288, 311, 322 and 336)
+
+    test:
+        - test_FGM_PS_duffing
+            --> Continuation 2: Changed the 'display' option from 'iter' to 'error-control' to test the error control output (line 46)
+            --> Continuation 2: Changed the value of 'n_fft' from 2^8 to 2^4 to test the algorithms of in- and decreasing n_fft (line 48)
+        - test_FGM_PS_vdP
+            --> Continuation 3: Changed the value of 'n_fft' from 2^6 to 2^4 and added rigorous error limits to test the algorithms of in- and decreasing n_fft (line 55)
+            --> Continuation 3: Changed options.opt_init to only have 4 harmonics in order to test the new algorithms (line 57)
+        - test_FGM_PS_duffing
+            --> Changed the value of 'n_fft' from 2^6 to 2^3 to test the algorithms of increasing n_fft (line 43)
+
+
+
+--------------------------------------------
+------------------ v3.1.7 ------------------
+--------------------------------------------
+
+FGM and SHM: It is now possible to set the contplot/solplot/solget field 'resolution' as a [1x2] array for quasi-periodic hypertime plots.
+Changes affect:
+
+    @SOL_QPS_FGM:
+        - evalsol_hypertime:
+            --> Restructured the method a bit and adapted some comments
+            --> Added support to accept a [1x2] array as well as a scalar for options.resolution (lines 18 - 24 and 63)
+            --> Some more variables are initialized to avoid calling obj in the loop. The hypertime values are also initialized before the loop now (lines 30 - 42 and 58)
+            --> The loop is now for k = i:n_evals instead of k = index (lines 46, 48 - 50, 53, 54)
+
+    @SOL_QPS_SHM:
+        - evalsol_hypertime:
+            --> Restructured the method: Removed unnecessary variables and array dimensions, realigned the comments and rearranged some code (-> that is why no lines are specified for the following subitems)
+            --> Added support to accept a [1x2] array as well as a scalar for options.resolution
+            --> Some more variables are initialized to avoid calling obj in the loop. The hypertime values are also initialized before the loop now
+            --> The loop is now for k = i:n_evals instead of k = index
+            --> The interpolation at the boundaries is now done within the "main" loop and not in a second loop 
+
+    @Solution:
+        - contplot_gatekeeper:
+            --> Removed the constraint that a [1x2] array for the field 'resolution' is only allowed if the FDM was used (lines 76 and 77)
+        - s_help_contplot:
+            --> Updated the description of the field 'resolution' (line 26)
+        - s_help_solget:
+            --> Updated the description of the field 'resolution' (lines 44 and 45)
+        - s_help_solplot:
+            --> Updated the description of the field 'resolution' (lines 54 and 55)
+        - solget_gatekeeper:
+            --> Removed the constraint that a [1x2] array for the field 'resolution' is only allowed if the FDM was used (lines 59 and 60)
+        - solplot_gatekeeper:
+            --> Removed the constraint that a [1x2] array for the field 'resolution' is only allowed if the FDM was used (lines 85 and 86)
+
+    test/01postprocessing:
+        - benchmark_postprocess_quasiperiodic:
+            --> Changed, added or removed the field 'resolution' here and there to test all possible cases: no value, scalar, vector (lines 36, 39, 56, 59 and 62)
+
+    Tutorials:
+        - Tutorial_Postprocessing_contplot:
+            --> Updated the description of the field 'resolution'
+        - Tutorial_Postprocessing_solget:
+            --> Updated the description of the field 'resolution'
+        - Tutorial_Postprocessing_solplot:
+            --> Updated the description of the field 'resolution'
+     
+    
+----------  
+   
+Periodic shooting method: It is now possible to define the opt_init field 'ic' as [dim*n_shoot_ic x 1] vector. 
+If the number of shooting points (state space values) in the opt_init-field 'ic' is not equal to one or does not match the desired number of shooting points n_shoot,
+the given shooting points in 'ic' are interpolated to obtain the desired shooting points. Changes affect:
+
+    @AM_PS_SHM:
+        - getIV:
+            --> Renamed z0 to s0 (line 15 and other)
+            --> Restructured the method: Removed the ifelse-block for n_auto == 1 since code was almost identical to the case n_auto == 0. Adapted this case to work for n_auto == 1 as well
+            --> Added if-ifelse-block for the case numel(s0) == dim to get the correct periodic time (lines 22 - 27)
+            --> Added else-block for the case that n_shoot_ic is not equal to one or to n_shoot (lines 44 - 54)
+            --> If system is autonomous, the autonomous frequency is now added at the end of the method (lines 59 - 63)
+        - s_help_opt_init_PS_SHM:
+            --> Updated the general info (lines 11 and 13 - 15)
+            --> Updated the value and text of the field 'ic' (lines 18 and 20 - 22)
+        - s_PS_SHM_gatekeeper
+            --> Check of correct number of elements of field 'ic' replaced by the check that numel(ic)/dim is an integer (lines 70 - 76 replaced by lines 70 - 73)
+
+    test:
+        - test_SHM_PS_duffing:
+            --> For the continuation, the method solution vector of the previously computed single solution is used as 'ic' to test the new code (line 39)
+        - test_SHM_PS_duffing:
+            --> For the continuation, the method solution vector of the previously computed single solution is used as 'ic' to test the new code (line 34)
+
+
+----------  
+
+Renamed the following functions:
+
+    RHS:
+        - duffing_ap  -> duffing        - duffing_qp -> deleted since redundant     - duffing_ap_qp -> duffing_qp
+        - ho_ap       -> harmonic       - ho_ap_qp   -> harmonic_qp                 - pitchfork_ap  -> pitchfork
+        - vdP_auto_ap -> vdP_auto       - coupledvdp -> vdP_coupled                 - vdP_qp        -> vdP_forced
+
+    test:
+        - test_FDM_QPS_cvdP -> test_FDM_QPS_vdP_coupled         - test_FDM_QPS_vdP  -> test_FDM_QPS_vdP_forced
+        - test_FGM_QPS_cvdp -> test_FGM_QPS_vdP_coupled         - test_SHM_PS_fvdP  -> test_SHM_PS_vdP_forced
+        - test_SHM_QPS_cvdP -> test_SHM_QPS_vdP_coupled         - test_SHM_QPS_vdP  -> test_SHM_QPS_vdP_forced
+
+Test files, tutorials and examples were updated accordingly:
+
+    test:
+        - test_EQ_pitchfork (line 16)
+        - test_FDM_PS_duffing (line 19)             - test_FDM_PS_harmonic (line 16)            - test_FDM_PS_vdP (line 14)
+        - test_FDM_QPS_duffing (line 41)            - test_FDM_QPS_harmonic (line 17)           - test_FDM_QPS_vdP_coupled (line 16)  
+        - test_FDM_QPS_vdP_forced (line 17 and 85)
+        - test_FGM_PS_duffing (line 17)             - test_FGM_PS_vdP (line 12)                 - test_FGM_QPS_duffing (line 17)
+        - test_FGM_QPS_vdP_coupled (line 16)
+        - test_SHM_PS_duffing (line 19)             - test_SHM_PS_vdP (line 14)                 - test_SHM_PS_vdP_forced (line 22)
+        - test_SHM_QPS_vdP_coupled (line 21)        - test_SHM_QPS_vdP_forced (line 18)
+
+    Tutorials:
+        - Tutorial_EQ
+        - Tutorial_Postprocessing_contplot          - Tutorial_Postprocessing_solget          - Tutorial_Postprocessing_solplot
+        - Tutorial_PS_FDM (lines 108, 116, 123, 453, 461 and 467)       - Tutorial_QPS_FDM (lines 122, 130, 138, 139, 885, 893 and 900)
+        - Tutorial_PS_FGM (lines 108, 116, 123, 480, 488 and 494)       - Tutorial_QPS_FGM (lines 123, 131, 139, 140, 900, 908 and 915)
+        - Tutorial_PS_SHM (lines 102, 110, 117, 418, 420 and 426)       - Tutorial_QPS_SHM (lines 120, 128, 136, 137, 823, 831 and 838)
+        - Example_EQ (line 65)
+        - Example_Postprocessing_contplot (line 41)     - Example_Postprocessing_solget (line 41)   - Example_Postprocessing_solplot (line 41)
+        - Example_PS_FDM (lines 42 and 98)              - Example_QPS_FDM (lines 47 and 160)
+        - Example_PS_FGM (lines 44 and 103)             - Example_QPS_FGM (lines 50 and 167)
+        - Example_PS_SHM (lines 42 and 98)              - Example_QPS_SHM (lines 47 and 157)
+
+
+----------  
+
+Bugfixes:
+
+    @AM_PS_SHM:
+        - PS_SHM_residuum:
+            --> Removed the initialisation of Z_end in line 42 since it was initialized twice (same code)
+
+    @AM_QPS_SHM:
+        - s_help_opt_init_QPS_SHM:
+            --> Updated the general info (lines 11 - 15)
+            --> Corrected the info texts of all fields (lines 20 - 22, 25, 28, 32, 35 and 39)
+
+    functions:
+        - initial_solution:
+            --> Added else-block to set the residuum function Fcn for equilibrium solutions (lines 56 and 57)
+
+    test:
+        - check_tutorials:
+            --> Added if condition to reset default figure window style. It is now reset only for MATLAB versions prior to R2025a (lines 119 - 121)
+
+    Tutorials:
+        - Example_QPS_FDM:
+            --> Enabled stability computation for all examples (lines 51, 81, 122 and 164)
+        - Example_QPS_FGM:
+            --> Enabled stability computation for all examples (lines 54, 84, 126 and 171)
+        - Example_QPS_SHM:
+            --> Set 'step_width' to 0.1 for the Jeffcott(-Laval) rotor example in order to match related tutorial (line 124)
