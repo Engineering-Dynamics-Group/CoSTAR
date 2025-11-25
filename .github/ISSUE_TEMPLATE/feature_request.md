@@ -1,20 +1,29 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
+about: A request, idea or new functionality that does not exist yet
 title: ''
-labels: feature request
+type: Feature Request
+labels: ''
 assignees: ''
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is.
+#### Motivation
+* Please describe the current state:
+  - [If possible] Which part(s) or module(s) of CoSTAR are involved in your requested feature?
+  - What is CoSTAR *not* able to do?
+  - What does CoSTAR do *instead*?
+* Is your feature request related to a problem?
+  - If yes: Please describe the problem.
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+#### What feature would you like to see in CoSTAR?
+* Please describe your requested feature clearly and concisely.
+  - What should CoSTAR be able to do?
+  - What is your preferred implementation?
+* [Optional] What (dis-)advantages does your requested feature and your preferred implementation have? Does it affect other parts or modules of CoSTAR?
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+#### [Optional] Possible alternatives
+If you have alternative solutions or other implementation ideas for your requested feature, please describe them here.
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+#### [Optional] Additional context
+Here you can add any other context or screenshots about your requested feature that might be helpful.
