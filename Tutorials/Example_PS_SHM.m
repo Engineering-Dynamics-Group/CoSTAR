@@ -30,16 +30,16 @@
 clear variables; clc; close all;                    % clear workspace; clear command window; close all figures
 
 % Parameters
-D = 0.05;     kappa = 0.3;     g = 1;               % Parameters needed for the Duffing differential equation
+D = 0.05;   c = 1;   kappa = 0.3;   g = 1;          % Parameters needed for the Duffing differential equation
 mu_limit = [0.01, 2.5];                             % Limits of the continuation        
-eta0 = mu_limit(1);                                 % Value of continuation parameter at start of continuation
-param = {kappa, D, eta0, g};                        % Parameter array
+eta0 = mu_limit(1);                                 % Value of continuation parameter at begin of continuation
+param = {kappa, D, eta0, g, c};                     % Parameter array
 active_parameter = 3;                               % Location of continuation parameter within the array
 IC = [1; 0];                                        % Initial condition (point in state space) for fsolve
 
 % Functions
 non_auto_freq = @(mu) mu;                           % Non-autonomous excitation frequency
-Fcn =  @(t,z,param) duffing_ap(t,z,param);          % Right-hand side of dz/dtau = f(tau,z,kappa,D,eta,g)
+Fcn =  @(t,z,param) duffing(t,z,param);             % Right-hand side of dz/dtau = f(tau,z,kappa,D,eta,g)
 
 % Options
 options.system = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','Continuation of Duffing Equation');   % Properties of the system
@@ -63,7 +63,7 @@ solplot_output_1  = S.solplot(DYN,solplot_options_1);                           
 eta_kappa = 1.5;                                    % Excitation frequency is now fixed
 mu_limit_kappa = [0, 1];                            % New limits of the continuation
 kappa0 = mu_limit_kappa(1);                         % New value of continuation parameter at start of continuation
-param_kappa = {kappa0, D, eta_kappa, g};            % New parameter array
+param_kappa = {kappa0, D, eta_kappa, g, c};         % New parameter array
 active_parameter_kappa = 1;                         % New location of continuation parameter within the array
 C1_kappa = [-g; 0];  S1_kappa = [0; g*eta_kappa];   % New Fourier coefficients used to create an initial value for fsolve
 
@@ -95,7 +95,7 @@ auto_freq = 1;                                      % Initial value of the auton
 IC = [2; 0];                                        % Initial condition (point in state space) for fsolve
 
 % Function
-Fcn = @(t,z,param) vdP_auto_ap(t,z,param);          % Right-hand side of dz/dtau = f(z,epsilon)
+Fcn = @(t,z,param) vdP_auto(t,z,param);             % Right-hand side of dz/dtau = f(z,epsilon)
 
 % Options
 options.system   = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','Continuation of van der Pol Oscillator');   % Properties of the system

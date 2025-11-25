@@ -12,54 +12,53 @@ function obj = getIV(obj,DYN)
     Fcn = DYN.rhs;                      % RHS of ODE
     param = DYN.param;                  % Parameter array
 
-    z0 = DYN.opt_init.ic(:);            % Initial point in state space
+    s0 = DYN.opt_init.ic;               % Initial point in state space or method solution vector
     n_auto = DYN.n_auto;                % Number of autonomous frequencies
     n_shoot = obj.n_shoot;              % Number of shooting points
     
 
-    if n_auto == 0                      % Non-autonomous system
-    
-        if obj.n_shoot > 1
-                    
-            mu = param{DYN.act_param};                                                  % Continuation parameter
-            T = 2*pi/DYN.non_auto_freq(mu);                                             % Periodic time
-            t = linspace(0,T*(1-1/n_shoot),n_shoot);                                    % Time vector of shooting points
-                    
-            [~,Z] = obj.solver_function(@(t,z) Fcn(t,z,param), t, z0, obj.odeOpts);     % Integration to get required shooting points
+    if numel(s0) == dim                                     % Only z(t=0) is supplied - time integration necessary to obtain the missing shooting points
 
-            if n_shoot == 2             % In this case, t is a [1x2] vector and is therefore interpreted as [t_start, t_end] by the solver
-                Z = Z([1,end],:);       % Thus, Z stores the values at all computed time points, but we only need the Z values at t
-            end
-            obj.iv = reshape(Z.',dim*n_shoot,1);                                        % Reshape to a vector
+        if n_auto == 0                                      % Non-autonomous system
+            mu = param{DYN.act_param};                      % Continuation parameter
+            T = 2*pi/DYN.non_auto_freq(mu);                 % Periodic time
+        elseif n_auto == 1
+            T = 2*pi/DYN.auto_freq;                         % Periodic time
+        end
+        T_int = linspace(0,T*(1-1/n_shoot),n_shoot);        % Time vector of shooting points
 
-        else  
+        [~,Z] = obj.solver_function(@(t,z) Fcn(t,z,param), T_int, s0, obj.odeOpts);     % Integration to get required shooting points
 
-            obj.iv = z0;                % z0 can be used directly if n_shoot = 1
-
+        if n_shoot == 2                                     % In this case, t is a [1x2] vector and is therefore interpreted as [t_start, t_end] by the solver
+            Z = Z([1,end],:);                               % Thus, Z stores the values at all computed time points, but we only need the Z values at t
         end
 
+        obj.iv = reshape(Z.',dim*n_shoot,1);                % Reshape to a vector
 
-    elseif n_auto == 1                  % Autonomous system
 
-        omega = DYN.auto_freq;          % Autonomous frequency
+    elseif numel(s0) == dim*n_shoot     % The complete method solution vector is already supplied
 
-        if obj.n_shoot > 1
+        obj.iv = s0;                    % s0 can be used directly as initial values for the shooting points
 
-            T = 2*pi./omega;                                                            % Periodic time
-            t = linspace(0,T*(1-1/n_shoot),n_shoot);                                    % Time vector of shooting points
         
-            [~,Z] = obj.solver_function(@(t,z) Fcn(t,z,param), t, z0, obj.odeOpts);     % Integration to get required shooting points
+    else                                                                % All other cases: n_shoot_s0 = numel(s0)/dim - Interpolate s0
 
-            if n_shoot == 2             % In this case, t is a [1x2] vector and is therefore interpreted as [t_start, t_end] by the solver
-                Z = Z([1,end],:);       % Thus, Z stores the values at all computed time points, but we only need the Z values at t
-            end
-            obj.iv = [reshape(Z.',dim*n_shoot,1); omega];                               % Reshape to a vector
-    
-        else 
+        n_shoot_s0 = numel(s0)/dim;                                     % Gatekeeper assures that n_shoot_s0 is an integer
 
-            obj.iv = [z0; omega];       % z0 can be used directly if n_shoot = 1
-        
-        end
+        theta_interp = 0 : 2*pi/n_shoot_s0 : 2*pi;                      % theta values corresponding to the shooting points of s0
+        Z_interp = [reshape(s0,dim,n_shoot_s0), s0(1:dim)];             % Reshape s0 to Z = [z(0), ... , z(2*pi-DeltaTheta)] and add z(0) (periodic condition)
+        Z_csape = csape(theta_interp, Z_interp, 'periodic');            % Interpolation with periodic end conditions (1st and 2nd derivative). Output of csape is a struct (piecewise polynomial form)
+
+        theta_eval = linspace(0,2*pi*(1-1/n_shoot),n_shoot);            % theta values for the evaluation (at the desired shooting points)
+        Z_eval = fnval(Z_csape, theta_eval);                            % Evaluate the interpolated data
+        obj.iv = reshape(Z_eval,dim*n_shoot,1);                         % Reshape to a vector
+
+    end
+
+
+    if n_auto == 1                              % If the system is autonomous
+
+        obj.iv = [obj.iv; DYN.auto_freq];       % Add the autonomous frequency to the initial value
 
     end
 

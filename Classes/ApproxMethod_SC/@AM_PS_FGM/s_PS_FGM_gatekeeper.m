@@ -127,8 +127,7 @@ function s_PS_FGM_gatekeeper(GC,system,opt_sol,opt_approx_method,opt_init)
        if ~(mod(log(opt_approx_method.n_fft)/log(2),1)==0)
          GC.error_msg{1,end+1} = append('There is a problem with your value of opt_approx_method.n_fft: The current value is ', num2str(opt_approx_method.n_fft), ' but must be a power of two (e.g. 2^6)');   
        end
-       if max(opt_init.hmatrix) > opt_approx_method.n_fft/2
-         
+       if max(opt_init.hmatrix) >= opt_approx_method.n_fft/2
          GC.error_msg{1,end+1} = append('Your supplied value of opt_approx_method.n_fft = ', num2str(opt_approx_method.n_fft) ,' in combination with the maximum value of opt_init.hmatrix = ', num2str(max(opt_init.hmatrix)),' violates the Nyquist-Shannon Theorem. Consider raising opt_approx_method.n_fft.');   
        end
            GC.speak();

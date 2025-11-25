@@ -94,4 +94,6 @@ function plot_contplot(obj,S,DYN)
 
     drawnow
        
+    drawnow
+    
 end

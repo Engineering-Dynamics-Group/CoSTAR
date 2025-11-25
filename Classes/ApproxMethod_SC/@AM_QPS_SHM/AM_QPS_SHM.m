@@ -44,7 +44,7 @@ classdef AM_QPS_SHM < ApproxMethod
             obj = updateoptions(obj,DYN.opt_init);                                  % Updates the properties with the values set by the user in opt_init
             obj = setSolver(obj,obj.solver);                                        % set ode Solver for time integration
             obj.n = DYN.dim;                                                        % Get dimension of system
-            obj.phi = zeros(obj.n,1);                                               % Set phase for characteristics to zero
+            obj.phi = zeros(2,obj.n_char);                                          % Set phase for characteristics to zero
             
             if(isfield(DYN.opt_init,'tinit')); obj.tinit = DYN.opt_init.tinit; end
             if(isfield(DYN.opt_init,'deltat')); obj.deltat = DYN.opt_init.deltat; end

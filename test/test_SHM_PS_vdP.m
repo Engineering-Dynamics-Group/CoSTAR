@@ -11,14 +11,14 @@ auto_freq = 1;                                  % Start value for autonomous fre
 
 param = {mu_limit(2)};                          % Parameter vector, all constant parameters are set here, the bifurcation parameter gets its starting value (here the left corner of bifurcation diagram)
 active_parameter = 1;                           % Which parameter is the bifurcation parameter?
-Fcn = @(t,z,param)vdP_auto_ap(t,z,param);       % Right-hand-side of ODE
+Fcn = @(t,z,param) vdP_auto(t,z,param);         % Right-hand-side of ODE
 
 
 %% Properties
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);           % Properties of the system
 options.opt_sol  = costaropts('stability','off','cont','off','auto_freq',auto_freq,'sol_type','periodic','approx_method','shm','act_param',active_parameter);    % Properties of the solution
 options.opt_init = costaropts('ic',IC);                                             % Properties for initial solution
-options.opt_approx_method = costaropts('solver','ode45','n_shoot',10);              % Properties for approximation method
+options.opt_approx_method = costaropts('solver','ode45','n_shoot',10,'phase_condition','poincare');      % Properties for approximation method
 options.opt_stability       = costaropts('iterate_bfp','on');                       % Properties for stability
 
 
@@ -31,8 +31,8 @@ time1 = toc(timer);                             % Display elapsed time since tic
 %% Properties
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);                                               % Properties of the system
 options.opt_sol  = costaropts('stability','on','cont','on','auto_freq',auto_freq,'sol_type','periodic','approx_method','shm','act_param',active_parameter);     % Properties of the solution
-options.opt_init = costaropts('ic',IC);                                                                                 % Properties for initial solution
-options.opt_approx_method = costaropts('solver','ode45','n_shoot',25);                                                  % Properties for approximation method
+options.opt_init = costaropts('ic',S1.s);                                                                               % Properties for initial solution
+options.opt_approx_method = costaropts('solver','ode45','n_shoot',25,'phase_condition','integral');                     % Properties for approximation method
 options.opt_cont = costaropts('step_control','angle','direction',-1,'mu_limit',mu_limit,'step_width',0.05);             % Properties for continuation
 options.opt_stability       = costaropts('iterate_bfp','on');                                                           % Properties for stability
 

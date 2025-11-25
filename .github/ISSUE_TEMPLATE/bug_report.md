@@ -1,27 +1,28 @@
 ---
 name: Bug report
-about: Create a report to help us improve CoSTAR
+about: An unexpected problem or behaviour
 title: ''
-labels: bug
+type: Bug
+labels: ''
 assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+#### Describe the bug
+A clear and concise description of the bug:
+* What is happening?
+* Which part(s) / module(s) / file(s) of CoSTAR are involved?
+* If possible, add screenshots to help explain your problem.
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
+#### Reproducing the bug
+Steps to reproduce the behaviour:
+1. Execute the test script `test_...` or go to `...`
+2. Click on `...` or scroll down to `...`
+3. ...
 4. See error
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+#### Expected behavior
+A clear and concise description of what CoSTAR is actually supposed to do.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
-
-**Additional context**
-Add any other context about the problem here.
+#### [Optional] Additional context
+Add any other context about the problem that might be helpful to fix the bug.

@@ -86,8 +86,8 @@ function s_QPS_FGM_gatekeeper(GC,system,opt_sol,opt_approx_method,opt_init)
         GC.speak();
 
         %Check data type and that matrices are matrices
-        GC.check_data(opt_init.cmatrix,'opt_init.cmatrix','double',{'matrix'},[]);
-        GC.check_data(opt_init.smatrix,'opt_init.smatrix','double',{'matrix'},[]);        %This must be a matrix since the hmatrix always contains a [0,0], a [1,0] and a [0,1]
+        GC.check_data(opt_init.cmatrix,'opt_init.cmatrix','double',[],[]);
+        GC.check_data(opt_init.smatrix,'opt_init.smatrix','double',[],[]);        %This must be a matrix since the hmatrix always contains a [0,0], a [1,0] and a [0,1]
     
         %Check the correct size of the matrices: the number of entries must be equal or smaller than the number of harmonics (in the latter case Fourier coefficient values are guessed)
         if ~(size(opt_init.cmatrix,1)==system.dim)
@@ -144,8 +144,7 @@ function s_QPS_FGM_gatekeeper(GC,system,opt_sol,opt_approx_method,opt_init)
        if ~(mod(log(opt_approx_method.n_fft)/log(2),1)==0)
          GC.error_msg{1,end+1} = append('There is a problem with your value of opt_approx_method.n_fft: The current value is ', num2str(opt_approx_method.n_fft), ' but must be a power of two (e.g. 2^6)');   
        end
-       if max(opt_init.hmatrix,[],'all') > opt_approx_method.n_fft/2
-         
+       if max(opt_init.hmatrix,[],'all') >= opt_approx_method.n_fft/2
          GC.error_msg{1,end+1} = append('Your supplied value of opt_approx_method.n_fft = ', num2str(opt_approx_method.n_fft) ,' in combination with the maximum harmonic of opt_init.hmatrix = ', num2str(max(opt_init.hmatrix,[],'all')),' violates the Nyquist-Shannon Theorem. Consider raising opt_approx_method.n_fft.');   
        end
            GC.speak();

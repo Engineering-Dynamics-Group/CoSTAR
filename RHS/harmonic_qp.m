@@ -1,6 +1,6 @@
 % This is the right-hand side of the quasi-periodically forced harmonic oscillator
 
-function dzdt = ho_ap_qp(t,z,param)
+function dzdt = harmonic_qp(t,z,param)
 
     % State variables and time variables
     z1 = z(1,:);

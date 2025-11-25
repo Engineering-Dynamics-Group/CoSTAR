@@ -28,15 +28,18 @@ classdef ST_PS_SHM < Stability
         function obj = ST_PS_SHM(DYN)
 
             % Reset the default value for the solver if shooting is the approximation method and solver was not defined in opt_stability
-            if ~isfield(DYN.opt_stability,'solver')
-                if isfield(DYN.opt_approx_method,'solver')
-                    obj.solver = DYN.opt_approx_method.solver;
-                end
+            if ~isfield(DYN.opt_stability,'solver') && isfield(DYN.opt_approx_method,'solver')
+                obj.solver = DYN.opt_approx_method.solver;
             end
+
+            obj = updateoptions(obj,DYN.opt_stability);                 % updateoptions method is a general function
+            if strcmpi(obj.solver,'ode15s') || strcmpi(obj.solver,'ode23s') || strcmpi(obj.solver,'ode23t') || strcmpi(obj.solver,'ode23tb')
+                dim = DYN.dim;
+                obj.odeOpts.JPattern = kron(speye(2*dim+1),spones(ones(dim)));    % Specify the Jacobian pattern for implicit solvers (used for time step, not corrector step)
+            end
+
             obj = setSolver(obj,obj.solver);                            % Set the solver for the shooting for the monodromy matrix
             
-            obj = updateoptions(obj,DYN.opt_stability);                 % updateoptions method is a general function
-
         end
 
         [res,J_res] = PS_SHM_ST_residuum(obj,x,x0,mu,DYN);              % Residuum function

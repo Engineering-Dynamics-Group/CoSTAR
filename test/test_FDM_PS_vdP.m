@@ -11,7 +11,7 @@ epsilon0 = mu_limit(1);                         % mu-value at start of continuat
 param = {epsilon0};                             % Parameter array
 active_parameter = 1;                           % Defines where the continuation parameter is located within param
 
-Fcn = @(t,z,param) vdP_auto_ap(t,z,param);
+Fcn = @(t,z,param) vdP_auto(t,z,param);
 
 auto_freq = 1;                                  % Initial autonomous frequency
 C1 = [2;0];   S1 = [0;-2];                      % Fourier-coefficients to create an initial value for fsolve to find the first point on the curve

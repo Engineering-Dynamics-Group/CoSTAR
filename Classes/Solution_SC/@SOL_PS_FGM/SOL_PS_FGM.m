@@ -8,6 +8,7 @@ classdef SOL_PS_FGM < Solution
         freq            %Property to save the frequency
         hmatrix         %Property to save the higher-harmonics matrix for every continuation step
         n_hh            %Number of higher harmonics
+        n_fft           %Number of FFT evaluation points
     
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -42,6 +43,7 @@ classdef SOL_PS_FGM < Solution
             obj.arclength(1,1)         = 0;                                                 %Set arclength of first curve point to zero
             obj.hmatrix{1,1}           = AM.hmatrix;
             obj.n_hh(1,1)              = numel(AM.hmatrix);
+            obj.n_fft(1,1)             = AM.n_fft;
 
             if strcmpi(AM.error_control,'on'); obj.error(1,1)      = varargin{1,1}{1,1}; end
             if strcmpi(DYN.stability,'on')
@@ -91,6 +93,7 @@ classdef SOL_PS_FGM < Solution
                 obj.error(1,end+1)  = CON.p_error;
             end
             obj.n_hh(1,end+1)       = numel(AM.hmatrix);
+            obj.n_fft(1,end+1)      = AM.n_fft;
 
             if DYN.n_auto == 0                                                              %Solution is periodic - if this is true: non-autonomous
                 obj.freq(1,end+1) = DYN.non_auto_freq(CON.p_y1(end,1));
@@ -128,6 +131,7 @@ classdef SOL_PS_FGM < Solution
             obj.arclength(1,end+1)  = CON.p_arclength_bfp;
             obj.hmatrix{1,end+1}    = AM.hmatrix;                                               %This is the same as the one of the newest point (due to a update_sol_dim statement in the ST.update_curve_container method)                                       
             obj.n_hh(1,end+1)       = numel(AM.hmatrix);
+            obj.n_fft(1,end+1)      = AM.n_fft;
             if strcmpi(AM.error_control,'on')
                 obj.error(1,end+1)  = CON.p_error_bfp;                                          %error at the bifurcation point
             end

@@ -62,8 +62,8 @@ function [s,hmatrix] = sort_guess_FC(obj,DYN,FC0)
         end
     
         %Guess the additional initial conditions.
-        tmp_cmatrix =  [cmatrix,repmat(abs(cmatrix(:,1)),[1,numb_guess])./hh_guess.^m_c];
-        tmp_smatrix =  [smatrix,repmat(abs(smatrix(:,1)),[1,numb_guess])./hh_guess.^m_s];
+        tmp_cmatrix =  [cmatrix,repmat(cmatrix(:,1),[1,numb_guess])./hh_guess.^m_c];        % abs() around cmatrix removed
+        tmp_smatrix =  [smatrix,repmat(smatrix(:,1),[1,numb_guess])./hh_guess.^m_s];        % abs() around smatrix removed
     
         %Sort the complete h-matrix again. Why? Maybe ferquencies needed to be guessed which are not higher than the hh_tmp frequencies but in between (unlikely case... but now accounted for).
         [hhm,idx_tmp] = sort([hh_tmp,hh_guess]);  

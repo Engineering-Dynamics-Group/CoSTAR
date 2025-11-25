@@ -13,7 +13,7 @@ switch obj.step_control
 
         if obj.p_convergence == 0                                                                   % If corrector did not converge previously
             obj.step_width = obj.p_step_width_init;                                                 % Reset step-width to initial step width
-            info_text = append('Step width reset to step_width = ',num2str(obj.step_width));        % Set info text
+            info_text = append('Step width reset to stepwidth = ',num2str(obj.step_width));         % Set info text
             write_log(DYN,info_text)                                                                % Write info text in log file
             if strcmpi(DYN.display,'step-control') || strcmpi(DYN.display,'full')
                 disp(info_text);                                                                    % Display information
@@ -94,7 +94,7 @@ switch obj.step_control
                 else
                     r_alpha = alpha_nom / alpha;                        % Calculate r_alpha using asymptotic expansion of alpha. alpha_nom sets the nominal (desired) angle
                 end
-                display_message_info = append('alpha = ', num2str(alpha), '°', ' corr_it = ', num2str(obj.p_it));   % Set additional display info
+                display_message_info = append('alpha = ', num2str(alpha), '°', ', corr_it = ', num2str(obj.p_it));   % Set additional display info
                 if r_it < 1                                             % If number of corrector iterations exceeds nominal number of corrector iterations ...
                     r_pre = min([r_it,r_alpha]);                        % take the minimum of r_it and r_alpha
                     display_message_info = append(display_message_info, ', r_alpha = ', num2str(r_alpha), ', r_it = ', num2str(r_it));      % Append info
@@ -183,7 +183,7 @@ switch obj.step_control
                 step_control_info = append('Step width not adapted since step width is optimal (r_pre = ', num2str(r_pre), '). ', display_message_info);
             end
         else                                                        % If step width has been adapted
-            step_control_info = append('Step width adapted to step_width = ', num2str(obj.step_width), ' by factor r = ', num2str(obj.p_r), '. r_pre = ', num2str(r_pre), ', ', display_message_info);
+            step_control_info = append('Step width adapted to stepwidth = ', num2str(obj.step_width), ' by factor r = ', num2str(obj.p_r), '. r_pre = ', num2str(r_pre), ', ', display_message_info);
         end
         write_log(DYN,step_control_info)                            % Write step control info in log file
 

@@ -1,4 +1,4 @@
-function f = vdP_qp(t,z,param)
+function f = vdP_forced(t,z,param)
 
 epsilon = param{1};
 s1 = param{2};
