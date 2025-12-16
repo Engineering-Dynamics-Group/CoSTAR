@@ -12,8 +12,8 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
     system_mandatory_fieldnames  = {'order','rhs','dim'};                       %required fieldnames in the options super structure
     system_allowed_fieldnames    = {'order','rhs','dim','param','info'};        %allowed fieldnames in the options super structure
 
-    opt_sol_mandatory_fieldnames  = {'sol_type','cont','stability'};                                                                                    %required fieldnames in the options super structure
-    opt_sol_allowed_fieldnames    = {'sol_type','cont','stability','approx_method','act_param','non_auto_freq','auto_freq','display','freq_limit'};     %allowed fieldnames in the options super structure
+    opt_sol_mandatory_fieldnames  = {'sol_type','cont','stability'};                                                                                                        %required fieldnames in the options super structure
+    opt_sol_allowed_fieldnames    = {'sol_type','cont','stability','approx_method','act_param','non_auto_freq','auto_freq','display','freq_limit','synchronization'};       %allowed fieldnames in the options super structure
 
     sol_type_allowed_fieldvalues   = {'equilibrium','eq','periodic','ps','quasiperiodic','qps'};
     display_allowed_fieldvalues = {'off','final','iter','iter-detailed','step-control','error-control','full'};
@@ -206,7 +206,7 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
     if strcmpi(opt_sol.sol_type,'quasiperiodic') || strcmpi(opt_sol.sol_type,'qps')
 
         opt_qp_sol_mandatory_fieldnames  = {'sol_type','cont','stability','approx_method'};                                                                 %needed fieldsnames in the options super structure
-        opt_qp_sol_allowed_fieldnames    = {'sol_type','cont','stability','approx_method','act_param','non_auto_freq','auto_freq','display','freq_limit'};  %allowed fieldsnames in the options super structure
+        opt_qp_sol_allowed_fieldnames    = {'sol_type','cont','stability','approx_method','act_param','non_auto_freq','auto_freq','display','freq_limit','synchronization'};  %allowed fieldsnames in the options super structure
 
         qp_approx_method_allowed_fieldvalues = {'fourier-galerkin','fgm','shooting','shm','finite-difference','fdm'};
 
@@ -291,6 +291,10 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
             GC.error_msg{1,end+1} = append(['Your solution type is "',opt_sol.sol_type, '" via opt_sol.sol_type. ',...
                                             'Your right hand side via system.rhs has ',num2str(nargin(system.rhs)),' argument(s), but it needs the arguments (t,z,param).']); 
         end
+        GC.speak();
+
+        %Check if opt_sol.synchronization is either set to on or off
+        GC.check_data(opt_sol.cont,'opt_sol.synchronization','char',[],{'on','off'});
         GC.speak();
         
     end

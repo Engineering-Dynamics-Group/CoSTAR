@@ -186,6 +186,12 @@ while  obj.p_contDo
     if strcmpi(DYN.stability,'on'); obj.bifurcation_stability(DYN,AM,S,ST); end
 
 
+    %%%%%%%%%%%%%%%%%%%%%%%%  SYNCHRONIZATION  %%%%%%%%%%%%%%%%%%%%%%
+    %If quasi-periodic solution is continued, check if solution
+    %synchronizes
+    if strcmpi(DYN.synchronization,'on'); obj.checkSync(); end
+
+
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%  SAVING  %%%%%%%%%%%%%%%%%%%%%%%%%%%
     S.IF_arch_data(obj,DYN,AM);                                                 %store calculated data point in Solution object
 

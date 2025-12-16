@@ -1,0 +1,27 @@
+--------------------------------------------
+----------------- v3.2.0.1 -----------------
+-------------------------------------------- 
+
+@Continuation:
+
+    New method:
+    - checkSync:            (line 135 in Continuation) 
+       --> Still empty
+
+    Changes to existing methods:
+    - m_continuation:
+        --> New check for sychronization added (lines 189-194)
+
+
+-------------------------------------------- 
+
+@DynamicalSystem:
+
+    New properties:
+    - string synchronization (line 28)
+
+    Changes to existing methods:
+    - s_DYN_gatekeeper
+        --> opt_sol_allowed_fieldnames now accepts "synchronization" (line 16)
+        --> opt_qp_sol_allowed_fieldnames now accepts "synchronization" (line 209)
+        --> Gatekeeper now checks value of "synchronization" (lines 296-298)
