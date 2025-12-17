@@ -32,7 +32,9 @@ if(chi_S<1e-1)
     obj.p_stopping_flag = append('CoSTAR stopped because solution synchronized by Suppresive Synchronization of Omega_', num2str(idx),'!');
 end
 
-
+% Save values of indicator functions to object of Continuation class
+obj.p_IndF_Lock = indFL;
+obj.p_IndF_Supp = indFS_A;
 
 end
 

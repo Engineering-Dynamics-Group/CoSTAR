@@ -56,6 +56,10 @@ classdef Continuation < handle
         p_error_bfp  = NaN;                                                   %error at the bifurcation point 
         p_stability_flag                                                      %exitflag of stability computation
         p_newton_flag_bfp                                                     %fsolve exitflag of iterating bifurcation point
+
+        %Parameters for synchronization detection
+        p_IndF_Lock                                                           %Indicator function for frequency locking
+        p_IndF_Supp                                                           %Indicator function for suppressive synchronization
     end
     
     properties(Access=private)

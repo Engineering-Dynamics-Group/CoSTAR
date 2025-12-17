@@ -10,7 +10,8 @@ classdef SOL_QPS_FDM < Solution
         local_gridpoint_indices_2   % Stores the local grid point indices in theta_2-direction, which determine the grid points relative to node j that are used for the finite difference approximation
         local_gridpoint_weights_1   % Stores the weights related to the local grid point indices in theta_1-direction
         local_gridpoint_weights_2   % Stores the weights related to the local grid point indices in theta_2-direction
-            
+        
+        indicator struct = struct('Locking',[],'Suppression',[]);           % Indikator function for synchronization detection
     end
 
     %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -59,7 +60,11 @@ classdef SOL_QPS_FDM < Solution
                 obj.n_unstable(1,1)     = varargin{1,1}{1,3};                   % Number of unstable multipliers
                 obj.stability_flag(1,1) = varargin{1,1}{1,4};                   % Exitflag of stability computation
             end
-
+            
+            if strcmpi(DYN.synchronization,'on')                                % If synchronization detection is on, set first value (if tangent predictor is
+                 obj.indicator.Locking = nan(1,1);                              % chosen) or first two values (if secant predictor is chosen) to zero
+                 obj.indicator.Suppression = nan(2,1);                     
+            end
         end
         
         %Abstract Superclass Method: Must be defined
@@ -91,7 +96,11 @@ classdef SOL_QPS_FDM < Solution
                 obj.n_unstable(1,end+1)     = CON.p_n_unstable_1;                   % Number of unstable multipliers
                 obj.stability_flag(1,end+1) = CON.p_stability_flag;                 % Exitflag of stability computation
             end
-
+            
+            if strcmpi(DYN.synchronization,'on')                                    % If synchronization detection is on, store the values of the indicator function
+                obj.indicator.Locking(1,end+1) = CON.p_IndF_Lock;
+                obj.indicator.Suppression(:,end+1) = CON.p_IndF_Supp;
+            end
         end
 
         %Abstract Superclass Method: Must be defined

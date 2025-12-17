@@ -4,6 +4,10 @@
 
 @Continuation:
 
+    New properties:
+    - p_IndF_Lock   (line 61)   Stores value of indicator function for frequency locking of current curve point
+    - p_IndF_Supp   (line 62)   Stores value of indicator function for suppressive synchronization of current curve point
+
     New method:
     - checkSync:            (line 135 in Continuation) 
        --> Newly written
@@ -18,10 +22,26 @@
 @DynamicalSystem:
 
     New properties:
-    - string synchronization (line 28)
+    - string synchronization = "off" (line 28)
 
     Changes to existing methods:
     - s_DYN_gatekeeper
         --> opt_sol_allowed_fieldnames now accepts "synchronization" (line 16)
         --> opt_qp_sol_allowed_fieldnames now accepts "synchronization" (line 209)
         --> Gatekeeper now checks value of "synchronization" (lines 296-298)
+
+
+-------------------------------------------- 
+
+@Solution:
+    
+    @SOL_QPS_FDM:
+        
+        New properties:
+        - struct indicator  (line 14)
+
+        @IF_arch_init_data
+        - initialization of struct indicator    (lines 64-67)
+
+       @IF_arch_data
+        - Stores values of indicator functions  (lines 100-103) 

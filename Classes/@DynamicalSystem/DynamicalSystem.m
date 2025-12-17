@@ -25,7 +25,7 @@ classdef DynamicalSystem
         approx_method   string                                          %shooting, fd, fgm
         cont            string                                          %indicates if a continuation should be done or not
         stability       string                                          %indicates if stability should be computed or not
-        synchronization string                                          %indicates if solution should be checked for synchronizaiton (only if SOL = 'QPS')
+        synchronization string = 'off';                                 %indicates if solution should be checked for synchronizaiton (only if SOL = 'QPS')
 
         act_param = 1;                                                  %Defines the index of the continuation parameter in the param array
         non_auto_freq = []                                              %contains all non-autonomous frequencies (this may be type function handle)
