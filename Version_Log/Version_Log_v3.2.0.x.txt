@@ -6,7 +6,7 @@
 
     New method:
     - checkSync:            (line 135 in Continuation) 
-       --> Still empty
+       --> Newly written
 
     Changes to existing methods:
     - m_continuation:

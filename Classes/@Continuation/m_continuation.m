@@ -189,7 +189,7 @@ while  obj.p_contDo
     %%%%%%%%%%%%%%%%%%%%%%%%  SYNCHRONIZATION  %%%%%%%%%%%%%%%%%%%%%%
     %If quasi-periodic solution is continued, check if solution
     %synchronizes
-    if strcmpi(DYN.synchronization,'on'); obj.checkSync(); end
+    if strcmpi(DYN.synchronization,'on'); obj.checkSync(DYN,AM,S); end
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%  SAVING  %%%%%%%%%%%%%%%%%%%%%%%%%%%

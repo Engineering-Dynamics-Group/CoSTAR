@@ -132,7 +132,7 @@ classdef Continuation < handle
         obj = IF_ec_save_reset_props(obj,AM,save_or_reset);                 %Method for saving and resetting properties that are modified by the error control. Needed in case that error control fails
         obj = bifurcation_stability(obj,DYN,AM,S,ST);                       %Method for calculating the stability and determining bifurcation points
 
-        obj = checkSync(obj);                                               %Method which checkes for synchronization
+        obj = checkSync(obj,DYN,AM,S);                                      %Method which checkes for synchronization
 
         %% Get Method
         %By altering the get-method. p_arcl_1 always computes the current arc-length
