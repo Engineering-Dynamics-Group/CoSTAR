@@ -27,7 +27,7 @@ classdef SOL_PS_SHM < Solution
             obj.s(:,1)                 = y1(1:(end-1-DYN.n_auto),1);                    % Approximation method vector 
             obj.mu(1,1)                = y1(end,1);                                     % Continuation parameter 
             obj.J{1,1}                 = sparse(J1);                                    % Jacobian matrix
-            obj.dy(:,1)                = NaN(size(J1,1),1);                             % Initialised. Gets correctly filled by IF_arch_data
+            obj.dy(:,1)                = NaN(size(y1));                                 % Initialised. Gets correctly filled by IF_arch_data
             obj.newton_flag(1,1)       = newton_flag;
             obj.arclength(1,1)         = 0;                                             % Set arc length of first curve point to zero
             

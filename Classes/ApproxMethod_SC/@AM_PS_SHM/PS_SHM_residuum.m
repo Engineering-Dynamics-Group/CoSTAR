@@ -93,7 +93,7 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
     % when approximating the derivatives and dividing by delta (~ e-8). Thus, the Jacobian can have errors ~ e-1 that eventually causes the corrector ...
     % to need more iterations. Not only does this influence the computation time negatively, it can also lead to the step control reducing the step size.
     for k=1:n_shoot
-        % Create a [dim x (2*dim+1)] matrix Z0_mat storing the initial condition to integrate column-wise  
+        % Create a [dim x (2*dim+2)] matrix Z0_mat storing the initial condition to integrate column-wise  
         Z0_mat = [z0_mat(:,k), Z_dim_plus(:,(k-1)*dim+1:k*dim), Z_dim_minus(:,(k-1)*dim+1:k*dim), s_p_mat(:,k)];    % Take z_k, the perturbed z_k and z_k^(P) (z_k at predictor) (need to be integrated for J)
         [~,Z] = obj.solver_function(@(t,Z) FCN_wrapper(t,Z,dim,@(t,z)Fcn(t,z,param)), linspace(T_int(k,1),T_int(k,2),n_time+1), Z0_mat, odeOpts_1); 
         Z_traj(:,:,k)       = Z(1:end-1,1:dim).';                   % Save the trajectory (not Z(t_end) because it will be equal to Z(t_start) of the next interval after convergence)
@@ -104,15 +104,17 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
         Z_end_plus(:,k)  = Z(end,dim+1:(dim+1)*dim).';              % Take the "+ delta" perturbed state vectors at t_end
         Z_end_minus(:,k) = Z(end,(dim+1)*dim+1:end-dim).';          % Take the "- delta" perturbed state vectors at t_end
         % Now do a second/third integration with perturbed mu-value (needed for Jacobian - can be deactivated when it is calculated by fsolve)
-        [~,Z_mu_plus]  = obj.solver_function(@(t,Z) FCN_wrapper(t,Z,dim,@(t,z)Fcn(t,z,param_mu_plus)), linspace(T_int_mu_plus(k,1),T_int_mu_plus(k,2),n_time+1), [z0_mat(:,k),s_p_mat(:,k)], odeOpts_2); 
-        Z_traj_mu_plus(:,:,k) = Z_mu_plus(1:end-1,1:dim).';         % Save the "+ delta" perturbed mu trajectory
-        Z_end_mu_plus(:,k) = Z_mu_plus(end,1:dim).';                % Take the state vector of the "+ delta" perturbed mu trajectory at t_end
-        Z_p_mu_plus(:,:,k) = Z_mu_plus(1:end-1,dim+1:end).';        % Save the "+ delta" perturbed mu trajectory at the predictor point
-        if calc_stability                                           % Only required when using central finite difference for Jacobian
-            [~,Z_mu_minus] = obj.solver_function(@(t,Z) FCN_wrapper(t,Z,dim,@(t,z)Fcn(t,z,param_mu_minus)), linspace(T_int_mu_minus(k,1),T_int_mu_minus(k,2),n_time+1), [z0_mat(:,k),s_p_mat(:,k)], odeOpts_2);
-            Z_traj_mu_minus(:,:,k) = Z_mu_minus(1:end-1,1:dim).';   % Save the "- delta" perturbed mu trajectory
-            Z_end_mu_minus(:,k) = Z_mu_minus(end,1:dim).';          % Take the state vector of the "- delta" perturbed mu trajectory at t_end
-            Z_p_mu_minus(:,:,k) = Z_mu_minus(1:end-1,dim+1:end).';  % Save the "- delta" perturbed mu trajectory at the predictor point
+        if ~(isfield(DYN.system,'first_integral') && (DYN.act_param == numel(param)))  % If the value of the first integral is NOT the continuation parameter (if it is: dg/dmu = 0 and dpc/dmu = 0)
+            [~,Z_mu_plus]  = obj.solver_function(@(t,Z) FCN_wrapper(t,Z,dim,@(t,z)Fcn(t,z,param_mu_plus(1:end-1))), linspace(T_int_mu_plus(k,1),T_int_mu_plus(k,2),n_time+1), [z0_mat(:,k),s_p_mat(:,k)], odeOpts_2);
+            Z_traj_mu_plus(:,:,k) = Z_mu_plus(1:end-1,1:dim).';         % Save the "+ delta" perturbed mu trajectory
+            Z_end_mu_plus(:,k) = Z_mu_plus(end,1:dim).';                % Take the state vector of the "+ delta" perturbed mu trajectory at t_end
+            Z_p_mu_plus(:,:,k) = Z_mu_plus(1:end-1,dim+1:end).';        % Save the "+ delta" perturbed mu trajectory at the predictor point
+            if calc_stability                                           % Only required when using central finite difference for Jacobian
+                [~,Z_mu_minus] = obj.solver_function(@(t,Z) FCN_wrapper(t,Z,dim,@(t,z)Fcn(t,z,param_mu_minus)), linspace(T_int_mu_minus(k,1),T_int_mu_minus(k,2),n_time+1), [z0_mat(:,k),s_p_mat(:,k)], odeOpts_2);
+                Z_traj_mu_minus(:,:,k) = Z_mu_minus(1:end-1,1:dim).';   % Save the "- delta" perturbed mu trajectory
+                Z_end_mu_minus(:,k) = Z_mu_minus(end,1:dim).';          % Take the state vector of the "- delta" perturbed mu trajectory at t_end
+                Z_p_mu_minus(:,:,k) = Z_mu_minus(1:end-1,dim+1:end).';  % Save the "- delta" perturbed mu trajectory at the predictor point
+            end
         end
     end
 
@@ -120,10 +122,9 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
     % Calculate the residuum
     s_end = reshape(Z_end,dim*n_shoot,1);               % Reshape the unperturbed state vectors of Z_end (end points of shooting) to a vector
     s_perm = [s(dim+1:end); s(1:dim)];                  % Create a vector of initial conditions [z_1; z_2; ...; z_n; z_0] for residuum calculation
-    if n_auto == 0
-        res = s_end - s_perm;                           % Residuum
-    elseif n_auto == 1
-        switch obj.phase_condition                      % Compute the phase condition
+ 
+    if n_auto == 1                                      % Compute the phase condition if system is autonomous
+        switch obj.phase_condition
             case 'poincare'                             
                 f_s_p = reshape(Fcn(0,s_p_mat,param),dim*n_shoot,1);                                    % Evaluate the RHS at predictor point s_p
                 pc = f_s_p.' * (s - reshape(s_p_mat,dim*n_shoot,1));                                    % Poincare phase condition
@@ -132,10 +133,20 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
                 f_p = reshape(Fcn(0,reshape(Z_p,dim,n_shoot*n_time),param),dim*n_shoot*n_time,1);       % Evaluate the RHS for the predictor point (not needed now, but later on for dpc/domega in the Jacobian)
                 pc = f.' * (reshape(Z_traj,dim*n_shoot*n_time,1) - reshape(Z_p,dim*n_shoot*n_time,1));  % * T / (n_time*n_shoot); % Integral phase condition
         end
-        % Residuum equation
-        res = [s_end - s_perm;                          % Residuum
-                     pc     ];                          % Phase condition
+    elseif n_auto == 0                                  % Non-autonomous system
+        pc = [];                                        % Set as empty in order to add "nothing" to the residuum
     end
+
+    % If a conservative system is considered: Expand the residuum
+    if isfield(DYN.system,'first_integral')
+        I = DYN.system.first_integral;                              % Function of the first integral I = I(z)
+        I_Z = I(z0_mat,param);                                      % Evalute the first integral for all shooting points z_i
+        IC = 1/n_shoot*sum(I_Z) - param{end};                       % First Integral Constraint: I(s) = param{end} | Take the average of I_Z to get a single value for all shooting points
+    else                                                            % Note: mean(I_Z) = 1/n_shoot*sum(I_Z), but the sum() function is somehow faster
+        IC = [];                                                    % Non-conservative system: Set the first integral constraint IC as empty in order to add "nothing" to the residuum
+    end
+
+   res = [s_end - s_perm;  pc;  IC];                    % Assemble the residuum: Residuum of the shooting; phase condition; first integral constraint
     
 
 
@@ -144,7 +155,7 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
     % When stability is computed, the Jacobian is approximated using central finite differences for higher accuracy since the Floquet multipliers are based on J
     
     % J_res = zeros(dim*n_shoot,dim*n_shoot+1);         % Needed only for testing purposes of non-autonomous systems when J is calculated by fsolve
-    % J_res = zeros(dim*n_shoot+1,dim*n_shoot+2);       % Needed only for testing purposes of autonomous systems when J is calculated by fsolve
+    % J_res = zeros(dim*n_shoot+2,dim*n_shoot+2);       % Needed only for testing purposes of autonomous systems when J is calculated by fsolve
     %
     % dg/ds consists of the derivatives dz(t_(k+1),z_k,mu)/dz_k, which are [dim x dim] matrices arranged block-wise on the main diagonal of dg/ds
     % The part of dg/ds described above is named dZ_ds_mat. Furthermore, there are some -eye(dim) here and there in dg/ds. All of these are arranged in I_mat
@@ -164,10 +175,14 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
 
     
     % Now calculate dg/dmu
-    if calc_stability                                                   % Use central finite difference
-        dg_dmu = reshape( (Z_end_mu_plus - Z_end_mu_minus) ./ (2*delta_mu) , dim*n_shoot, 1);
-    else                                                                % Use forward finite difference
-        dg_dmu = reshape( (Z_end_mu_plus - Z_end) ./ delta_mu , dim*n_shoot, 1);
+    if isfield(DYN.system,'first_integral') && (DYN.act_param == numel(param))  % If the value of the first integral is the continuation parameter
+        dg_dmu = zeros(dim*n_shoot,1);                                  % dg/dmu is zero since g is not explicitly dependent on I = mu
+    else
+        if calc_stability                                               % Use central finite difference
+            dg_dmu = reshape( (Z_end_mu_plus - Z_end_mu_minus) ./ (2*delta_mu) , dim*n_shoot, 1);
+        else                                                            % Use forward finite difference
+            dg_dmu = reshape( (Z_end_mu_plus - Z_end) ./ delta_mu , dim*n_shoot, 1);
+        end
     end
 
    
@@ -248,27 +263,56 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
                     dpc_domega = dpc_domega - 2*pi/(n_time*n_shoot*omega^2) * ((df_dz_j_mat*f_k).' * (j_vec.*(Z_traj_k - Z_p_k)) + f_k.'*(j_vec.*(f_k-f_p_k)));  
                 end
                 % dpc_dmu:
-                if calc_stability
-                    df_dmu = (Fcn(0,reshape(Z_traj_mu_plus,dim,n_time*n_shoot),param_mu_plus) - Fcn(0,reshape(Z_traj_mu_minus,dim,n_time*n_shoot),param_mu_minus)) ./ (2*delta_mu);
-                    dz_j_dmu = (reshape(Z_traj_mu_plus,dim,n_time*n_shoot) - reshape(Z_traj_mu_minus,dim,n_time*n_shoot)) ./ (2*delta_mu);
-                    dz_p_dmu = (reshape(Z_p_mu_plus,dim,n_time*n_shoot) - reshape(Z_p_mu_minus,dim,n_time*n_shoot)) ./ (2*delta_mu);
+                if isfield(DYN.system,'first_integral') && (DYN.act_param == numel(param))  % If the value of the first integral is the continuation parameter
+                    dpc_dmu = 0;                                                    % dpc/dmu is zero since pc is not explicitly dependent on I = mu
                 else
-                    df_dmu = (Fcn(0,reshape(Z_traj_mu_plus,dim,n_time*n_shoot),param_mu_plus) - Fcn(0,reshape(Z_traj,dim,n_time*n_shoot),param)) ./ delta_mu;
-                    dz_j_dmu = (reshape(Z_traj_mu_plus,dim,n_time*n_shoot) - reshape(Z_traj,dim,n_time*n_shoot)) ./ delta_mu;
-                    dz_p_dmu = (reshape(Z_p_mu_plus,dim,n_time*n_shoot) - reshape(Z_p,dim,n_time*n_shoot)) ./ delta_mu;
+                    if calc_stability
+                        df_dmu = (Fcn(0,reshape(Z_traj_mu_plus,dim,n_time*n_shoot),param_mu_plus) - Fcn(0,reshape(Z_traj_mu_minus,dim,n_time*n_shoot),param_mu_minus)) ./ (2*delta_mu);
+                        dz_j_dmu = (reshape(Z_traj_mu_plus,dim,n_time*n_shoot) - reshape(Z_traj_mu_minus,dim,n_time*n_shoot)) ./ (2*delta_mu);
+                        dz_p_dmu = (reshape(Z_p_mu_plus,dim,n_time*n_shoot) - reshape(Z_p_mu_minus,dim,n_time*n_shoot)) ./ (2*delta_mu);
+                    else
+                        df_dmu = (Fcn(0,reshape(Z_traj_mu_plus,dim,n_time*n_shoot),param_mu_plus) - Fcn(0,reshape(Z_traj,dim,n_time*n_shoot),param)) ./ delta_mu;
+                        dz_j_dmu = (reshape(Z_traj_mu_plus,dim,n_time*n_shoot) - reshape(Z_traj,dim,n_time*n_shoot)) ./ delta_mu;
+                        dz_p_dmu = (reshape(Z_p_mu_plus,dim,n_time*n_shoot) - reshape(Z_p,dim,n_time*n_shoot)) ./ delta_mu;
+                    end
+                    dpc_dmu = reshape(df_dmu,dim*n_time*n_shoot,1).' * reshape(Z_traj - Z_p,dim*n_time*n_shoot,1) + f.' * reshape(dz_j_dmu - dz_p_dmu,dim*n_time*n_shoot,1);
                 end
-                dpc_dmu = reshape(df_dmu,dim*n_time*n_shoot,1).' * reshape(Z_traj - Z_p,dim*n_time*n_shoot,1) + f.' * reshape(dz_j_dmu - dz_p_dmu,dim*n_time*n_shoot,1);
         end
+
+    % Non-Autonomous system: Set dg/domega and dpc/dy as empty in order to add "nothing" to the Jacobian matrix below
+    elseif n_auto == 0
+        dg_domega = [];  dpc_ds = [];  dpc_domega = [];  dpc_dmu = [];      
     end
-         
+    
+
+    % Conservative system: Calculate dIC/dy -> GEHT NOCH NICHT, DRÜBER SCHAUEN (VARIABLENNAMEN UND SO)
+    if isfield(DYN.system,'first_integral')
+        if calc_stability                                                                                           % Use central finite difference
+            dIC_ds = 1/n_shoot .* (I(Z_dim_plus,param) - I(Z_dim_minus,param)) ./ (2.*nonzeros(Delta)');
+        else                                                                                                        % Use forward finite difference
+            dIC_ds = 1/n_shoot .* (I(Z_dim_plus,param) - reshape(repmat(I_Z,dim,1),1,n_shoot*dim)) ./ nonzeros(Delta)';
+        end
+        if n_auto == 1;     dIC_domega = 0;                                                                         % Autonomous system: dIC/domega is also required
+        else;               dIC_domega = [];                                                                        % Non-Autonomous system: Set dIC/domega as empty in order to add "nothing" to the Jacobian matrix below
+        end
+        if DYN.act_param == numel(param)                                                                            % If param{end} = first integral is the continuation parameter
+            dIC_dmu = - 1;                                                                                          % I(Z,param) is independent of mu and dparam{end}/dmu = 1
+        else                                                                                                        % A parameter of the RHS is the continuation parameter: In this case, I can be dependent on mu
+            if calc_stability                                                                                       % Use central finite difference
+                dIC_dmu = 1/n_shoot*sum(I(z0_mat,param_mu_plus) - I(z0_mat,param_mu_minus)) / (2*delta_mu);
+            else                                                                                                    % Use forward finite difference
+                dIC_dmu = 1/n_shoot*sum(I(z0_mat,param_mu_plus) - I_Z) / delta_mu;
+            end
+        end
+    % Non-Conservative system: Set dIC/dy as empty in order to add "nothing" to the Jacobian matrix below
+    else
+        dIC_ds = [];  dIC_domega = [];  dIC_dmu = [];
+    end
 
     % Build the Jacobian matrix J_res
-    if n_auto == 0                              % Non-autonomous system
-        J_res = [dg_ds,  dg_dmu];
-    elseif n_auto == 1                          % Autonomous system
-        J_res = [dg_ds,  dg_domega,  dg_dmu;
-                 dpc_ds, dpc_domega, dpc_dmu];
-    end
+    J_res = [dg_ds,  dg_domega,  dg_dmu;                                % Build the Jacobian matrix
+             dpc_ds, dpc_domega, dpc_dmu;                               % Build the Jacobian matrix
+             dIC_ds, dIC_domega, dIC_dmu];                              % Build the Jacobian matrix
     %}
 
 

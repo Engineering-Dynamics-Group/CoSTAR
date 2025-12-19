@@ -74,10 +74,8 @@ function [res,J_res] = PS_FDM_residuum(obj,y,DYN)
     % Calculate the residuum of the ODE
     g = omega/DeltaTheta .* Z_i_sigma * w - reshape(Fcn_eval,n_int*dim,1);        
 
-    % Assemble the residuum res
-    if n_auto == 0                                                      % Non-autonomous system
-        res = g;                                                        % Build the residuum
-    elseif n_auto == 1                                                  % Autonomous system
+    % Compute the phase condition if system is autonomous
+    if n_auto == 1                                                      % Autonomous system
         pc = (Z_i_sigma * w)' * (s - s_p);                              % Integral phase condition: sum_(i=0)^(n_int-1) ( f(t_i,z_i,param)' * (z(theta_i) - z_p(theta_i)) ), but ...
         % Poincare phase condition (not used anymore)                   % ... f(t_i,z_i,param) = dz(theta_i)/dtheta .* omega is approximated by FD -> benefit: dpc/dmu = 0
         %{
@@ -86,8 +84,21 @@ function [res,J_res] = PS_FDM_residuum(obj,y,DYN)
         Fcn_eval_pc = Fcn(0,zp_0,param);                                % Evaluate Fcn for the phase condition
         pc = Fcn_eval_pc' * (z_0 - zp_0);                               % Poincare phase condition
         %}
-        res = [g; pc];                                                  % Build the residuum
+    elseif n_auto == 0                                                  % Non-autonomous system
+        pc = [];                                                        % Set as empty in order to add "nothing" to the residuum
     end
+
+    % If a conservative system is considered: Expand the residuum
+    if isfield(DYN.system,'first_integral')
+        I = DYN.system.first_integral;                                  % Function of the first integral I = I(z)
+        I_Z = I(Z,param);                                               % Evalute the first integral for all state space vectors z_i                                
+        IC = 1/n_int*sum(I_Z) - param{end};                             % First Integral Constraint: I(s) = param{end} | Take the average of I_Z to get a single value for the whole trajectory
+    else                                                                % Note: mean(I_Z) = 1/n_int*sum(I_Z), but the sum() function is somehow faster
+        IC = [];                                                        % Non-conservative system: Set the first integral constraint IC as empty in order to add "nothing" to the residuum
+    end
+
+    % Assemble the residuum res
+    res = [g; pc; IC];
 
 
     %% Calculate the Jacobian matrix J_res
@@ -138,10 +149,8 @@ function [res,J_res] = PS_FDM_residuum(obj,y,DYN)
         % dg_dmu = ( - reshape(Fcn_eval_plus_h,n_int*dim,1) + reshape(Fcn_eval_minus_h,n_int*dim,1) ) / (2*h_mu);   % OPTIONAL: central finite difference
     end
 
-    % Build the Jacobian matrix J_res
-    if n_auto == 0                                                      % Non-autonomous system
-        J_res = [dg_ds, dg_dmu];                                        % Build the Jacobian matrix
-    elseif n_auto == 1                                                  % Autonomous system: Additional derivations must be calculated   
+    % Autonomous system: Calculate the additionally required derivatives dg/domega and dpc/dy
+    if n_auto == 1
         dg_domega = 1 / DeltaTheta .* Z_i_sigma * w;                    % dg/domega 
         dpc_ds = (s - s_p)' * obj.p_w_mat_J + (Z_i_sigma * w)';         % dpc/ds (pc: integral phase condition, see above)
         % dpc_ds = [Fcn_eval_pc', zeros(1,(n_int-1)*dim)];              % dpc/ds of Poincare phase condition (not used anymore, see above)
@@ -149,9 +158,33 @@ function [res,J_res] = PS_FDM_residuum(obj,y,DYN)
         dpc_dmu = 0;                                                    % dpc/dmu = 0, because the phase condition is independent of the continuation parameter
         % dpc_dmu = (Fcn(0,zp_0,param_plus_h)' - Fcn_eval_pc') * (z_0 - zp_0) / h;                      % dpc/dmu of Poincare phase condition calculated using forward finite difference (not used anymore, see above)
         % dpc_dmu = (Fcn(0,zp_0,param_plus_h)' - Fcn(0,zp_0,param_minus_h)') * (z_0 - zp_0) / (2*h);    % OPTIONAL: dpc/dmu of Poincare phase condition calculated using central finite difference (not used anymore, see above)
-        J_res = [dg_ds,  dg_domega,  dg_dmu;                            % Build the Jacobian matrix
-                 dpc_ds, dpc_domega, dpc_dmu];                          % Build the Jacobian matrix
+    % Non-Autonomous system: Set dg/domega and dpc/dy as empty in order to add "nothing" to the Jacobian matrix below
+    elseif n_auto == 0
+        dg_domega = [];  dpc_ds = [];  dpc_domega = [];  dpc_dmu = [];
     end
+    
+    % Conservative system: Calculate dIC/dy
+    if isfield(DYN.system,'first_integral')
+        dIC_ds = 1/n_int .* (I(Z_dim_plus_h,param) - reshape(repmat(I_Z,dim,1),1,n_int*dim)) ./ nonzeros(H)';       % Forward finite difference
+        % dIC_ds = 1/n_int .* (I(Z_dim_plus_h,param) - I(Z_dim_minus_h,param)) ./ (2.*nonzeros(H)');                % Central finite difference
+        if n_auto == 1;     dIC_domega = 0;                                                                         % Autonomous system: dIC/domega is also required
+        else;               dIC_domega = [];                                                                        % Non-Autonomous system: Set dIC/domega as empty in order to add "nothing" to the Jacobian matrix below
+        end
+        if DYN.act_param == numel(param)                                                                            % If param{end} = first integral is the continuation parameter
+            dIC_dmu = - 1;                                                                                          % I(Z,param) is independent of mu and dparam{end}/dmu = 1
+        else                                                                                                        % A parameter of the RHS is the continuation parameter
+            dIC_dmu = 1/n_int*sum(I(Z,param_plus_h) - I_Z) / h_mu;                                                  % In this case, the first integral can be dependent on mu
+            % dIC_dmu = 1/n_int*sum(I(Z,param_plus_h) - I(Z,param_minus_h)) / (2*h_mu);                             % Central finite difference
+        end
+    % Non-Conservative system: Set dIC/dy as empty in order to add "nothing" to the Jacobian matrix below
+    else
+        dIC_ds = [];  dIC_domega = [];  dIC_dmu = [];
+    end
+
+    % Build the Jacobian matrix J_res
+    J_res = [dg_ds,  dg_domega,  dg_dmu;                                % Build the Jacobian matrix
+             dpc_ds, dpc_domega, dpc_dmu;                               % Build the Jacobian matrix
+             dIC_ds, dIC_domega, dIC_dmu];                              % Build the Jacobian matrix
     
 
 end

@@ -24,7 +24,7 @@ if isempty(obj.step_control_param)                                      % If ste
 
 
         case 'angle'
-            it_nom = 2;                                                 % Nominal number of corrector iterations
+            it_nom = 3;                                                 % Nominal number of corrector iterations
             alpha_nom = 3;                                              % Nominal angle in degrees between the direction vectors at the last two points
             obj.step_control_param = [it_nom, alpha_nom];               % Setting the parameter array
 

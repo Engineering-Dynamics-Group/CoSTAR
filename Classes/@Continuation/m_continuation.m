@@ -53,11 +53,11 @@ end
 while  obj.p_contDo
         
     %%%%%%%%%%%%%  PREDICTOR AND STEP CONTROL  %%%%%%%%%%%%
-    if any(obj.p_newton_flag == [0,1,3,4]) && obj.p_ec_flag == 1    %direction vector needs to be calculated in the first loop and every time a new solution has been found
+    if any(obj.p_newton_flag == [1i,1,3,4]) && obj.p_ec_flag == 1    %direction vector needs to be calculated in the first loop and every time a new solution has been found
         obj.direction_vector();                 %calculate direction vector
     end
    
-    if any(obj.p_newton_flag == [1,3,4]) && obj.p_ec_flag == 1     %stepcontrol may be called if corrector converged and error control is fine (initialised: obj.p_newton_flag = 0, obj.p_ec_flag = 1)
+    if any(obj.p_newton_flag == [1,3,4]) && obj.p_ec_flag == 1     %stepcontrol may be called if corrector converged and error control is fine (initialised: obj.p_newton_flag = 1i, obj.p_ec_flag = 1)
         obj.stepcontrol(DYN);                   %adapt step width
         obj.p_convergence = 1;                  %reset convergence property if corrector did not converge previously
     end     
@@ -90,19 +90,24 @@ while  obj.p_contDo
         AM.IF_up_res_data(obj);                                                 %pass information to the ApproxMethod object
         Fcn = @(y)[AM.res(y);obj.sub_con(y,obj)];                               %define corrector-function containing the residual function and the subspace-constraint
     end
-    
-    [obj.p_y1,~,obj.p_newton_flag,obj.p_output,obj.p_J1] = fsolve(Fcn,obj.yp,obj.fsolve_opts);      %solve corrector function
 
+    [obj.p_y1,~,obj.p_newton_flag,obj.p_output,obj.p_J1] = fsolve(Fcn,obj.yp,obj.fsolve_opts);      %solve corrector function
+    r = sum(Fcn(obj.p_y1).^2);                                                  %re-calculate the sum of squared function values to check whether the equations were actually solved
     
-    %%%%%%%%%%%%  EXITFLAG < 1 OR EXITFLAG = 2  %%%%%%%%%%%
-    if ((obj.p_newton_flag < 1) || (obj.p_newton_flag == 2)) && (obj.step_width <= obj.step_width_limit(1,1))               %if step width is already <= minimal step width 
+    
+    %%%%%%%%%%%%  EXITFLAG < 1 OR EXITFLAG = 2 OR RES >= 1e-12  %%%%%%%%%%%
+    if ((obj.p_newton_flag < 1) || (obj.p_newton_flag == 2) || (r >= 1e-12)) && (obj.step_width <= obj.step_width_limit(1,1))       %if step width is already <= minimal step width 
         if obj.p_newton_flag < 1
             warn_msg = append('WARNING: No solution found for Iter = ',num2str(obj.p_local_cont_counter+1),' (fsolve exit_flag = ',num2str(obj.p_newton_flag),')!');
             stopping_msg = 'CoSTAR stopped because corrector did not converge and step width has reached minimal value.';   %set stopping message
         elseif obj.p_newton_flag == 2
             warn_msg = append(['WARNING: Equation solved for Iter = ',num2str(obj.p_local_cont_counter+1),', but ' ...      %set warning message
-                              'change in y smaller than the specified tolerance, or Jacobian at y is undefined (fsolve exit_flag = 2)!']);
+                               'change in y is smaller than the specified tolerance, or Jacobian at y is undefined (fsolve exit_flag = 2)!']);
             stopping_msg = 'CoSTAR stopped because Jacobian can be undefined and step width has reached minimal value.';    %set stopping message
+        elseif r >= 1e-12
+            warn_msg = append(['WARNING: fsolve returned a point y with exit_flag = ',num2str(obj.p_newton_flag),' for Iter = ',num2str(obj.p_local_cont_counter+1),', ' ...
+                               'but the sum of squared function values sum(F(y).^2) = ',num2str(r),' is larger than 1e-12!']);
+            stopping_msg = 'CoSTAR stopped because residual is too large and step width has reached minimal value.';        %set stopping message
         end
         S.warnings{end+1} = warn_msg(10:end);                                                       %save warning in Solution object
         obj.p_stopping_flag = stopping_msg;                                                         %save stopping message
@@ -111,12 +116,16 @@ while  obj.p_contDo
         write_log(DYN,'finalize',append(warn_msg,'\n\n',stopping_msg))                              %finalize log file with warning message and message
         break                                                                                       %immediately break while loop, because everything else can lead to errors
     
-    elseif ((obj.p_newton_flag < 1) || (obj.p_newton_flag == 2)) && (obj.step_width > obj.step_width_limit(1,1))            %if fsolve did not converge and step width is above minimal step width 
+    elseif ((obj.p_newton_flag < 1) || (obj.p_newton_flag == 2) || (r >= 1e-12)) && (obj.step_width > obj.step_width_limit(1,1))    %if fsolve did not converge and step width is above minimal step width 
         if obj.p_newton_flag < 1
-            warn_text = append('No solution found for Iter = ',num2str(obj.p_local_cont_counter+1),' (fsolve exit_flag = ',num2str(obj.p_newton_flag),')!');
+            warn_text = append('No solution found for Iter = ',num2str(obj.p_local_cont_counter+1),' (fsolve exit_flag = ',num2str(obj.p_newton_flag),')! Trying again with reduced step width.');
         elseif obj.p_newton_flag == 2
-            warn_text = append(['Equation solved for Iter = ',num2str(obj.p_local_cont_counter+1),', but ' ...              %set warning message
-                                'change in y smaller than the specified tolerance, or Jacobian at y is undefined (fsolve exit_flag = 2)!']);
+            warn_text = append(['Equation solved for Iter = ',num2str(obj.p_local_cont_counter+1),', but change in y is smaller than the specified ' ...
+                                'tolerance, or Jacobian at y is undefined (fsolve exit_flag = 2)! Trying to recompute the solution with reduced step width.']);
+        elseif r >= 1e-12
+            warn_text = append(['fsolve returned a point y with exit_flag = ',num2str(obj.p_newton_flag),' for Iter = ',num2str(obj.p_local_cont_counter+1),', but the sum ' ...
+                                'of squared function values sum(F(y).^2) = ',num2str(r,'%.5e'),' is larger than 1e-12! Trying to compute an actual solution with reduced step width.']);
+            obj.p_newton_flag = -4;                                                                 % Artificially set p_newton_flag to -4 to skip methods direction_vector and stepcontrol
         end
         write_log(DYN,append('WARNING: ',warn_text))                                                % Write warning in log file
         S.warnings{end+1} = warn_text;                                                              % Save warning in Solution object
@@ -125,7 +134,7 @@ while  obj.p_contDo
         step_width_pre = 0.5.*obj.step_width;                                                       %new preliminary step width
         obj.step_width = max([step_width_pre,obj.step_width_limit(1)]);                             %set step_width. If new preliminary step width falls below minimal step width, take minimal step width
         obj.p_convergence = 0;                                                                      %set property p_convergence to zero (for resetting the step_width after convergence)
-        info_text = append('Step width adapted to stepwidth = ',num2str(obj.step_width),', because corrector did not converge or Jacobian can be undefined!');
+        info_text = append('Step width adapted to stepwidth = ',num2str(obj.step_width),'.');
         write_log(DYN,info_text)                                                                    %write info text in log file
         if strcmpi(DYN.display,'step-control') || strcmpi(DYN.display,'full'); disp(info_text); end %display info text
         continue                                                                                    %skip the remaining code and start the next loop (try again with reduced step width)

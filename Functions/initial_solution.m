@@ -21,6 +21,9 @@ end
 
 %% Set function and options for fsolve
 newtonOpts = optimoptions('fsolve','Display','iter-detailed','MaxFunEvals',1e5,'MaxIter',1e3,'FiniteDifferenceType','forward');
+if isfield(DYN.system,'first_integral')
+    newtonOpts = optimoptions(newtonOpts,'Algorithm','levenberg-marquardt');
+end
 y0 = [AM.iv;DYN.param{DYN.act_param}];
 
 if strcmpi(DYN.approx_method,'shooting')
@@ -73,18 +76,21 @@ else
     [y,~,newton_flag,~,J] = fsolve(Fcn,y0,newtonOpts);
     write_log(DYN,'diary_off')                                          % Stop recording of command window for log file
 end
-% checkGradients_opts = optimoptions('fsolve',FiniteDifferenceType='forward'); checkGradients(Fcn,y,checkGradients_opts,Display='on',Tolerance=1e-5);   % Check the user-defined Jacobian matrix
+r = sum(Fcn(y).^2);                                                     % Re-calculate the sum of squared function values to check whether the equations were actually solved
 
 
 %% Check fsolve exit flags
-% No initial solution found or solution found but Jacobian can be undefined
-if (newton_flag < 1) || (newton_flag == 2)
+% No initial solution found or solution found but Jacobian can be undefined or residuum is too large
+if (newton_flag < 1) || (newton_flag == 2) || (r >= 1e-12)
     if newton_flag < 1
         error_text = append('ERROR: No initial solution found (fsolve exit_flag = ',num2str(newton_flag),')!');             % Set error text
         stopping_msg = 'CoSTAR stopped because corrector did not converge at initial solution.';                            % Set stopping message
     elseif newton_flag == 2
-        error_text = 'ERROR: Equation solved, but change in y smaller than the specified tolerance, or Jacobian at y is undefined (fsolve exit_flag = 2)!';     % Set error text
+        error_text = 'ERROR: Equation solved, but change in y is smaller than the specified tolerance, or Jacobian at y is undefined (fsolve exit_flag = 2)!';      % Set error text
         stopping_msg = 'CoSTAR stopped because Jacobian can be undefined at initial solution.';                             % Set stopping message
+    elseif r >= 1e-12
+        error_text = append('ERROR: fsolve returned a point y with exit_flag = ',num2str(newton_flag),', but the sum of squared function values sum(F(y).^2) = ',num2str(r,'%.5e'),' is larger than 1e-12!');
+        stopping_msg = 'CoSTAR stopped because residual is too large at initial solution.';                                 % Set stopping message
     end
     write_log(DYN,error_text)                                           % Write error text in log file
     write_log(DYN,'finalize_error',stopping_msg)                        % Finalize log file with error message
@@ -105,6 +111,9 @@ elseif newton_flag == 4
     warn_msg{end+1} = 'WARNING: Equation solved for initial solution, but magnitude of search direction is smaller than specified tolerance (fsolve exit_flag = 4)!';
     S.warnings{end+1} = warn_msg{end}(10:end);                          % Save warning in Solution object
 end
+
+% A user-defined Jacobian matrix can be checked here by executing the next line (since R2023b: function checkGradients is recommended instead of obj.fsolve_opts.CheckGradients = true)
+% checkGradients_opts = optimoptions('fsolve',FiniteDifferenceType='forward'); checkGradients(Fcn,y,checkGradients_opts,Display='on',Tolerance=1e-5);   % Check the user-defined Jacobian matrix
 
 info_text = 'Initial solution found!';                                  % This message is updated if stability is successfully computed
 

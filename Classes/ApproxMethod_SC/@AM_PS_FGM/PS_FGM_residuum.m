@@ -64,5 +64,13 @@ function res = PS_FGM_residuum(obj,y,DYN)
         res(end,1) = obj.phase_condition(FCtemp,DYN);
     end
 
+    %% Expand the residuum if system is conservative
+    if isfield(DYN.system,'first_integral')
+        I = DYN.system.first_integral;                              % Function of the first integral I = I(z)
+        I_Z = I(FS,param);                                          % Evalute the first integral for all shooting points z_i
+        IC = 1/n_fft*sum(I_Z) - param{end};                         % First Integral Constraint: I(s) = param{end} | Take the average of I_Z to get a single value for all shooting points
+        res = [res; IC];                                            % Note: mean(I_Z) = 1/n_shoot*sum(I_Z), but the sum() function is somehow faster                                                      
+    end
+
 
 end

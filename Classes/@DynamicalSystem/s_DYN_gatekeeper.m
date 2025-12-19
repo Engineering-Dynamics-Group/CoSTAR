@@ -9,8 +9,8 @@
 
 function s_DYN_gatekeeper(GC,system,opt_sol)
 
-    system_mandatory_fieldnames  = {'order','rhs','dim'};                       %required fieldnames in the options super structure
-    system_allowed_fieldnames    = {'order','rhs','dim','param','info'};        %allowed fieldnames in the options super structure
+    system_mandatory_fieldnames  = {'order','rhs','dim'};                                   %required fieldnames in the options super structure
+    system_allowed_fieldnames    = {'order','rhs','dim','param','first_integral','info'};   %allowed fieldnames in the options super structure
 
     opt_sol_mandatory_fieldnames  = {'sol_type','cont','stability'};                                                                                    %required fieldnames in the options super structure
     opt_sol_allowed_fieldnames    = {'sol_type','cont','stability','approx_method','act_param','non_auto_freq','auto_freq','display','freq_limit'};     %allowed fieldnames in the options super structure
@@ -44,7 +44,8 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
             GC.error_msg{1,end+1} = 'You supplied the field system.param, but did not supply an active parameter via opt_sol.act_param. This is not allowed.';
         end
     end
-    if isfield(system,'info'); GC.check_data(system.info,'system.info','char',[],[]); end    
+    if isfield(system,'first_integral'); GC.check_data(system.rhs,'system.rhs','function_handle',[],[]);    end
+    if isfield(system,'info');           GC.check_data(system.info,'system.info','char',[],[]);             end    
     GC.speak;
 
 

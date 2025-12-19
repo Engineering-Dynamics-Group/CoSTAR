@@ -38,7 +38,7 @@ classdef SOL_PS_FGM < Solution
             obj.s{1,1}                 = y1(1:(end-1-DYN.n_auto),1);                        %For equilibria, there is no autonomous frequency in the solution vector
             obj.mu(1,1)                = y1(end,1);                             
             obj.J{1,1}                 = J1;
-            obj.dy{1,1}                = NaN(size(J1,1),1);                                 %Initialised. Gets correctly filled by IF_arch_data
+            obj.dy{1,1}                = NaN(size(y1));                                     %Initialised. Gets correctly filled by IF_arch_data
             obj.newton_flag(1,1)       = newton_flag;
             obj.arclength(1,1)         = 0;                                                 %Set arclength of first curve point to zero
             obj.hmatrix{1,1}           = AM.hmatrix;

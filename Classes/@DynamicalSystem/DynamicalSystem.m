@@ -7,7 +7,7 @@ classdef DynamicalSystem
     %% Properties    
     properties(Constant)
         % Constant properties cannot be changed (read-only)
-        costar_version = ' 3.2 ';                                       %release versions (e.g. 3.1) should be defined as ' 3.1 ' (see the space between the ' and the numbers)
+        costar_version = '3.2.0.ConSys.1';                              %release versions (e.g. 3.1) should be defined as ' 3.1 ' (see the space between the ' and the numbers)
     end
 
 
@@ -19,6 +19,7 @@ classdef DynamicalSystem
         rhs     function_handle                                         %right hand side of the ode
         dim     double                                                  %dimension of the state space
         param = {0};                                                    %array for the parameter vector
+        first_integral function_handle                                  %first integral of rhs
         
         %opt_sol structure
         sol_type        string                                          %equilibrium, periodic, quasi-periodic
@@ -51,7 +52,7 @@ classdef DynamicalSystem
 
     properties(Hidden)
         % Hidden properties are not visible in property lists or in results from calls to get, set, or the properties functions
-        create_log = true;                                              %defines whether a log file is created (used by the development team)
+        create_log = false;                                              %defines whether a log file is created (used by the development team)
         display = 'iter';                                               %Controls the command window output
     end
 

@@ -59,7 +59,7 @@ end
 
 
 % Check the stopping criteria
-if(obj.p_mu0>obj.mu_limit(1,2))         % Check if calculated curve point is above upper limit of mu
+if(obj.p_mu0>=obj.mu_limit(1,2))        % Check if calculated curve point is above upper limit of mu
     obj.p_contDo = 0;
     clear fsolve;
     stopping_text = append('CoSTAR stopped because maximal value of continuation parameter mu_max = ', num2str(obj.mu_limit(1,2)), ' was reached.');
@@ -67,7 +67,7 @@ if(obj.p_mu0>obj.mu_limit(1,2))         % Check if calculated curve point is abo
     if ~strcmpi(DYN.display,'off');  disp(' '); disp(stopping_text);  end
     obj.p_stopping_flag = stopping_text;
 
-elseif(obj.p_mu0<obj.mu_limit(1,1))     % Check if calculated curve point is below bottom limit of mu
+elseif(obj.p_mu0<=obj.mu_limit(1,1))    % Check if calculated curve point is below bottom limit of mu
     obj.p_contDo = 0;
     clear fsolve;
     stopping_text = append('CoSTAR stopped because minimal value of continuation parameter mu_min = ', num2str(obj.mu_limit(1,1)), ' was reached.');

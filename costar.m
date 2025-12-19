@@ -135,7 +135,7 @@ function [S,DYN] = costar(options)
 
     %% Continuation
     if strcmpi(DYN.cont,'on')
-        CON = Continuation(options.opt_cont);               % Create Continuation object CON
+        CON = Continuation(DYN,options.opt_cont);           % Create Continuation object CON
         S = CON.m_continuation(DYN,S,AM,ST);                % Calls the method where the continuation loop is carried out
     end
 

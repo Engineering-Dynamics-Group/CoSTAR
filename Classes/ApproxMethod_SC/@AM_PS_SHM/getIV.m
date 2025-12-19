@@ -17,7 +17,12 @@ function obj = getIV(obj,DYN)
     n_shoot = obj.n_shoot;              % Number of shooting points
     
 
-    if numel(s0) == dim                                     % Only z(t=0) is supplied - time integration necessary to obtain the missing shooting points
+    if numel(s0) == dim*n_shoot         % The complete method solution vector is already supplied
+
+        obj.iv = s0;                    % s0 can be used directly as initial values for the shooting points
+
+        
+    elseif numel(s0) == dim                                 % Only z(t=0) is supplied - time integration necessary to obtain the missing shooting points
 
         if n_auto == 0                                      % Non-autonomous system
             mu = param{DYN.act_param};                      % Continuation parameter
@@ -35,12 +40,7 @@ function obj = getIV(obj,DYN)
 
         obj.iv = reshape(Z.',dim*n_shoot,1);                % Reshape to a vector
 
-
-    elseif numel(s0) == dim*n_shoot     % The complete method solution vector is already supplied
-
-        obj.iv = s0;                    % s0 can be used directly as initial values for the shooting points
-
-        
+    
     else                                                                % All other cases: n_shoot_s0 = numel(s0)/dim - Interpolate s0
 
         n_shoot_s0 = numel(s0)/dim;                                     % Gatekeeper assures that n_shoot_s0 is an integer
