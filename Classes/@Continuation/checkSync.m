@@ -1,5 +1,8 @@
 function obj = checkSync(obj,DYN,AM,S)
 
+tolL = 1e-4;                                                                % Tolerance for detection of frequency locking
+tolS = 1e-1;                                                                % Tolerance for detection of suppressive synchronization
+
 n_auto = DYN.n_auto;
 y1 = obj.p_y1;
 
@@ -20,14 +23,14 @@ indFL = indicatorLocking(OMEGA,DeltaMu);                                    % Ev
 indFS_A = indicatorSuppArea(Z);
 
 % Check stopping criterion for Frequency Locking
-if(indFL<1e-3)
+if(indFL<tolL)
     obj.p_contDo = 0;
     obj.p_stopping_flag = 'CoSTAR stopped because solution synchronized by Frequency Locking!';
 end
 
 % Check stopping criterion for Suppressive Synchronization
 [chi_S, idx] = min(indFS_A,[],1);
-if(chi_S<1e-1)
+if(chi_S<tolS)
     obj.p_contDo = 0;
     obj.p_stopping_flag = append('CoSTAR stopped because solution synchronized by Suppresive Synchronization of Omega_', num2str(idx),'!');
 end

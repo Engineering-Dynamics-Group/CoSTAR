@@ -11,7 +11,7 @@ classdef SOL_QPS_FDM < Solution
         local_gridpoint_weights_1   % Stores the weights related to the local grid point indices in theta_1-direction
         local_gridpoint_weights_2   % Stores the weights related to the local grid point indices in theta_2-direction
         
-        indicator struct = struct('Locking',[],'Suppression',[]);           % Indikator function for synchronization detection
+        indicator struct = struct('Locking',[],'Suppression',[]);           % Indicator function for synchronization detection
     end
 
     %%%%%%%%%%%%%%%%%%%%%%%%%
