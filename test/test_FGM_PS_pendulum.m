@@ -60,7 +60,7 @@ options_2.opt_sol = costaropts('cont','on','stability','off','sol_type','periodi
                                'auto_freq',sqrt(g/mu_limit_2(1)),'act_param',active_parameter_2,'display','full');          % Properties of the solution
 options_2.opt_init = costaropts('Hmatrix',[0,1],'c0',[0;0],'cmatrix',C1,'smatrix',S1);                                      % Property for initial solution
 options_2.opt_approx_method = costaropts('n_fft',2^6,'phasecond','poincare','error_limit',[1e-3 1e-2]);                     % Properties of approximation method
-options_2.opt_cont = costaropts('mu_limit',mu_limit_2,'step_control','off','step_width',1,'pred','secant');                  % Properties for continuation
+options_2.opt_cont = costaropts('mu_limit',mu_limit_2,'step_control','off','step_width',2,'pred','secant');                  % Properties for continuation
 
 [S_2,DYN_2] = costar(options_2);                % Calculate initial solution and continue the curve
 

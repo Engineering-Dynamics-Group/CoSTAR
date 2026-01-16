@@ -105,7 +105,7 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
         Z_end_minus(:,k) = Z(end,(dim+1)*dim+1:end-dim).';          % Take the "- delta" perturbed state vectors at t_end
         % Now do a second/third integration with perturbed mu-value (needed for Jacobian - can be deactivated when it is calculated by fsolve)
         if ~(isfield(DYN.system,'first_integral') && (DYN.act_param == numel(param)))  % If the value of the first integral is NOT the continuation parameter (if it is: dg/dmu = 0 and dpc/dmu = 0)
-            [~,Z_mu_plus]  = obj.solver_function(@(t,Z) FCN_wrapper(t,Z,dim,@(t,z)Fcn(t,z,param_mu_plus(1:end-1))), linspace(T_int_mu_plus(k,1),T_int_mu_plus(k,2),n_time+1), [z0_mat(:,k),s_p_mat(:,k)], odeOpts_2);
+            [~,Z_mu_plus]  = obj.solver_function(@(t,Z) FCN_wrapper(t,Z,dim,@(t,z)Fcn(t,z,param_mu_plus)), linspace(T_int_mu_plus(k,1),T_int_mu_plus(k,2),n_time+1), [z0_mat(:,k),s_p_mat(:,k)], odeOpts_2);
             Z_traj_mu_plus(:,:,k) = Z_mu_plus(1:end-1,1:dim).';         % Save the "+ delta" perturbed mu trajectory
             Z_end_mu_plus(:,k) = Z_mu_plus(end,1:dim).';                % Take the state vector of the "+ delta" perturbed mu trajectory at t_end
             Z_p_mu_plus(:,:,k) = Z_mu_plus(1:end-1,dim+1:end).';        % Save the "+ delta" perturbed mu trajectory at the predictor point
@@ -285,7 +285,7 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
     end
     
 
-    % Conservative system: Calculate dIC/dy -> GEHT NOCH NICHT, DRÜBER SCHAUEN (VARIABLENNAMEN UND SO)
+    % Conservative system: Calculate dIC/dy
     if isfield(DYN.system,'first_integral')
         if calc_stability                                                                                           % Use central finite difference
             dIC_ds = 1/n_shoot .* (I(Z_dim_plus,param) - I(Z_dim_minus,param)) ./ (2.*nonzeros(Delta)');

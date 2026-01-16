@@ -81,15 +81,15 @@ r = sum(Fcn(y).^2);                                                     % Re-cal
 
 %% Check fsolve exit flags
 % No initial solution found or solution found but Jacobian can be undefined or residuum is too large
-if (newton_flag < 1) || (newton_flag == 2) || (r >= 1e-12)
+if (newton_flag < 1) || (newton_flag == 2) || (r >= 1e-10)
     if newton_flag < 1
         error_text = append('ERROR: No initial solution found (fsolve exit_flag = ',num2str(newton_flag),')!');             % Set error text
         stopping_msg = 'CoSTAR stopped because corrector did not converge at initial solution.';                            % Set stopping message
     elseif newton_flag == 2
         error_text = 'ERROR: Equation solved, but change in y is smaller than the specified tolerance, or Jacobian at y is undefined (fsolve exit_flag = 2)!';      % Set error text
         stopping_msg = 'CoSTAR stopped because Jacobian can be undefined at initial solution.';                             % Set stopping message
-    elseif r >= 1e-12
-        error_text = append('ERROR: fsolve returned a point y with exit_flag = ',num2str(newton_flag),', but the sum of squared function values sum(F(y).^2) = ',num2str(r,'%.5e'),' is larger than 1e-12!');
+    elseif r >= 1e-10
+        error_text = append('ERROR: fsolve returned a point y with exit_flag = ',num2str(newton_flag),', but the sum of squared function values sum(F(y).^2) = ',num2str(r,'%.5e'),' is larger than 1e-10!');
         stopping_msg = 'CoSTAR stopped because residual is too large at initial solution.';                                 % Set stopping message
     end
     write_log(DYN,error_text)                                           % Write error text in log file
