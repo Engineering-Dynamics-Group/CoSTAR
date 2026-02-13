@@ -108,3 +108,39 @@ Functions:
 
     - initial_solution:
         --> Moved the code to check the Jacobian matrix from line 76 to line 116 and added the comment in line 115 (now it is almost identical to m_continuation)
+
+
+
+--------------------------------------------
+-------------- v3.2.0.ConSys.2 -------------
+--------------------------------------------
+
+Added Poincare phase condition for the periodic FDM.
+Moreover, the implemented "pseudo Integral Poincare" phase condition of the periodic SHM was corrected to be the exact Poincare phase condition.
+
+    @AM_PS_FDM:
+        - AM_PS_FDM:
+            --> Added property "phase_condition" with default value 'integral' (line 18)
+            --> Added "opt_sol" to the input arguments of method s_PS_FDM_gatekeeper (line 41)
+        - PS_FDM_residuum:
+            --> Added switch-case for the computation of the phase condition and activated the code for the Poincare phase condition (lines 79 - 87)
+            --> Added switch-case for the computation of the derivative of the phase condition and activated the code for the Poincare phase condition (lines 156 - 165)
+        - s_help_opt_approx_method_PS_SHM:
+            --> Added info text for field 'phase_condition' (lines 42 - 44)
+        - s_PS_FDM_gatekeeper:
+            --> Added "opt_sol" to the input arguments (line 10)
+            --> Added 'phase_condition' to the allowed fieldnames (line 18)
+            --> Added check for field 'phase_condition' (lines 120 - 129)
+
+    @AM_PS_SHM:
+        - PS_SHM_residuum:
+            --> Added variable "s_p" as method solution vector of the predictor point to the parameter definition block (line 20)
+            --> Replaced "obj.iv(1:end-n_auto)" in line 43 by "s_p"
+            --> Corrected the computation of the Poincare phase condition to match the equation found in the literature (former lines 129 and 130 removed, new lines 130 - 133 added)
+            --> Corrected the computation of the derivative of the phase condition (former lines 200 - 207 removed, new lines 203 - 208 added)
+        - s_help_opt_approx_method_PS_SHM:
+            --> Slightly improved the description of field 'phase_condition' (line 23)
+
+    @ApproxMethod:
+        - s_AM_gatekeeper:
+            --> Added "opt_sol" to the input arguments of AM_PS_FDM.s_PS_FDM_gatekeeper (line 31)

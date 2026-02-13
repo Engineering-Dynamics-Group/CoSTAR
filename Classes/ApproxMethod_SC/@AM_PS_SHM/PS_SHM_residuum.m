@@ -17,6 +17,7 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
     n_shoot = obj.n_shoot;                              % Number of shooting points
     n_time = ceil(100/obj.n_shoot);                     % Number of time evaluation points in each shooting interval for the integral phase condition
     s = y(1:(end-1-n_auto));                            % Method solution vector (hyper-vector of shooting points [z_0; z_1; ...; z_n])
+    s_p = obj.iv(1:end-n_auto);                         % Method solution vector at the predictor point (obj.iv(end) is the autonomous frequency if present)
     mu = y(end);                                        % Continuation parameter
 
     if n_auto == 0
@@ -39,7 +40,7 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
     dT = T/n_shoot;                                     % Time span for each shooting operation (integration)
     T_int = [0:dT:(n_shoot-1)*dT; dT:dT:n_shoot*dT].';  % Define time intervals for the shooting operation (integration)
     z0_mat = reshape(s,dim,n_shoot);                    % Reshape s to a matrix of size [dim x n_shoot]
-    s_p_mat = reshape(obj.iv(1:end-n_auto),dim,n_shoot);% Matrix of shooting points at the predictor point (obj.iv(end) is the autonomous frequency if present)
+    s_p_mat = reshape(s_p,dim,n_shoot);                 % Matrix of shooting points at the predictor point
     Z_traj = zeros(dim,n_time,n_shoot);                 % Stores the trajectory for evaluating the integral phase condition
     Z_end = zeros(dim,n_shoot);                         % Stores the end points of integration (could be stored in Z_traj as well, but using Z_end is more convenient)
     Z_p = zeros(dim,n_time,n_shoot);                    % Stores the trajectory of the predictor point for evaluating the integral phase condition
@@ -125,9 +126,11 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
  
     if n_auto == 1                                      % Compute the phase condition if system is autonomous
         switch obj.phase_condition
-            case 'poincare'                             
-                f_s_p = reshape(Fcn(0,s_p_mat,param),dim*n_shoot,1);                                    % Evaluate the RHS at predictor point s_p
-                pc = f_s_p.' * (s - reshape(s_p_mat,dim*n_shoot,1));                                    % Poincare phase condition
+            case 'poincare'
+                z_0 = s(1:dim);                                                                         % State space vector at theta = 0
+                zp_0 = s_p(1:dim);                                                                      % State space vector at the predictor point for theta = 0
+                f_zp_0 = Fcn(0,zp_0,param);                                                             % Evaluate Fcn for the phase condition
+                pc = f_zp_0' * (z_0 - zp_0);                                                            % Poincare phase condition
             case 'integral'
                 f = reshape(Fcn(0,reshape(Z_traj,dim,n_shoot*n_time),param),dim*n_shoot*n_time,1);      % Evaluate the RHS at the n_shoot*n_time evaluation points
                 f_p = reshape(Fcn(0,reshape(Z_p,dim,n_shoot*n_time),param),dim*n_shoot*n_time,1);       % Evaluate the RHS for the predictor point (not needed now, but later on for dpc/domega in the Jacobian)
@@ -197,14 +200,12 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
         switch obj.phase_condition
             
             case 'poincare'                     % Poincare phase condition
-                dpc_ds = f_s_p.';                                                                               % dpc/ds
-                dpc_domega = 0;                                                                                 % dpc/domega = 0 (phase condition is independent of the frequency)
-                f_mu_plus = reshape(Fcn(0,s_p_mat,param_mu_plus),dim*n_shoot,1);                                % Evaluate the RHS at predictor point s_p with perturbed mu
-                if calc_stability                                                                               % Use central finite difference
-                    f_mu_minus = reshape(Fcn(0,s_p_mat,param_mu_minus),dim*n_shoot,1);                          % Evaluate the RHS at predictor point s_p with perturbed mu
-                    dpc_dmu = (f_mu_plus - f_mu_minus).' * (s - reshape(s_p_mat,dim*n_shoot,1)) / (2*delta_mu); % dpc/dmu
-                else                                                                                            % Use forward finite difference
-                    dpc_dmu = (f_mu_plus - f_s_p).' * (s - reshape(s_p_mat,dim*n_shoot,1)) / delta_mu;          % dpc/dmu
+                dpc_ds = [f_zp_0', zeros(1,(n_shoot-1)*dim)];                                                           % dpc/ds of Poincare phase condition
+                dpc_domega = 0;                                                                                         % dpc/domega = 0 (phase condition is independent of the frequency)
+                if calc_stability                                                                                       % Use central finite difference
+                    dpc_dmu = (Fcn(0,zp_0,param_mu_plus) - Fcn(0,zp_0,param_mu_minus)).' * (z_0 - zp_0) / (2*delta_mu); % dpc/dmu
+                else                                                                                                    % Use forward finite difference
+                    dpc_dmu = (Fcn(0,zp_0,param_mu_plus) - f_zp_0).' * (z_0 - zp_0) / delta_mu;                         % dpc/dmu
                 end
             
             case 'integral'                     % Integral phase condition

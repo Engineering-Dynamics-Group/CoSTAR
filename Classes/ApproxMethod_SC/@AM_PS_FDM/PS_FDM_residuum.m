@@ -76,14 +76,15 @@ function [res,J_res] = PS_FDM_residuum(obj,y,DYN)
 
     % Compute the phase condition if system is autonomous
     if n_auto == 1                                                      % Autonomous system
-        pc = (Z_i_sigma * w)' * (s - s_p);                              % Integral phase condition: sum_(i=0)^(n_int-1) ( f(t_i,z_i,param)' * (z(theta_i) - z_p(theta_i)) ), but ...
-        % Poincare phase condition (not used anymore)                   % ... f(t_i,z_i,param) = dz(theta_i)/dtheta .* omega is approximated by FD -> benefit: dpc/dmu = 0
-        %{
-        z_0 = s(1:dim);                                                 % State space vector at theta = 0
-        zp_0 = s_p(1:dim);                                              % State space vector at the predictor point for theta = 0
-        Fcn_eval_pc = Fcn(0,zp_0,param);                                % Evaluate Fcn for the phase condition
-        pc = Fcn_eval_pc' * (z_0 - zp_0);                               % Poincare phase condition
-        %}
+        switch obj.phase_condition
+            case 'integral'                                             % Integral phase condition: sum_(i=0)^(n_int-1) ( f(t_i,z_i,param)' * (z(theta_i) - z_p(theta_i)) ), but ...
+                pc = (Z_i_sigma * w)' * (s - s_p);                      % ... f(t_i,z_i,param) = dz(theta_i)/dtheta .* omega is approximated by FD -> benefit: dpc/dmu = 0
+            case 'poincare'                                             % Poincare phase condition:
+                z_0 = s(1:dim);                                         % State space vector at theta = 0
+                zp_0 = s_p(1:dim);                                      % State space vector at the predictor point for theta = 0
+                f_zp_0 = Fcn(0,zp_0,param);                             % Evaluate Fcn for the phase condition
+                pc = f_zp_0' * (z_0 - zp_0);                            % Poincare phase condition
+        end
     elseif n_auto == 0                                                  % Non-autonomous system
         pc = [];                                                        % Set as empty in order to add "nothing" to the residuum
     end
@@ -152,12 +153,16 @@ function [res,J_res] = PS_FDM_residuum(obj,y,DYN)
     % Autonomous system: Calculate the additionally required derivatives dg/domega and dpc/dy
     if n_auto == 1
         dg_domega = 1 / DeltaTheta .* Z_i_sigma * w;                    % dg/domega 
-        dpc_ds = (s - s_p)' * obj.p_w_mat_J + (Z_i_sigma * w)';         % dpc/ds (pc: integral phase condition, see above)
-        % dpc_ds = [Fcn_eval_pc', zeros(1,(n_int-1)*dim)];              % dpc/ds of Poincare phase condition (not used anymore, see above)
-        dpc_domega = 0;                                                 % dpc/domega = 0, because the phase condition is independent of the frequency
-        dpc_dmu = 0;                                                    % dpc/dmu = 0, because the phase condition is independent of the continuation parameter
-        % dpc_dmu = (Fcn(0,zp_0,param_plus_h)' - Fcn_eval_pc') * (z_0 - zp_0) / h;                      % dpc/dmu of Poincare phase condition calculated using forward finite difference (not used anymore, see above)
-        % dpc_dmu = (Fcn(0,zp_0,param_plus_h)' - Fcn(0,zp_0,param_minus_h)') * (z_0 - zp_0) / (2*h);    % OPTIONAL: dpc/dmu of Poincare phase condition calculated using central finite difference (not used anymore, see above)
+        switch obj.phase_condition
+            case 'integral'
+                dpc_ds = (s - s_p)' * obj.p_w_mat_J + (Z_i_sigma * w)'; % dpc/ds (pc: integral phase condition, see above)
+                dpc_dmu = 0;                                            % dpc/dmu = 0, because the phase condition is independent of the continuation parameter
+            case 'poincare'
+                dpc_ds = [f_zp_0', zeros(1,(n_int-1)*dim)];             % dpc/ds of Poincare phase condition
+                dpc_dmu = (Fcn(0,zp_0,param_plus_h) - f_zp_0)' * (z_0 - zp_0) / h_mu;                           % dpc/dmu of Poincare phase condition calculated using forward finite difference
+                % dpc_dmu = (Fcn(0,zp_0,param_plus_h) - Fcn(0,zp_0,param_minus_h))' * (z_0 - zp_0) / (2*h_mu);  % OPTIONAL: dpc/dmu of Poincare phase condition calculated using central finite difference
+        end
+        dpc_domega = 0;                                                 % dpc/domega = 0, because the phase conditions are independent of the frequency
     % Non-Autonomous system: Set dg/domega and dpc/dy as empty in order to add "nothing" to the Jacobian matrix below
     elseif n_auto == 0
         dg_domega = [];  dpc_ds = [];  dpc_domega = [];  dpc_dmu = [];

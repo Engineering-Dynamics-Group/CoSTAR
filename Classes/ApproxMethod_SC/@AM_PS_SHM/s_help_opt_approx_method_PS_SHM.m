@@ -20,6 +20,6 @@ function help_struct = s_help_opt_approx_method_PS_SHM()
     
     help_struct.optional.phase_condition.value  = '''poincare'' or ''integral''\n Default: ''poincare''';
     help_struct.optional.phase_condition.text   = ['Defines the phase condition (PC), which is only allowed for autonomous systems. The PC is required to compute the frequency, which is an unknown variable for autonomous systems.\n' ...
-                                                   'The Poincare PC is easier to compute, while the Integral PC is said to minimise shifts in the solution profile.'];
+                                                   'The Poincare PC is easier to compute, while the Integral PC minimises shifts in the solution profile.'];
     
 end
