@@ -144,3 +144,130 @@ Moreover, the implemented "pseudo Integral Poincare" phase condition of the peri
     @ApproxMethod:
         - s_AM_gatekeeper:
             --> Added "opt_sol" to the input arguments of AM_PS_FDM.s_PS_FDM_gatekeeper (line 31)
+
+
+
+--------------------------------------------
+-------------- v3.2.0.ConSys.3 -------------
+--------------------------------------------
+
+Added the option to set the phase condition to 'off'.
+
+    @Continuation:
+        - Continuation:
+            --> Levenberg-Marquardt algorithm is only used if phase condition is not 'off' (lines 25 - 28)
+
+    @AM_PS_FDM:
+        - PS_FDM_residuum:
+            --> Phase condition is only evaluated and added to the equation system if system is autonomous and phase condition is not 'off' (lines 78 and 88)
+            --> Separated the if-condition for calculation of dg_domega and dpc/dy: 
+                dg_domega is always needed if system is autonomous, dpc/dy only if system is autonomous and phase condition is not 'off' (lines 153 - 161 and 172 - 174)
+        - s_PS_FDM_gatekeeper:
+            --> Added option 'off' to allowed field values of 'phase_condition'. Modified and added checks accordingly (lines 121, 124 and 129 - 134)
+
+    @AM_PS_FGM:
+        - PS_FGM_residuum:
+            --> Changed the allocation of res since the phase condition must not be present if the system is autonomous (line 43)
+            --> Add the phase condition only if system is autonomous and phase condition is not 'off' (lines 63 and 64)
+        - s_PS_FDM_gatekeeper:
+            --> Added option 'off' to allowed field values of 'phasecond' (line 27)
+
+    @AM_PS_SHM:
+        - PS_SHM_residuum:
+            --> Phase condition is only evaluated and added to the equation system if system is autonomous and phase condition is not 'off' (lines 136 and 148)
+            --> Separated the if-condition for calculation of dg_domega and dpc/dy: 
+                dg_domega is always needed if system is autonomous, dpc/dy only if system is autonomous and phase condition is not 'off' (lines 201 - 212 amd 337 - 339)
+        - s_PS_FDM_gatekeeper:
+            --> Added option 'off' to allowed field values of 'phase_condition'. Modified and added checks accordingly (lines 44, 47 and 52 - 57)
+
+    Functions:
+        - initial_solution:
+            --> Levenberg-Marquardt algorithm is only used if phase condition is not 'off' (lines 115 - 118)
+
+
+----------  
+
+Added some more methods to compute a tangent vector and to compare it to the secant direction vector.
+
+    @Continuation:
+        - Continuation:
+            --> Added property "t" to store an alternative direction vector (line 24)
+            --> Added "DYN" to the input arguments of method direction_vector (line 128)
+        - direction_vector:
+            --> Added "DYN" to the input arguments (line 6)
+            --> Added a method to compute a tangent vector for systems with first integral by means of a SVD (lines 11 - 28 and 31)
+            --> Added some code to test different tangent vectors and to compare a tangent vector to a secant direction vector (lines 59 - 86)
+        - m_continuation:
+            --> Added "DYN" to the input arguments of method direction_vector (line 57)
+
+    @SOL_PS_FDM:
+        - SOL_PS_FDM:
+            --> Added the property t and its saving (lines 11, 39 and 74)
+
+    @SOL_PS_FGM:
+        - SOL_PS_FGM:
+            --> Added the property t and its saving (lines 11, 39 and 74)
+
+    @SOL_PS_SHM:
+        - SOL_PS_SHM:
+            --> Added the property t and its saving (lines 10, 32 and 58)
+
+
+----------  
+
+Bugfix: The integral phase condition for PS SHM was not evaluated correctly
+
+    @AM_PS_FGM/IF_up_res_data:
+        - AM_PS_FGM:
+            --> obj.iv is now var1(1:end-1) (line 116)
+
+    @AM_PS_SHM:
+        - AM_PS_SHM:
+            --> Added properties Z0 and n_time and their initialisations (lines 13, 14 and 37)
+        - getIV:
+            --> Add n_time as variable to the Parameter block (line 18)
+            --> Add the integration of the initialised solution if the integral phase condition is used (lines 64 - 105)
+        - IF_up_res_data:
+            --> Modified the setting of obj.iv depending on the selected phase condition. Added the variable mu to the block (lines 11 - 28)
+            --> Add the integration of the preceding solution if the integral phase condition is used (lines 31 - 80)
+        - PS_SHM_residuum:
+            --> Changed the setting of variable n_time and added Z_p to the Parameter block (lines 18 and 22 - 24)
+            --> Deactivated the old Z_p and adjusted the odeOpts variables (lines 49, 51 - 55 and 77 - 78)
+            --> Removed the integration of the trajectory of the predictor point and modified the related saving (lines 102, 103, 107 - 109, 112, 113, 116, 117, 120, 121, 122, 123, 126)
+            --> Changed the computation of the phase condition: f to f_p (line 146)
+            --> Deactivated the computation of dpc/dy of the old phase condition and added the computation of dpc/dy of the new phase condition (lines 222 -335)
+
+    @AM_QPS_FGM/IF_up_res_data:
+        - AM_PS_FGM:
+            --> obj.iv is now var1(1:end-1) (line 107)
+
+    Functions:
+        - initial_solution:
+            --> The IF_up_res_data method now gets the full y0 vector instead of (1:end-1) (lines 190, 193 and 196)
+
+
+----------  
+
+@Continuation:
+
+    - Continuation:
+        --> Removed "options" from input arguments of the constructor (line 101)
+        --> Changed "options" to "DYN.opt_cont" in the input arguments of updateoptions (line 103)
+    - m_continuation:
+        --> Added "f" to the output arguments of fsolve. Now using this instead of Fcn(obj.p_y1) to compute "r" (lines 94 and 95)
+    - stepcontrol:
+        --> Added display of number of corrector iterations for the case that a constant step width is used (line 13)
+
+
+@DynamicalSystem:
+
+    - s_DYN_gatekeeper:
+        --> Added logical checks for field 'first_integral'. An error is displayed if the solution type is equilibrium or quasi-periodic (lines 47 - 56)
+
+
+Functions:
+
+    - costar:
+        --> Removed "options.opt_cont" from input arguments of Continuation (line 138)
+    - initial_solution:
+        --> Added "f" to the output arguments of fsolve. Now using this instead of Fcn(y) to compute "r" (lines 79 and 82)

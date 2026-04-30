@@ -21,6 +21,7 @@ classdef Continuation < handle
 
         %Parameter of active curve point
         dy0                                                                 %Direction vector of the predictor
+        t
         y0                                                                  %Curve point
 
     end
@@ -97,9 +98,9 @@ classdef Continuation < handle
     
     methods
         %% Constructor
-        function obj = Continuation(DYN,options)    
+        function obj = Continuation(DYN)    
 
-            obj = updateoptions(obj,options);
+            obj = updateoptions(obj,DYN.opt_cont);
             if strcmpi(obj.step_control,'on')                               %If user sets options.opt_cont.step_control = 'on', ...
                 obj.step_control = 'angle';                                 %the default step control method 'angle' is chosen
             end 
@@ -110,8 +111,11 @@ classdef Continuation < handle
             %Set the step width limits if they were not given by user
             if isempty(obj.step_width_limit); obj.step_width_limit = [0.2.*obj.step_width,5.*obj.step_width]; end
 
-            if isfield(DYN.system,'first_integral')
-                obj.fsolve_opts = optimoptions(obj.fsolve_opts,'Algorithm','levenberg-marquardt');
+            if isfield(DYN.system,'first_integral') 
+                if ~isfield(DYN.opt_approx_method,'phase_condition') || (isfield(DYN.opt_approx_method,'phase_condition') && ~strcmpi(DYN.opt_approx_method.phase_condition,'off'))
+                % if ~isfield(DYN.opt_approx_method,'phasecond') || (isfield(DYN.opt_approx_method,'phasecond') && ~strcmpi(DYN.opt_approx_method.phasecond,'off'))     % For FGM
+                    obj.fsolve_opts = optimoptions(obj.fsolve_opts,'Algorithm','levenberg-marquardt');
+                end
             end
 
         end
@@ -121,7 +125,7 @@ classdef Continuation < handle
         
         %% Methods
         obj = initial_slope(obj,DYN,AM);                                    %Calculates second curve point to determine initial slope for direction vector (secant, parable, cubic)
-        obj = direction_vector(obj);                                        %Calculates the vector of the direction of the predictor (tangent, secant, ...)
+        obj = direction_vector(obj,DYN);                                    %Calculates the vector of the direction of the predictor (tangent, secant, ...)
         obj = predictor(obj);                                               %Generates predictor to given point on diagram
         
         obj = iterate_data(obj);                                            %Iterates the relevant data: new data point 1 is now current data point 0 for next iteration

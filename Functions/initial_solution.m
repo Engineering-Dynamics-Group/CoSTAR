@@ -22,7 +22,10 @@ end
 %% Set function and options for fsolve
 newtonOpts = optimoptions('fsolve','Display','iter-detailed','MaxFunEvals',1e5,'MaxIter',1e3,'FiniteDifferenceType','forward');
 if isfield(DYN.system,'first_integral')
-    newtonOpts = optimoptions(newtonOpts,'Algorithm','levenberg-marquardt');
+    if ~isprop(AM,'phase_condition') || (isprop(AM,'phase_condition') && ~strcmpi(AM.phase_condition,'off'))
+    % if ~isprop(AM,'phasecond') || (isprop(AM,'phasecond') && ~strcmpi(AM.phasecond,'off'))    % For FGM
+        newtonOpts = optimoptions(newtonOpts,'Algorithm','levenberg-marquardt');
+    end
 end
 y0 = [AM.iv;DYN.param{DYN.act_param}];
 
@@ -73,10 +76,10 @@ if strcmpi(DYN.display,'off') || strcmpi(DYN.display,'final')
 else
     write_log(DYN,'diary_on')                                           % Start recording of command window for log file
     disp('fsolve is trying to find an initial solution ...')            % This text is automatically printed to the log file due to diary function
-    [y,~,newton_flag,~,J] = fsolve(Fcn,y0,newtonOpts);
+    [y,f,newton_flag,~,J] = fsolve(Fcn,y0,newtonOpts);
     write_log(DYN,'diary_off')                                          % Stop recording of command window for log file
 end
-r = sum(Fcn(y).^2);                                                     % Re-calculate the sum of squared function values to check whether the equations were actually solved
+r = sum(f.^2);                                                          % Re-calculate the sum of squared function values to check whether the equations were actually solved
 
 
 %% Check fsolve exit flags
@@ -184,13 +187,13 @@ else
             if iterate == 1
                 % Corrector
                 if strcmpi(DYN.approx_method,'shooting')
-                    AM.IF_up_res_data(y0(1:(end-1)),DYN);                       % Update AM properties and set y0 as initial value
+                    AM.IF_up_res_data(y0,DYN);                                  % Update AM properties and set y0 as initial value
                     Fcn = @(y)AM.fun_Jac_wrapper_init(y,y0,DYN);                % Function wrapper for initial solution, if Jacobian is supplied
                 elseif strcmpi(DYN.approx_method,'finite-difference')           % Special corrector function for FDM due to specification of Jacobian matrix
-                    AM.IF_up_res_data(y0(1:(end-1)));                           % Update AM properties and set y0 as initial value
+                    AM.IF_up_res_data(y0);                                      % Update AM properties and set y0 as initial value
                     Fcn = @(y) AM.corr_fun_init_FDM(y,y0);                      % Set corrector-function
                 else
-                    AM.IF_up_res_data(y0(1:(end-1)));                           % Update AM properties and set y0 as initial value
+                    AM.IF_up_res_data(y0);                                      % Update AM properties and set y0 as initial value
                     Fcn = @(y)[AM.res(y);y(end)-y0(end)];                       % Define corrector-function containing the residual function and the subspace-constraint
                 end
                 newtonOpts.Display = 'off';                                     % Deactivate fsolve output

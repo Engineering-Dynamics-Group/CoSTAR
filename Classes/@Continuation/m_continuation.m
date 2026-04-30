@@ -54,7 +54,7 @@ while  obj.p_contDo
         
     %%%%%%%%%%%%%  PREDICTOR AND STEP CONTROL  %%%%%%%%%%%%
     if any(obj.p_newton_flag == [1i,1,3,4]) && obj.p_ec_flag == 1    %direction vector needs to be calculated in the first loop and every time a new solution has been found
-        obj.direction_vector();                 %calculate direction vector
+        obj.direction_vector(DYN);              %calculate direction vector
     end
    
     if any(obj.p_newton_flag == [1,3,4]) && obj.p_ec_flag == 1     %stepcontrol may be called if corrector converged and error control is fine (initialised: obj.p_newton_flag = 1i, obj.p_ec_flag = 1)
@@ -91,8 +91,8 @@ while  obj.p_contDo
         Fcn = @(y)[AM.res(y);obj.sub_con(y,obj)];                               %define corrector-function containing the residual function and the subspace-constraint
     end
 
-    [obj.p_y1,~,obj.p_newton_flag,obj.p_output,obj.p_J1] = fsolve(Fcn,obj.yp,obj.fsolve_opts);      %solve corrector function
-    r = sum(Fcn(obj.p_y1).^2);                                                  %re-calculate the sum of squared function values to check whether the equations were actually solved
+    [obj.p_y1,f,obj.p_newton_flag,obj.p_output,obj.p_J1] = fsolve(Fcn,obj.yp,obj.fsolve_opts);      %solve corrector function
+    r = sum(f.^2);                                                              %re-calculate the sum of squared function values to check whether the equations were actually solved
     
     
     %%%%%%%%%%%%  EXITFLAG < 1 OR EXITFLAG = 2 OR RES >= 1e-10  %%%%%%%%%%%

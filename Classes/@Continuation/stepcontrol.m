@@ -10,7 +10,7 @@ switch obj.step_control
         % No step control. Step width is a constant value (exception: corrector did not converge)
         % If step width was reduced because corrector did not converge: step width must be reset to initial step width
         % If step control is on: Step width does not have to be reset to initial step width, because step width is controlled via step control
-
+        disp(append('Corrector iterations = ',num2str(obj.p_it)))
         if obj.p_convergence == 0                                                                   % If corrector did not converge previously
             obj.step_width = obj.p_step_width_init;                                                 % Reset step-width to initial step width
             info_text = append('Step width reset to stepwidth = ',num2str(obj.step_width));         % Set info text

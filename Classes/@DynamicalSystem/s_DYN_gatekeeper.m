@@ -44,7 +44,16 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
             GC.error_msg{1,end+1} = 'You supplied the field system.param, but did not supply an active parameter via opt_sol.act_param. This is not allowed.';
         end
     end
-    if isfield(system,'first_integral'); GC.check_data(system.rhs,'system.rhs','function_handle',[],[]);    end
+    if isfield(system,'first_integral')
+        GC.check_data(system.rhs,'system.rhs','function_handle',[],[]); 
+        if strcmpi(opt_sol.sol_type,'equilibrium') || strcmpi(opt_sol.sol_type,'eq') 
+            GC.error_msg{1,end+1} = 'You set the solution type to ''equilibrium'' and you defined a function for the first integral via system.first_integral.';
+            GC.error_msg{1,end+1} = 'However, defining a first integral does not make sense when computing equilibrium solutions.';
+        end
+        if strcmpi(opt_sol.sol_type,'quasiperiodic') || strcmpi(opt_sol.sol_type,'qps') 
+            GC.error_msg{1,end+1} = 'Quasi-periodic solutions of conservative systems are not supported yet.';
+        end
+    end
     if isfield(system,'info');           GC.check_data(system.info,'system.info','char',[],[]);             end    
     GC.speak;
 
