@@ -53,11 +53,11 @@ end
 while  obj.p_contDo
         
     %%%%%%%%%%%%%  PREDICTOR AND STEP CONTROL  %%%%%%%%%%%%
-    if any(obj.p_newton_flag == [1i,1,3,4]) && obj.p_ec_flag == 1    %direction vector needs to be calculated in the first loop and every time a new solution has been found
+    if any(obj.p_newton_flag == [0,1,3,4]) && obj.p_ec_flag == 1    %direction vector needs to be calculated in the first loop and every time a new solution has been found
         obj.direction_vector(DYN);              %calculate direction vector
     end
    
-    if any(obj.p_newton_flag == [1,3,4]) && obj.p_ec_flag == 1     %stepcontrol may be called if corrector converged and error control is fine (initialised: obj.p_newton_flag = 1i, obj.p_ec_flag = 1)
+    if any(obj.p_newton_flag == [1,3,4]) && obj.p_ec_flag == 1     %stepcontrol may be called if corrector converged and error control is fine (initialised: obj.p_newton_flag = 0, obj.p_ec_flag = 1)
         obj.stepcontrol(DYN);                   %adapt step width
         obj.p_convergence = 1;                  %reset convergence property if corrector did not converge previously
     end     

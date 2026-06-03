@@ -271,3 +271,102 @@ Functions:
         --> Removed "options.opt_cont" from input arguments of Continuation (line 138)
     - initial_solution:
         --> Added "f" to the output arguments of fsolve. Now using this instead of Fcn(y) to compute "r" (lines 79 and 82)
+
+
+
+--------------------------------------------
+-------------- v3.2.0.ConSys.4 -------------
+--------------------------------------------
+
+Completely removed the in v3.2.0.ConSys.3 introduced option to set the phase condition to 'off' for PS.
+All related changes as listed for v3.2.0.ConSys.3 were removed.
+
+
+----------  
+
+Computation of the tangent:
+    - Removed the property "t" from Continuation to store an alternative direction vector 
+    - Improved the code to check if the Jacobian has a one-dimensional kernel
+
+    @Continuation:
+        - Continuation:
+            --> Removed property "t" (former line 24)
+        - direction_vector:
+            --> Removed old (and already commented) if-condition in former line 10
+            --> Improved the code to check if the Jacobian has a one-dimensional kernel. Also improved the comments (lines 13 - 30)
+            --> Removed the extra code to test different tangent vectors (fromer lines 59 - 87)
+
+    @SOL_PS_FDM:
+        - SOL_PS_FDM:
+            --> Removed the property t and its saving (former lines 11, 39 and 74)
+
+    @SOL_PS_FGM:
+        - SOL_PS_FGM:
+            --> Removed the property t and its saving (former lines 12, 43 and 91 - 91)
+
+    @SOL_PS_SHM:
+        - SOL_PS_SHM:
+            --> Removed the property t and its saving (former lines 10, 32 and 58)
+
+
+----------
+
+Fix for the integral phase condition for PS SHM introduced in v3.2.0.ConSys.3: Further improvements
+
+    @AM_PS_SHM:
+        - AM_PS_SHM:
+            --> Removed the initialisation of Z0 (Z0 remains) (line 13)
+            --> Added property "Z_traj" (line 14)
+        - getIV:
+            --> Removed the commented code (former lines 71 - 75, 78 - 83, 89 - 97 and 102 - 103)
+            --> Adapted the saving of Z0 (new line 81)
+        - IF_up_res_data:
+            --> Completely removed the old code (integration of preceding solution is not necessary for the new code)
+            --> Restored the setting of obj.iv to be equal to the other approximation methods (lines 9 - 13)
+            --> obj.Z_traj is copied to obj.Z0 if the integral phase condition is used (lines 15 - 18)
+        - PS_SHM_residuum:
+            --> Removed commented code (former lines 23 - 24, 46, 49, 51, 53 - 54, 77 - 78, 102, 107, 109, 112, 116, 120, 122, 126 and 269 - 335)
+            --> Added the saving of Z_traj (new line 127)
+            --> Renamed s_p to s0, Z_p to Z0, zp_0 to z0_0, f_zp_0 to f_z0_0 and f_p to f0 
+                (new lines 20, 22, 123- 125, 129 - 130, 195, 198, 200, 209, 218 - 219, 229 - 231, 233, 236, 242, 245 and 248)
+
+
+----------  
+
+@Continuation:
+    - Continuation:
+        --> Resetted the initialisation of the property p_newton_flag to 0 (line 34)
+    - m_continuation:
+        --> if-condition for execution of method "direction_vector": Resetted the 1i to 0 (line 56 and 60)
+    - initial_slope:
+        --> Restored the state of the method of v3.2 (lines 8, 14, 16, 19, 22 and 25)
+
+@AM_PS_FGM:
+    - AM_PS_FGM/IF_up_res_data:
+        --> var1(1:end-1) is resetted to var1 if var1 is of type double (line 116)
+
+@AM_QPS_FGM:
+    - AM_PS_FGM/IF_up_res_data:
+        --> var1(1:end-1) is resetted to var1 if var1 is of type double (line 107)
+
+Functions:
+        - initial_solution:
+            --> Reset the input argument of the IF_up_res_data method from y0 to y0(1:end-1) (lines 190, 193 and 196)
+
+test:
+    - test_FDM_PS_pendulum:
+        --> Changed phi_end from pi to 3.1 (line 12)
+        --> Changed ic from [0.1; 0] to [0.1; 0.1] (line 23)
+        --> Added 'phase_condition' with value 'integral' and 'poincare' to options.opt_approx_methdod (lines 33 and 62)
+        --> Set step width to 1.5 (lines 34 and 63)
+        --> Changed predictor from 'secant' to 'tangent' (line 34)
+    - test_FGM_PS_pendulum:
+        --> Changed ic from [0.1; 0] to [0.1; 0.1] (line 23)
+        --> Changed phase condition from 'poincare' to 'int_poincare' (line 33)
+        --> Changed predictor from 'secant' to 'tangent' (line 34)
+        --> Set step width to 1.5 (line 63)
+    - test_SHM_PS_pendulum:
+        --> Changed ic from [0.1; 0] to [0.1; 0.1] (line 23)
+        --> Changed 'n_shoot' from 10 to 5 (lines 31 and 60)
+        --> Set step width to 0.3 and 1.5 (lines 34 and 63)
+        --> Changed predictor from 'secant' to 'tangent' (line 32)

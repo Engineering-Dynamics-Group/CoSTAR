@@ -10,7 +10,8 @@ classdef AM_PS_SHM < ApproxMethod
         n_shoot = 2;                                                    % Number of shooting points for multiple shooting
         phase_condition = 'poincare';                                   % Phase condition
 
-        Z0 = cell(1,3)                                                  % Stores the trajectory of the preceding solution
+        Z0                                                              % Stores the trajectory of the preceding solution (needed for the integral phase condition)
+        Z_traj                                                          % Buffers the trajectory computed in the residuum function. It is copied to Z0 in IF_up_res_data
         n_time                                                          % Number of time evaluation points in each shooting interval for the integral phase condition
                 
         %Inherited Properties

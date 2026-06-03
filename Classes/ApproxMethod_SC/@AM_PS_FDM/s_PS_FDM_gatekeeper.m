@@ -118,19 +118,14 @@ function s_PS_FDM_gatekeeper(GC,system,opt_sol,opt_approx_method,opt_init)
     end
 
     % Field 'phase_condition'
-    phase_condition_allowed_fieldvalues = {'poincare','integral','off'};
+    phase_condition_allowed_fieldvalues = {'poincare','integral'};
     if isfield(opt_approx_method,'phase_condition')
         GC.check_data(opt_approx_method.phase_condition,'opt_approx_method.phase_condition','char',[],phase_condition_allowed_fieldvalues);
-        if isfield(opt_sol,'non_auto_freq') %&& ~strcmpi(opt_approx_method.phase_condition,'off')
+        if isfield(opt_sol,'non_auto_freq')
             GC.error_msg{1,end+1} = 'You defined a phase condition via opt_approx_method.phase_condition and';
             GC.error_msg{1,end+1} = 'the system seems to be non-autonomous since you set the option opt_sol.non_auto_freq.';
             GC.error_msg{1,end+1} = 'However, a phase condition is only allowed for autonomous systems.';
         end
-        % if isfield(opt_sol,'auto_freq') && ~isfield(system,'first_integral') && strcmpi(opt_approx_method.phase_condition,'off')
-        %     GC.error_msg{1,end+1} = 'The system seems to be dissipative and autonomous since you set the option opt_sol.auto_freq';
-        %     GC.error_msg{1,end+1} = 'and omitted system.first_integral. Moreover, you deactivated the phase condition via ';
-        %     GC.error_msg{1,end+1} = 'opt_approx_method.phase_condition. However, dissipative autonomous systems require a phase condition.';
-        % end
         GC.speak();
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

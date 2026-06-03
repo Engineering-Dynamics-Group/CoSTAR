@@ -75,7 +75,7 @@ function [res,J_res] = PS_FDM_residuum(obj,y,DYN)
     g = omega/DeltaTheta .* Z_i_sigma * w - reshape(Fcn_eval,n_int*dim,1);        
 
     % Compute the phase condition if system is autonomous
-    if (n_auto == 1) && ~strcmpi(obj.phase_condition,'off')             % Autonomous system with phase condition (always the case for dissipative systems, can be the case for conservative systems)
+    if n_auto == 1                                                      % Autonomous system with phase condition (always the case for dissipative systems, can be the case for conservative systems)
         switch obj.phase_condition
             case 'integral'                                             % Integral phase condition: sum_(i=0)^(n_int-1) ( f(t_i,z_i,param)' * (z(theta_i) - z_p(theta_i)) ), but ...
                 pc = (Z_i_sigma * w)' * (s - s_p);                      % ... f(t_i,z_i,param) = dz(theta_i)/dtheta .* omega is approximated by FD -> benefit: dpc/dmu = 0
@@ -85,7 +85,7 @@ function [res,J_res] = PS_FDM_residuum(obj,y,DYN)
                 f_zp_0 = Fcn(0,zp_0,param);                             % Evaluate Fcn for the phase condition
                 pc = f_zp_0' * (z_0 - zp_0);                            % Poincare phase condition
         end
-    else                                                                % Non-autonomous system OR autonomous conservative system without phase condition
+    elseif n_auto == 0                                                  % Non-autonomous system
         pc = [];                                                        % Set as empty in order to add "nothing" to the residuum
     end
 
@@ -150,15 +150,9 @@ function [res,J_res] = PS_FDM_residuum(obj,y,DYN)
         % dg_dmu = ( - reshape(Fcn_eval_plus_h,n_int*dim,1) + reshape(Fcn_eval_minus_h,n_int*dim,1) ) / (2*h_mu);   % OPTIONAL: central finite difference
     end
 
-    % Autonomous system: Calculate the additionally required derivative dg/domega (always needed)
+    % Autonomous system: Calculate the additionally required derivatives dg/domega and dpc/dy
     if n_auto == 1              
         dg_domega = 1 / DeltaTheta .* Z_i_sigma * w;                    % dg/domega
-    % Non-autonomous system: Set dg/domega and dpc/dy as empty in order to add "nothing" to the Jacobian matrix below
-    elseif n_auto == 0
-        dg_domega = [];
-    end
-    % If phase condition is enabled (always the case for autonomous dissipative systems, can be the case for conservative systems)
-    if (n_auto == 1) && ~strcmpi(obj.phase_condition,'off')             % Calculate dpc/dy
         switch obj.phase_condition
             case 'integral'
                 dpc_ds = (s - s_p)' * obj.p_w_mat_J + (Z_i_sigma * w)'; % dpc/ds (pc: integral phase condition, see above)
@@ -169,9 +163,9 @@ function [res,J_res] = PS_FDM_residuum(obj,y,DYN)
                 % dpc_dmu = (Fcn(0,zp_0,param_plus_h) - Fcn(0,zp_0,param_minus_h))' * (z_0 - zp_0) / (2*h_mu);  % OPTIONAL: dpc/dmu of Poincare phase condition calculated using central finite difference
         end
         dpc_domega = 0;                                                 % dpc/domega = 0, because the phase conditions are independent of the frequency
-    % Phase condition is missing: Set derivatives as empty in order to add "nothing" to the Jacobian matrix below
-    else
-        dpc_ds = [];  dpc_domega = [];  dpc_dmu = [];
+    % Non-autonomous system: Set dg/domega and dpc/dy as empty in order to add "nothing" to the Jacobian matrix below
+    elseif n_auto == 0 
+        dg_domega = [];  dpc_ds = [];  dpc_domega = [];  dpc_dmu = [];
     end
     
     % Conservative system: Calculate dIC/dy

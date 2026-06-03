@@ -24,7 +24,7 @@ function s_PS_FGM_gatekeeper(GC,system,opt_sol,opt_approx_method,opt_init)
     opt_init_allowed_fieldnames_2     = {'fc0','hmatrix'};                          %allowed fieldsnames in the options super structure
 
 
-    phasecond_allowed_fieldsvalues = {'poincare','int_poincare','off'};  %allowed fieldsnames for phasecondition values
+    phasecond_allowed_fieldsvalues = {'poincare','int_poincare'};  %allowed fieldsnames for phasecondition values
     %% Check the opt_approx_method structure
   
     GC.check_fields(opt_approx_method,'opt_approx_method',opt_approx_method_mandatory_fieldnames,opt_approx_method_allowed_fieldnames);

@@ -7,7 +7,6 @@ classdef SOL_PS_SHM < Solution
         freq                                    % storing frequency values (they are either non-autonomous or autonomous for periodic solutions)
         solver_function function_handle
         odeOpts
-        t
 
     end
 
@@ -29,7 +28,6 @@ classdef SOL_PS_SHM < Solution
             obj.mu(1,1)                = y1(end,1);                                     % Continuation parameter 
             obj.J{1,1}                 = sparse(J1);                                    % Jacobian matrix
             obj.dy(:,1)                = NaN(size(y1));                                 % Initialised. Gets correctly filled by IF_arch_data
-            obj.t(:,1)             = NaN(size(y1));
             obj.newton_flag(1,1)       = newton_flag;
             obj.arclength(1,1)         = 0;                                             % Set arc length of first curve point to zero
             
@@ -55,7 +53,6 @@ classdef SOL_PS_SHM < Solution
             obj.mu(1,end+1)         = CON.p_y1(end,1);                                  % Continuation parameter 
             obj.J{1,end+1}          = sparse(CON.p_J1);                                 % Jacobian matrix
             obj.dy(:,end:end+1)     = [CON.dy0, NaN(size(CON.dy0))];                    % Direction vector of the predictor
-            obj.t(:,end:end+1)         = [CON.t, NaN(size(CON.t))];
             obj.newton_flag(1,end+1)= CON.p_newton_flag;                                % Exit-flag of corrector (fsolve)
             obj.step_width(1,end+1) = CON.step_width;
             obj.arclength(1,end+1)  = CON.p_arcl_1;

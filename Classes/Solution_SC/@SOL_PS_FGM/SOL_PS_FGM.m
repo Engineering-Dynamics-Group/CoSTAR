@@ -9,7 +9,6 @@ classdef SOL_PS_FGM < Solution
         hmatrix         %Property to save the higher-harmonics matrix for every continuation step
         n_hh            %Number of higher harmonics
         n_fft           %Number of FFT evaluation points
-        t
     
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -40,7 +39,6 @@ classdef SOL_PS_FGM < Solution
             obj.mu(1,1)                = y1(end,1);                             
             obj.J{1,1}                 = J1;
             obj.dy{1,1}                = NaN(size(y1));                                     %Initialised. Gets correctly filled by IF_arch_data
-            obj.t{1,1}             = NaN(size(y1));
             obj.newton_flag(1,1)       = newton_flag;
             obj.arclength(1,1)         = 0;                                                 %Set arclength of first curve point to zero
             obj.hmatrix{1,1}           = AM.hmatrix;
@@ -87,8 +85,6 @@ classdef SOL_PS_FGM < Solution
             obj.J{1,end+1}          = CON.p_J1;                                                 %Jacobian matrix
             obj.dy{1,end}           = CON.dy0;                                                  %direction vector of the predictor (this one belongs to the previous point)
             obj.dy{1,end+1}         = NaN(size(CON.dy0));                                       %expand dy by a NaN vector which can be filled with the direction vector in the next loop
-            obj.t{1,end}         = CON.t;
-            obj.t{1,end+1}         = NaN(size(CON.t));
             obj.newton_flag(1,end+1)= CON.p_newton_flag;
             obj.step_width(1,end+1) = CON.step_width;
             obj.arclength(1,end+1)  = CON.p_arcl_1;

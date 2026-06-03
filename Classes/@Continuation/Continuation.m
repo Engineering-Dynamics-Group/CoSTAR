@@ -21,7 +21,6 @@ classdef Continuation < handle
 
         %Parameter of active curve point
         dy0                                                                 %Direction vector of the predictor
-        t
         y0                                                                  %Curve point
 
     end
@@ -32,7 +31,7 @@ classdef Continuation < handle
         %Parameters of predicted curve point
         p_y1 = 0;                                                             %Initialise for get method of p_arcl_1 to be well defined
         p_J1
-        p_newton_flag = 1i;                                                   %Exit flag of Newton solver
+        p_newton_flag = 0;                                                    %Exit flag of Newton solver
         p_ec_flag = 1;                                                        %Exit flag of error control 
         p_stopping_flag                                                       %Exit flag of continuation
         p_arcl_0  = 0;                                                        %arc-length of current point
@@ -112,10 +111,7 @@ classdef Continuation < handle
             if isempty(obj.step_width_limit); obj.step_width_limit = [0.2.*obj.step_width,5.*obj.step_width]; end
 
             if isfield(DYN.system,'first_integral') 
-                if ~isfield(DYN.opt_approx_method,'phase_condition') || (isfield(DYN.opt_approx_method,'phase_condition') && ~strcmpi(DYN.opt_approx_method.phase_condition,'off'))
-                % if ~isfield(DYN.opt_approx_method,'phasecond') || (isfield(DYN.opt_approx_method,'phasecond') && ~strcmpi(DYN.opt_approx_method.phasecond,'off'))     % For FGM
-                    obj.fsolve_opts = optimoptions(obj.fsolve_opts,'Algorithm','levenberg-marquardt');
-                end
+                obj.fsolve_opts = optimoptions(obj.fsolve_opts,'Algorithm','levenberg-marquardt');
             end
 
         end

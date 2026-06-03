@@ -40,7 +40,7 @@ function res = PS_FGM_residuum(obj,y,DYN)
     param{DYN.act_param} = mu;
 
     %% Allocate memory and declare persistent variables
-    res = zeros(length(s),1);
+    res = zeros(length(s)+DYN.n_auto,1);
     
     %% Projection with FFT
 
@@ -60,8 +60,8 @@ function res = PS_FGM_residuum(obj,y,DYN)
     res((p_n_hh*dim+1):(2.*p_n_hh-1)*dim,1)                 =  -imag(cmpl_res((dim+1):end,1));   %sine term
    
     %% Add phase condition (only if autonomous frequencies are present)    
-    if DYN.n_auto && ~strcmpi(obj.phasecond,'off')
-        res = [res; obj.phase_condition(FCtemp,DYN)];
+    if DYN.n_auto
+        res(end,1) = obj.phase_condition(FCtemp,DYN);
     end
 
     %% Expand the residuum if system is conservative

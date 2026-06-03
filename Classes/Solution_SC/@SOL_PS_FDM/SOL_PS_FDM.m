@@ -8,7 +8,6 @@ classdef SOL_PS_FDM < Solution
         freq                        % Property to save the frequency
         local_gridpoint_indices     % Stores the local grid point indices, which determine the grid points relative to node i that are used for the finite difference approximation
         local_gridpoint_weights     % Stores the weights related to the local grid point indices
-        t
             
     end
 
@@ -36,7 +35,6 @@ classdef SOL_PS_FDM < Solution
             obj.mu(1,1)             = y1(end,1);                                % Continuation parameter 
             obj.J{1,1}              = sparse(J1);                               % Jacobian matrix
             obj.dy(:,1)             = NaN(size(y1));                            % Initialised. Gets correctly filled by IF_arch_data
-            obj.t(:,1)             = NaN(size(y1));
             obj.newton_flag(1,1)    = newton_flag;                              % Exit-flag of corrector (fsolve)
             obj.arclength(1,1)      = 0;                                        % Set arclength of first curve point to zero
             % obj.fsolve_it(1,1)    = varargin{1,1}{1,5};                       % Number of iterations of fsolve
@@ -71,7 +69,6 @@ classdef SOL_PS_FDM < Solution
             obj.mu(1,end+1)             = CON.p_y1(end,1);                          % Continuation parameter
             obj.J{1,end+1}              = sparse(CON.p_J1);                         % Jacobian matrix
             obj.dy(:,end:end+1)         = [CON.dy0, NaN(size(CON.dy0))];            % Direction vector of the predictor
-            obj.t(:,end:end+1)         = [CON.t, NaN(size(CON.t))];
             obj.newton_flag(1,end+1)    = CON.p_newton_flag;                        % Exit-flag of corrector (fsolve)
             obj.step_width(1,end+1)     = CON.step_width;                           % Step width
             obj.arclength(1,end+1)      = CON.p_arcl_1;                             % Arclength
