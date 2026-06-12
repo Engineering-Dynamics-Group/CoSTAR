@@ -55,7 +55,7 @@ classdef AM_QPS_SHM < ApproxMethod
 
         %% Methods
         %interface methods
-        obj = IF_up_res_data(obj,var1,DYN);                             % This methods modifies the superclass method. var1 can be either y0 (see method QPS_SHM_calc_stability) or CON
+        obj = IF_up_res_data(obj,var,DYN);                              % This methods modifies the superclass method. var1 can be either y0 (see method QPS_SHM_calc_stability) or CON
         obj = getIV(obj,DYN);                                           % Method generates initial value for shooting method from point in state-space
         IC  = getIC(obj,y,DYN,n_char_st);                               % Method that interpolates the initial vectors z(0,theta_2) (potentially needed needed for stability calculation)
 

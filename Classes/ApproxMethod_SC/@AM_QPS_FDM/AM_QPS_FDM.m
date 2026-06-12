@@ -81,7 +81,7 @@ classdef AM_QPS_FDM < ApproxMethod
         [F,J] = corr_fun_FDM(obj,y,CON);            % Method that provides the residuum vector function and the corresponding Jacobian matrix for fsolve during continuation
         [res,J_res] = QPS_FDM_residuum(obj,y,DYN);  % Method that builds the residuum of the finite-difference equation system and its Jacobian matrix
         
-        obj = IF_up_res_data(obj,CON);              % Interface method: Used to pass information between continuation algorithm an this subclass
+        obj = IF_up_res_data(obj,var);              % Interface method: Used to pass information between continuation algorithm an this subclass
         IC  = getIC(obj,y,DYN,n_char_st);           % Method that extracts the state space vectors z(0,theta_2) (needed needed for stability calculation via the shooting method)
 
     end

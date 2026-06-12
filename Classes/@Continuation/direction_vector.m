@@ -7,7 +7,7 @@ function obj = direction_vector(obj,DYN)
 
 
 % Case: Tangent predictor or initial_slope failed
-if strcmpi(obj.pred,'tangent') || obj.p_use_qr
+if strcmpi(obj.predictor,'tangent') || obj.p_use_tangent
     if isfield(DYN.system,'first_integral') 
         Jg = full(obj.p_J0(1:end-1,:));         % Jg needs to have a defect = 1. Its null space can be computed by means of a SVD
         [~,S,V] = svd(Jg);                      % The column of V corresponding to the SV = 0 is a tangent vector
@@ -31,7 +31,7 @@ if strcmpi(obj.pred,'tangent') || obj.p_use_qr
         [Q,~] = qr(obj.p_J0(1:end-1,:).');      % Do QR factorization of Jacobian without subspace constraint
         obj.dy0 = Q(:,end);                     % Tangent is last column of Q
     end
-    obj.p_use_qr = false;                  % Reset property since secant predictor can now be used
+    obj.p_use_tangent = false;                  % Reset property since secant predictor can now be used
 
 % Case: All other predictors (secant, parable, cubic) and there is only 1 curve point
 elseif obj.p_local_cont_counter == 1 

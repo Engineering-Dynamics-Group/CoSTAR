@@ -3,17 +3,17 @@
 %
 % @obj:  Continuation class object
 
-function obj = predictor(obj)   % Compute the predictor
+function obj = predictor_point(obj)   % Compute the predictor
 
 
 % Tangent or secant predictor (also used instead of parable or cubic predictor if there are less than 3 curve points)
-if strcmpi(obj.pred,'tangent') || strcmpi(obj.pred,'secant') || (obj.p_local_cont_counter <= 2)
+if strcmpi(obj.predictor,'tangent') || strcmpi(obj.predictor,'secant') || (obj.p_local_cont_counter <= 2)
 
     obj.yp = obj.y0 + obj.direction.*obj.step_width.*obj.dy0;           % Calculate predictor point
 
 
 % Parable predictor (also used instead of cubic predictor of there are less than 4 curve points)
-elseif strcmpi(obj.pred,'parable') || (obj.p_local_cont_counter <= 3)   % Only possible if there are at least 3 curve points
+elseif strcmpi(obj.predictor,'parable') || (obj.p_local_cont_counter <= 3)      % Only possible if there are at least 3 curve points
 
     % Calculate the predictor point yp = y(sp) using the polynomial y(s) = y0 + C1*s + C2*s^2, where s is the "local" arc-length with y(s=0) = y0
     % y(-s1) = y_{k-1}  and  y(-s2) = y_{k-2}  ->  Y = [Delta_y_{k-1}, Delta_y_{k-2}]  using  Delta_y_{k-i} = y_{k-i} - y0
@@ -35,7 +35,7 @@ elseif strcmpi(obj.pred,'parable') || (obj.p_local_cont_counter <= 3)   % Only p
 
 
 % Cubic predictor
-elseif strcmpi(obj.pred,'cubic')                                        % Only possible if there are at least 4 curve points
+elseif strcmpi(obj.predictor,'cubic')                                   % Only possible if there are at least 4 curve points
 
     % Calculate the predictor point yp = y(sp) using the polynomial y(s) = y0 + C1*s + C2*s^2 + C3*s^3, where s is the "local" arc length with y(s=0) = y0
     % y(-si) = y_{k-i} with i \in {1,2,3}  ->  Y = [Delta_y_{k-1}, Delta_y_{k-2}, Delta_y_{k-3}]  using  Delta_y_{k-i} = y_{k-i} - y0

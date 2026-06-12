@@ -16,8 +16,8 @@ function help_struct = s_help_opt_approx_method_PS_FGM()
     help_struct.optional.n_fft.text             = ['Number of evaluation points along the periodic orbit for the Fast Fourier Transformation. Always use powers of two for ideal FFT performance! A higher value leads to more accuracy but higher numerical cost.\n' ...
                                                    'If the error control is enabled, the value of n_fft is automatically adapted, but it is at least as large as defined here.'];
     
-    help_struct.optional.phasecond.value        = '''poincare'', ''int_poincare'' \n  Default: ''poincare''';
-    help_struct.optional.phasecond.text         = 'Type of phase condition for autonomous periodic solutions only(!).\n Poincare condition is recommend.';
+    help_struct.optional.phase_condition.value  = '''poincare'', ''int_poincare'' \n  Default: ''int_poincare''';
+    help_struct.optional.phase_condition.text   = 'Type of phase condition for autonomous periodic solutions only(!).\n Integral-Poincare condition is recommended.';
 
     help_struct.optional.error_control.value    = '''on'', ''off'' \n  Default: ''on''';
     help_struct.optional.error_control.text     = 'The error control automatically estimates the error (in frequency space) of the approximation and adapts the number of harmonics as well as the number of FFT evaluation points n_fft in accordance with the Nyquist-Shannon theorem.';

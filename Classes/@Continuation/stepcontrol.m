@@ -127,39 +127,6 @@ switch obj.step_control
                 end
                 d = 0.25;                                               % Set damping factor (default: 0.25)
                 display_message_info = append('alpha = ', num2str(alpha), ', corr_it = ', num2str(obj.p_it), ', r_alpha = ', num2str(r_alpha), ', r_it = ', num2str(r_it));     % Set additional display info
-            
-
-            case 'pid'
-                % Step control using PID control to adapt step width
-                % This method was taken from  Valli, Elias, Carey, Coutinho (2009): "PID adaptive control of incremental and arclength continuation" and has been adapted to fit CoSTAR
-                % ATTENTION: This method does not work well currently. The optimal values of the four parameters are still unknown
-
-                % Step control parameters
-                it_nom = obj.step_control_param(1);                         % Maximal number of corrector iterations
-                tol = obj.step_control_param(2);                            % Reference value
-                kP = obj.step_control_param(3);   kI = obj.step_control_param(4);   kD = obj.step_control_param(5);
-
-                r_it = it_nom / obj.p_it;                                   % Ratio of nominal number of corrector iterations to actual number of corrector iterations  
-                % Calculate parameter e using the direction vectors at current point (y0) and previous point
-                obj.p_e = norm(obj.dy0 - obj.p_dy_old) / tol;               % norm(obj.dy0 - obj.p_dy_old) / norm(obj.dy0) = norm(obj.dy0 - obj.p_dy_old)
-                % Calculate preliminary value of r (r_pre)
-                if obj.p_e ~= 0                                             % If parameter e is unequal zero, r_pre can be calculated
-                    prop = (obj.p_e_old/obj.p_e)^kP;                        % "Present"
-                    int = (1/obj.p_e)^kI;                                   % "Past"
-                    diff = (obj.p_e_old^2/(obj.p_e*obj.p_e_old_old))^kD;    % "Future" --> swap e_old_old and e_old in order to make sense?
-                    r_PID = prop * int * diff;
-                    display_message_info = append('e = ', num2str(obj.p_e), ', prop = ', num2str(prop), ', int = ', num2str(int), ', diff = ', num2str(diff), ', corr_it = ', num2str(obj.p_it));   % Set additional display info
-                else
-                    r_PID = r_limit(2);                                     % If parameter e is zero (direction vectors dy0 and dy_old are equal), r_pre can be set to maximum value
-                    display_message_info = append('e = 0, corr_it = ', num2str(obj.p_it));      % Set display message
-                end
-                if r_it < 1                                             % If number of corrector iterations exceeds nominal number of corrector iterations ...
-                    r_pre = min([r_it,r_PID]);                          % take the minimum of r_it and r_PID
-                    display_message_info = append(display_message_info, ', r_PID = ', num2str(r_PID), ', r_it = ', num2str(r_it));      % Append info
-                else                                                    % In all other cases ...
-                    r_pre = r_PID;                                      % use r_PID only
-                end
-                d = 0;                                                  % Set damping factor (generally, no damping is required when using step control method 'pid')
                 
         end
 

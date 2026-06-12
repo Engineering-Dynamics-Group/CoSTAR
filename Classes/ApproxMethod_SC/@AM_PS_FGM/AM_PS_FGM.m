@@ -30,7 +30,7 @@ classdef AM_PS_FGM < ApproxMethod
         %opt_init 
 
         n_fft                       %Number of FFT points used for Fourier-Series build-up
-        phasecond = 'poincare';     %Phase condition 
+        phase_condition = 'int_poincare';   %Phase condition 
         
 
         %Everything for error control
@@ -109,11 +109,11 @@ classdef AM_PS_FGM < ApproxMethod
         %Interface methods: This is an abstract method and must be defined
         %It passes information between the continuation algrithm and the ApproxMethod subclass
         %@var1: Continuation class object OR solution vector x whose dimension was updated in the error control
-        function obj = IF_up_res_data(obj,var1)
-            if isa(var1,'Continuation')                 % If var1 is an object of Continuation
-                obj.iv = var1.yp(1:(end-1));            % Update the current initial condition. Used for the phase condition
-            elseif isa(var1,'double')                   % var1 should be a solution vector (type double) in all other cases
-                obj.iv = var1;                          % Set iv to given solution vector x0 (only relevant in initial_solution)
+        function obj = IF_up_res_data(obj,var)
+            if isa(var,'Continuation')                  % If var is an object of Continuation
+                obj.iv = var.y0(1:(end-1));             % Update the current initial condition. Used for the phase condition
+            elseif isa(var,'double')                    % var should be a solution vector (type double) in all other cases
+                obj.iv = var(1:(end-1));                % Set iv to given solution vector x0 (only relevant in initial_solution)
             end
         end
 
@@ -142,7 +142,7 @@ classdef AM_PS_FGM < ApproxMethod
     %% Private methods
     methods(Access = private)
 
-        ph   = phase_condition(obj,FCtemp,DYN);                            %Method for the phase_condition
+        ph   = phasecondition(obj,FCtemp,DYN);                             %Method for the phase condition
         proj = residuum_projection(obj,y,DYN);                             %Method for projecting the residuum of the system into the frequency space
         [s,hmatrix] = sort_guess_FC(obj,DYN,FC0);                          %sorting and possibly guessing new Fourier coefficients according to the higher harmonics
 

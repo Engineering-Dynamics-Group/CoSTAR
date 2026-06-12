@@ -41,7 +41,7 @@ end
 
 % Calculate second curve point with differential perturbation dmu to
 % calculate initial slope for secant predictor
-if(~strcmpi(obj.pred,'tangent'))
+if ~strcmpi(obj.predictor,'tangent')
     obj = obj.initial_slope(DYN,AM);
 end
 
@@ -53,16 +53,16 @@ end
 while  obj.p_contDo
         
     %%%%%%%%%%%%%  PREDICTOR AND STEP CONTROL  %%%%%%%%%%%%
-    if any(obj.p_newton_flag == [0,1,3,4]) && obj.p_ec_flag == 1    %direction vector needs to be calculated in the first loop and every time a new solution has been found
+    if any(obj.p_newton_flag == [1,3,4]) && (obj.p_ec_flag == 1)    %direction vector needs to be calculated in the first loop and every time a new solution has been found
         obj.direction_vector(DYN);              %calculate direction vector
     end
    
-    if any(obj.p_newton_flag == [1,3,4]) && obj.p_ec_flag == 1     %stepcontrol may be called if corrector converged and error control is fine (initialised: obj.p_newton_flag = 0, obj.p_ec_flag = 1)
+    if any(obj.p_newton_flag == [1,3,4]) && (obj.p_ec_flag == 1) && (obj.p_local_cont_counter > 1)  %stepcontrol may be called if corrector converged and error control is fine, but not in the first loop
         obj.stepcontrol(DYN);                   %adapt step width
         obj.p_convergence = 1;                  %reset convergence property if corrector did not converge previously
     end     
     
-    obj.predictor();                            %calculate predicted point
+    obj.predictor_point();                      %calculate predictor point
 
     stopping_msg = check_freq(DYN,obj.yp);                                      %check the frequencies at the predictor point (not done in predictor to be able to break the while loop)
     if ~isempty(stopping_msg)                                                   %if frequency(s) are smaller than frequency limit
