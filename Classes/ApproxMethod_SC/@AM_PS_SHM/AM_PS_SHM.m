@@ -36,7 +36,7 @@ classdef AM_PS_SHM < ApproxMethod
         end
         
         % Interface Methods
-        obj = IF_up_res_data(obj,CON,DYN);                              % This methods modifies the superclass method
+        obj = IF_up_res_data(obj,var,DYN);                              % This methods modifies the superclass method
         obj = getIV(obj,DYN);
    
         % Methods for shooting algorithms

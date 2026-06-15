@@ -9,14 +9,14 @@
 %
 % @obj:  ApproximationMethod object
 %
-function obj = IF_up_res_data(obj,var1,DYN)
+function obj = IF_up_res_data(obj,var,DYN)
 
-if isa(var1,'Continuation')                                                         % If var1 is an object of Continuation
-    obj.iv = var1.yp(1:(end-1));                                                    % Set iv to predictor point
-    y_old  = var1.p_y0_old{end};                                                    % Get last curve point
-elseif isa(var1,'double')                                                           % var1 should be a solution vector (type double) in all other cases
-    obj.iv = var1;                                                                  % Set iv to given solution vector y0
-    y_old  = var1;                                                                  % Use given solution
+if isa(var,'Continuation')                                                          % If var is an object of Continuation
+    obj.iv = var.y0(1:(end-1));                                                     % Set iv to predictor point
+    y_old  = var.p_y0_old{end};                                                     % Get last curve point
+elseif isa(var,'double')                                                            % var should be a solution vector (type double) in all other cases
+    obj.iv = var(1:(end-1));                                                        % Set iv to given solution vector y0
+    y_old  = var;                                                                   % Use given solution
 end
 
 

@@ -21,12 +21,12 @@ Fcn = @(t,z,param) laval_qp(t,z,param);         % Right hand side of ODE
 
 
 %% Properties
-options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',4);    %Properties of the System
-options.opt_sol  = costaropts('stability','on','cont','on','auto_freq',auto_freq,'non_auto_freq',non_auto_freq,'sol_type','qps','approx_method','fgm','act_param',active_parameter,'display','error-control');      %Properties of the solution
-options.opt_cont = costaropts('step_control','angle','direction',-1,'pred','tangent','subspace','pseudo-arc','mu_limit',mu_limit,'step_width',0.02,'max_cont_step',1e4);                                                             %Properties for continuation
-options.opt_approx_method = costaropts('n_FFT',2^6,'phasecond','int_poincare');   %Properties for approx_method (e.g. Shoot)
+options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',4);
+options.opt_sol  = costaropts('stability','on','cont','on','auto_freq',auto_freq,'non_auto_freq',non_auto_freq,'sol_type','qps','approx_method','fgm','act_param',active_parameter,'display','error-control');
+options.opt_cont = costaropts('step_control','angle','direction',-1,'predictor','tangent','subspace','pseudo-arc','mu_limit',mu_limit,'step_width',0.02,'max_cont_step',1e4);
+options.opt_approx_method = costaropts('n_FFT',2^6,'phase_condition','int_poincare');
 options.opt_init = costaropts('c0',zeros(4,1),'cmatrix',c_max,'smatrix',s_max,'hmatrix',K3);
-options.opt_stability = costaropts('iterate_bfp','on','n_char_st',75,'n_map',1e4);                                      %Properties for stability
+options.opt_stability = costaropts('iterate_bfp','on','n_char_st',75,'n_map',1e4);
 
 
 %% Continuation

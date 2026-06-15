@@ -30,7 +30,7 @@ options.system   = costaropts('order',0,'rhs',Fcn,'param',param,'dim',4);       
 options.opt_sol  = costaropts('stability','on','cont','on','sol_type','equilibrium','act_param',active_parameter);       %Properties of the solution
 options.opt_init = costaropts('ic',IC);                                                                                         %Properties for approx_method (e.g. Shoot)
 options.opt_stability = costaropts('iterate_bfp','on');
-options.opt_cont = costaropts('step_control','angle','direction',1,'pred','tangent','subspace','pseudo-arc','mu_limit',mu_limit,'step_width',0.01,'max_cont_step',1e4);                                                             %Properties for continuation
+options.opt_cont = costaropts('step_control','angle','direction',1,'predictor','tangent','subspace','pseudo-arc','mu_limit',mu_limit,'step_width',0.01,'max_cont_step',1e4);                                                             %Properties for continuation
 
 
 %% Continuation

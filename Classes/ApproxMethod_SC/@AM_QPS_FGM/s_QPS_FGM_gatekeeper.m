@@ -11,7 +11,7 @@
 function s_QPS_FGM_gatekeeper(GC,system,opt_sol,opt_approx_method,opt_init)
 
     opt_approx_method_mandatory_fieldnames  = {};                                                                              %mandatory fieldsnames in the options super structure
-    opt_approx_method_allowed_fieldnames    = {'n_fft','phasecond','error_control','error_limit','ec_iter_max','n_hh_max'};    %allowed fieldsnames in the options super structure
+    opt_approx_method_allowed_fieldnames    = {'n_fft','phase_condition','error_control','error_limit','ec_iter_max','n_hh_max'};    %allowed fieldsnames in the options super structure
 
     opt_init_mandatory_fieldnames_1  = {'c0','cmatrix','smatrix','hmatrix'};                                                %mandatory fieldsnames in the options super structure
     opt_init_allowed_fieldnames_1    = {'c0','cmatrix','smatrix','hmatrix'};                                                %allowed fieldsnames in the options super structure
@@ -20,7 +20,7 @@ function s_QPS_FGM_gatekeeper(GC,system,opt_sol,opt_approx_method,opt_init)
     opt_init_allowed_fieldnames_2     = {'fc0','hmatrix'};                      %allowed fieldsnames in the options super structure
 
 
-    phasecond_allowed_fieldsvalues = {'poincare','int_poincare'};                            %allowed fieldsnames for phasecondition values
+    phase_condition_allowed_fieldsvalues = {'poincare','int_poincare'};                            %allowed fieldsnames for phase_conditionition values
     %% Check the opt_approx_method structure
   
     GC.check_fields(opt_approx_method,'opt_approx_method',opt_approx_method_mandatory_fieldnames,opt_approx_method_allowed_fieldnames);
@@ -150,12 +150,12 @@ function s_QPS_FGM_gatekeeper(GC,system,opt_sol,opt_approx_method,opt_init)
            GC.speak();
     end
     
-    if isfield(opt_approx_method,'phasecond')&&isfield(opt_sol,'non_auto_freq')
+    if isfield(opt_approx_method,'phase_condition')&&isfield(opt_sol,'non_auto_freq')
         if ~isfield(opt_sol,'auto_freq')
-            GC.error_msg{1,end+1} = append('You are trying to solve a non-autonomous ODE, since you set the option opt_sol.non_auto_freq. In that case you are not allowed to set a phasecondition via opt_approx_method.phasecond.');   
+            GC.error_msg{1,end+1} = append('You are trying to solve a non-autonomous ODE, since you set the option opt_sol.non_auto_freq. In that case you are not allowed to set a phase_conditionition via opt_approx_method.phase_condition.');   
         end
     end
-    if isfield(opt_approx_method,'phasecond')&&isfield(opt_sol,'auto_freq'); GC.check_data(opt_approx_method.phasecond, 'opt_approx_method.phasecond','char',[],phasecond_allowed_fieldsvalues); end
+    if isfield(opt_approx_method,'phase_condition')&&isfield(opt_sol,'auto_freq'); GC.check_data(opt_approx_method.phase_condition, 'opt_approx_method.phase_condition','char',[],phase_condition_allowed_fieldsvalues); end
   
     if isfield(opt_approx_method,'error_control'); GC.check_data(opt_approx_method.error_control, 'opt_approx_method.error_control','char',[],{'on','off'}); end
   

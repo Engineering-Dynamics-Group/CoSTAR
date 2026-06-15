@@ -49,7 +49,7 @@ options.opt_init = costaropts('c1_matrix',C1_mat,'s1_matrix',S1_mat);           
 % load('workspace_test_duffing_QPS_FDM');    options.opt_init = costaropts('fdm_sol',s0);           % Use already calculated FDM solution vector as initial value
 options.opt_approx_method = costaropts('n_int_1',25,'scheme_1','central','approx_order_1',6,...                                     % Properties of approximation method FDM
                                        'n_int_2',25,'scheme_2','central','approx_order_2',6);                                       % Properties of approximation method FDM
-options.opt_cont = costaropts('mu_limit',mu_limit,'pred','cubic','direction',-1);                                                   % Properties for continuation
+options.opt_cont = costaropts('mu_limit',mu_limit,'predictor','cubic','direction',-1);                                              % Properties for continuation
 options.opt_stability = costaropts('iterate_bfp','on','n_char_st',25,'n_map',1e4);                                                  % Properties for stability
 
 % Step control options

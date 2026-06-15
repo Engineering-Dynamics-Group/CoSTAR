@@ -6,7 +6,7 @@
 %@system:               user supplied option structure for the system. Needed
 %here for checking the correct dimension of the initial value
 %@opt_sol:              user supplied option structure for solution. Needed
-%here for checking the phasecondition
+%here for checking the phase condition
 %@opt_approx_method:       user supplied option structure for the solution
 %method
 %@opt_init_sol:         user supplied option structure for initializing a
@@ -15,7 +15,7 @@
 function s_PS_FGM_gatekeeper(GC,system,opt_sol,opt_approx_method,opt_init)
 
     opt_approx_method_mandatory_fieldnames  = {};                                                                                  %mandatory fieldsnames in the options super structure
-    opt_approx_method_allowed_fieldnames    = {'n_fft','phasecond','error_control','error_limit','ec_iter_max','n_hh_max'};         %allowed fieldsnames in the options super structure
+    opt_approx_method_allowed_fieldnames    = {'n_fft','phase_condition','error_control','error_limit','ec_iter_max','n_hh_max'};  %allowed fieldsnames in the options super structure
 
     opt_init_mandatory_fieldnames_1  = {'c0','cmatrix','smatrix','hmatrix'};                      %mandatory fieldsnames in the options super structure
     opt_init_allowed_fieldnames_1    = {'c0','cmatrix','smatrix','hmatrix'};                      %allowed fieldsnames in the options super structure
@@ -24,7 +24,7 @@ function s_PS_FGM_gatekeeper(GC,system,opt_sol,opt_approx_method,opt_init)
     opt_init_allowed_fieldnames_2     = {'fc0','hmatrix'};                          %allowed fieldsnames in the options super structure
 
 
-    phasecond_allowed_fieldsvalues = {'poincare','int_poincare'};  %allowed fieldsnames for phasecondition values
+    phase_condition_allowed_fieldsvalues = {'poincare','int_poincare'};  %allowed fieldsnames for phase condition values
     %% Check the opt_approx_method structure
   
     GC.check_fields(opt_approx_method,'opt_approx_method',opt_approx_method_mandatory_fieldnames,opt_approx_method_allowed_fieldnames);
@@ -135,10 +135,10 @@ function s_PS_FGM_gatekeeper(GC,system,opt_sol,opt_approx_method,opt_init)
 
 %The s_DYN_gatekeeper already checked, that there is either non_auto_freq
 %OR auto_freq
-    if isfield(opt_approx_method,'phasecond')&&isfield(opt_sol,'non_auto_freq')
-        GC.error_msg{1,end+1} = append('You are trying to solve a non-autonomous ODE, since you set the option opt_sol.non_auto_freq. In that case you are not allowed to set a phasecondition via opt_approx_method.phasecond.');   
+    if isfield(opt_approx_method,'phase_condition')&&isfield(opt_sol,'non_auto_freq')
+        GC.error_msg{1,end+1} = append('You are trying to solve a non-autonomous ODE, since you set the option opt_sol.non_auto_freq. In that case you are not allowed to set a phase condition via opt_approx_method.phase_condition.');   
     end
-    if isfield(opt_approx_method,'phasecond')&&isfield(opt_sol,'auto_freq'); GC.check_data(opt_approx_method.phasecond, 'opt_approx_method.phasecond','char',[],phasecond_allowed_fieldsvalues); end
+    if isfield(opt_approx_method,'phase_condition')&&isfield(opt_sol,'auto_freq'); GC.check_data(opt_approx_method.phase_condition, 'opt_approx_method.phase_condition','char',[],phase_condition_allowed_fieldsvalues); end
   
     if isfield(opt_approx_method,'error_control'); GC.check_data(opt_approx_method.error_control, 'opt_approx_method.error_control','char',[],{'on','off'}); end
   

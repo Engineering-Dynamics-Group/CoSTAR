@@ -4,14 +4,12 @@
 % @obj:     continuation class object
 
 function obj = direction_vector(obj)
-    
 
 % Case: Tangent predictor or there is only one curve point
-% if strcmpi(obj.pred,'tangent') || ((obj.p_local_cont_counter == 1)&&(strcmpi(obj.pred,'parable')||strcmpi(obj.pred,'cubic'))) || obj.p_use_qr        
-if strcmpi(obj.pred,'tangent') || obj.p_use_qr        
+if strcmpi(obj.predictor,'tangent') || obj.p_use_tangent
     [Q,~] = qr(obj.p_J0(1:end-1,:).');          % Do QR factorization of Jacobian without subspace constraint
     obj.dy0 = Q(:,end);                         % Tangent is last column of Q
-    obj.p_use_qr = false;                       % Reset property since secant predictor can now be used
+    obj.p_use_tangent = false;                  % Reset property since secant predictor can now be used
 
 % Case: All other predictors (secant, parable, cubic) and there is only 1 curve point
 elseif obj.p_local_cont_counter == 1 
@@ -30,13 +28,10 @@ end
 if (obj.p_local_cont_counter >= 2) && (obj.p_dy_old'*obj.dy0 < 0)       
     obj.dy0 = - obj.dy0;
 
-
 % If the direction of continuation at the initial point is negative: change the sign to positive
 elseif (obj.p_local_cont_counter == 1) && (obj.dy0(end,1) < 0)          
     obj.dy0 = - obj.dy0;
 
-
 end
-
 
 end

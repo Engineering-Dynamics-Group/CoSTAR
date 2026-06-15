@@ -308,14 +308,14 @@ options.opt_approx_method = costaropts('n_FFT',2^6,'error_control','on','error_l
 %                  - 'n_hh_max':       If 'error_control' = 'on': Defines the maximum number of harmonics to be used.
 %                                      -> Allowed values: Positive integer
 %                                      -> Default value:  Inf  
-%                  - 'phasecond':      Defines the type of phase condition used for calculating solutions of autonomous systems. 
-%                                      'poincare' phase condition is recommended. 'phasecond' is not allowed when dealing with 
-%                                      non-autonomous systems.
-%                                      -> Allowed values: 'poincare', 'int_poincare'
-%                                      -> Default value:  'poincare'
+%                  - 'phase_condition': Defines the type of phase condition used for calculating solutions of autonomous systems. 
+%                                       'int_poincare' phase condition is recommended. 'phase_condition' is not allowed when dealing ...
+%                                       with non-autonomous systems.
+%                                       -> Allowed values: 'poincare', 'int_poincare'
+%                                       -> Default value:  'int_poincare'
 % NOTE: It is not necessary to set 'n_FFT' and 'error_control' since the default values are used. However, it is demonstrated ...
 %       here in order to show the fields and possible values. In section "1.4 Change of the continuation parameter", the error ...
-%       control is disabled. For usage of the field 'phasecond', please see the "van der Pol Oscillator" example below.
+%       control is disabled. For usage of the field 'phase_condition', please see the "van der Pol Oscillator" example below.
 %
 options.opt_cont = costaropts('mu_limit',mu_limit);
 % Mandatory fields: - 'mu_limit':  Sets the limits of the continuation. For this purpose, we defined the "mu_limit" variable.
@@ -646,18 +646,18 @@ options.opt_init = costaropts('hmatrix',Hmatrix,'c0',C0,'cmatrix',Cmatrix,'smatr
 % execute a continuation, we also have to set the "options.opt_approx_method" as well as the "options.opt_cont" structures.
 % The fields of the "options.opt_approx_method" structure depend on the solution type as well as the chosen approximation method. ...
 % For periodic solutions using the FGM, there are no mandatory fields and six optional field.
-options.opt_approx_method = costaropts('n_FFT',2^6,'phasecond','poincare','error_control','on','error_limit',[1e-4, 1e-3],...
+options.opt_approx_method = costaropts('n_FFT',2^6,'phase_condition','poincare','error_control','on','error_limit',[1e-4, 1e-3],...
                                        'ec_iter_max',5,'n_hh_max',50);
 % Optional fields: - 'n_FFT':          Sets the number of evaluation points along periodic orbit for the Fast Fourier Transformation. ...
 %                                      For ideal performance of the FFT, only "power of two"-values should be used. A high value ...
 %                                      leads to higher accuracy but also to higher numerical effort.
 %                                      -> Allowed values: Power of 2
 %                                      -> Default value:  2^6
-%                  - 'phasecond':      Defines the type of phase condition used for calculating solutions of autonomous systems. 
-%                                      'poincare' phase condition is recommended. 'phasecond' is not allowed when dealing with 
-%                                      non-autonomous systems.
-%                                      -> Allowed values: 'poincare', 'int_poincare'
-%                                      -> Default value:  'poincare'
+%                  - 'phase_condition': Defines the type of phase condition used for calculating solutions of autonomous systems. 
+%                                       'int_poincare' phase condition is recommended. 'phase_condition' is not allowed when dealing ... 
+%                                       with non-autonomous systems.
+%                                       -> Allowed values: 'poincare', 'int_poincare'
+%                                       -> Default value:  'int_poincare'
 %                  - 'error_control':  Enables or disables the error control which estimates the error of the approximation in ...
 %                                      frequency space and adapts the number of harmonics accordingly.
 %                                      -> Allowed values: 'on', 'off'
@@ -674,7 +674,7 @@ options.opt_approx_method = costaropts('n_FFT',2^6,'phasecond','poincare','error
 %                  - 'n_hh_max':       If 'error_control' = 'on': Defines the maximum number of harmonics to be used.
 %                                      -> Allowed values: Positive integer
 %                                      -> Default value:  Inf  
-% NOTE: It is not necessary to set 'n_FFT', 'phasecond' and 'error_control' since the default values are used. However, it is ...
+% NOTE: It is not necessary to set 'n_FFT', 'phase_condition' and 'error_control' since the default values are used. However, it is ...
 %       demonstrated here in order to show the fields and possible values. In section "1.4 Change of the continuation parameter", ...
 %       the error control is disabled.
 %

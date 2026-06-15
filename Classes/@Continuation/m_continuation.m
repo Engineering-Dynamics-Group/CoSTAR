@@ -41,7 +41,7 @@ end
 
 % Calculate second curve point with differential perturbation dmu to
 % calculate initial slope for secant predictor
-if(~strcmpi(obj.pred,'tangent'))
+if ~strcmpi(obj.predictor,'tangent')
     obj = obj.initial_slope(DYN,AM);
 end
 
@@ -53,16 +53,16 @@ end
 while  obj.p_contDo
         
     %%%%%%%%%%%%%  PREDICTOR AND STEP CONTROL  %%%%%%%%%%%%
-    if any(obj.p_newton_flag == [0,1,3,4]) && obj.p_ec_flag == 1    %direction vector needs to be calculated in the first loop and every time a new solution has been found
+    if any(obj.p_newton_flag == [1,3,4]) && (obj.p_ec_flag == 1)    %direction vector needs to be calculated in the first loop and every time a new solution has been found
         obj.direction_vector();                 %calculate direction vector
     end
    
-    if any(obj.p_newton_flag == [1,3,4]) && obj.p_ec_flag == 1     %stepcontrol may be called if corrector converged and error control is fine (initialised: obj.p_newton_flag = 0, obj.p_ec_flag = 1)
+    if any(obj.p_newton_flag == [1,3,4]) && (obj.p_ec_flag == 1) && (obj.p_local_cont_counter > 1)  %stepcontrol may be called if corrector converged and error control is fine, but not in the first loop
         obj.stepcontrol(DYN);                   %adapt step width
         obj.p_convergence = 1;                  %reset convergence property if corrector did not converge previously
     end     
     
-    obj.predictor();                            %calculate predicted point
+    obj.predictor_point();                      %calculate predictor point
 
     stopping_msg = check_freq(DYN,obj.yp);                                      %check the frequencies at the predictor point (not done in predictor to be able to break the while loop)
     if ~isempty(stopping_msg)                                                   %if frequency(s) are smaller than frequency limit
@@ -113,10 +113,10 @@ while  obj.p_contDo
     
     elseif ((obj.p_newton_flag < 1) || (obj.p_newton_flag == 2)) && (obj.step_width > obj.step_width_limit(1,1))            %if fsolve did not converge and step width is above minimal step width 
         if obj.p_newton_flag < 1
-            warn_text = append('No solution found for Iter = ',num2str(obj.p_local_cont_counter+1),' (fsolve exit_flag = ',num2str(obj.p_newton_flag),')!');
+            warn_text = append('No solution found for Iter = ',num2str(obj.p_local_cont_counter+1),' (fsolve exit_flag = ',num2str(obj.p_newton_flag),')! Trying again with reduced step width.');        
         elseif obj.p_newton_flag == 2
-            warn_text = append(['Equation solved for Iter = ',num2str(obj.p_local_cont_counter+1),', but ' ...              %set warning message
-                                'change in y smaller than the specified tolerance, or Jacobian at y is undefined (fsolve exit_flag = 2)!']);
+            warn_text = append(['Equation solved for Iter = ',num2str(obj.p_local_cont_counter+1),', but change in y is smaller than the specified ' ...
+                                'tolerance, or Jacobian at y is undefined (fsolve exit_flag = 2)! Trying again with reduced step width.']);
         end
         write_log(DYN,append('WARNING: ',warn_text))                                                % Write warning in log file
         S.warnings{end+1} = warn_text;                                                              % Save warning in Solution object
@@ -125,7 +125,7 @@ while  obj.p_contDo
         step_width_pre = 0.5.*obj.step_width;                                                       %new preliminary step width
         obj.step_width = max([step_width_pre,obj.step_width_limit(1)]);                             %set step_width. If new preliminary step width falls below minimal step width, take minimal step width
         obj.p_convergence = 0;                                                                      %set property p_convergence to zero (for resetting the step_width after convergence)
-        info_text = append('Step width adapted to stepwidth = ',num2str(obj.step_width),', because corrector did not converge or Jacobian can be undefined!');
+        info_text = append('Step width adapted to stepwidth = ',num2str(obj.step_width),'.');
         write_log(DYN,info_text)                                                                    %write info text in log file
         if strcmpi(DYN.display,'step-control') || strcmpi(DYN.display,'full'); disp(info_text); end %display info text
         continue                                                                                    %skip the remaining code and start the next loop (try again with reduced step width)

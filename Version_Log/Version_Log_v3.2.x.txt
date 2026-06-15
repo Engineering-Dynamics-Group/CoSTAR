@@ -1,118 +1,5 @@
 --------------------------------------------
--------------- v3.2.0.ConSys.1 -------------
---------------------------------------------
-
-Add first integral constraint to enable continuation in conversative systems. Changes affect:
-
-    @Continuation:
-        - Continuation:
-            --> Constructor: Added DYN to input arguments (line 100)
-            --> Constructor: If the DYN.system field 'first_integral' exists, the fsolve algorithm is set to Levenberg-Marquardt (lines 113 - 115)
-        - initial_slope:
-            --> Use of variable "newtonOpts" disabled, fsolve options from CON object are used (lines 8, 14, 16, 22)
-        - m_continuation:
-            --> Added re-computation and check of residuum after fsolve. A residuum >= 1e-10 is treated like fsolve exitflag < 1 or = 2 (lines 95, 98, 99, 107 - 110, 119 and 125 - 128)
-
-    @DynamicalSystem:
-        - DynamicalSystem:
-            --> Added the property first_integral as data type "function_handle" (line 22)
-            --> Temporarily disabled the log (line 55)
-        - s_DYN_gatekeeper:
-            --> Added the field 'first_integral' to "system_allowed_fieldnames" (line 13)
-            --> Added check for correct data type for field 'first_integral' and moved the check for field 'info' one line below (lines 47 and 48)
-
-    @AM_PS_FDM:
-        - PS_FDM_residuum:
-            --> Calculation of the first integral constraint added (lines 91 - 98)
-            --> Assembly of residuum restructured (former lines 77 - 90 and 89 removed, lines 77 - 78, 87 - 89 and 100 - 101 added)
-            --> Calculation of dIC/dy added (lines 166 - 182)
-            --> Assembly of Jacobian restructured (former lines 141 - 144 and 152 - 153 removed, lines 152 - 153, 161 - 164 and 184 - 187 added)
-
-    @AM_PS_FGM:
-        - PS_FGM_residuum:
-            --> If the DYN.system field 'first_integral' exists, the residuum is expanded by the first integral constraint (lines 67 - 73)
-
-    @AM_PS_SHM:
-        - PS_SHM_residuum:
-            --> Integration with perturbed mu-value wrapped into an if-condition: Integration is not necessary if value of first integral is the continuation parameter (lines 107 and 117)
-            --> Calculation of the first integral constraint added (lines 140 - 147)
-            --> Assembly of residuum restructured (former lines 123 - 125 and 135 - 137 removed, lines 126, 136 - 138 and 149 added)
-            --> Calculation of dg/dmu wrapped into an if-condition: It is zero if value of first integral is the continuation parameter (lines 178 - 180 and 186 added)
-            --> Calculation of dpc/dmu wrapped into an if-condition: It is zero if value of first integral is the continuation parameter (lines 266 - 268 and 279 added)
-            --> Calculation of dIC/dy added (lines 288 - 310)
-            --> Assembly of Jacobian restructured (former lines 265 - 270 removed, lines 312 - 315 added)
-
-    @SOL_PS_SHM:
-        - SOL_PS_FDM:
-            --> Changed the initialisation of obj.dy from "NaN(size(J1,1),1)" to "NaN(size(y1))" since size(J1,1) = size(obj.dy,1) + 1 for conservative systems (line 37)
-        - SOL_PS_FGM:
-            --> Changed the initialisation of obj.dy from "NaN(size(J1,1),1)" to "NaN(size(y1))" since size(J1,1) = size(obj.dy,1) + 1 for conservative systems (line 41)
-        - SOL_PS_SHM:
-            --> Changed the initialisation of obj.dy from "NaN(size(J1,1),1)" to "NaN(size(y1))" since size(J1,1) = size(obj.dy,1) + 1 for conservative systems (line 30)
-    
-    Functions:
-        - initial_solution:
-            --> The fsolve algorithm is set to Levenberg-Marquardt if the DYN.system field 'first_integral' exists (lines 24 - 26)
-            --> Added re-computation and check of residuum after fsolve. A residuum >= 1e-10 is treated like fsolve exitflag < 1 or = 2 (lines 79, 83, 84 and 91 - 93)
-
-    test:
-        - test_FDM_PS_pendulum
-            --> Added to test continuation via value of first integral using the FDM
-        - test_FGM_PS_pendulum
-            --> Added to test continuation via value of first integral using the FGM
-        - test_SHM_PS_pendulum
-            --> Added to test continuation via value of first integral using the SHM
-
-    costar:
-        --> Added DYN as input argument to the Continuation class (line 138)
-
-
-----------  
-
-Bugfixes:
-
-    @Continuation:
-        - Continuation:
-            --> Changed the initialisation of the property p_newton_flag from 0 to 1i (line 34)
-        - m_continuation:
-            --> if-condition for execution of method "direction_vector": Changed the 0 to 1i to circumvent the method if obj.p_newton_flag = 0 (line 56 and 60)
-            --> Added an "is" to error_text for fsolve exitflag = 2 (line 105)
-
-    @AM_PS_SHM:
-        - getIV:
-            --> Moved the elseif-condition "numel(s0) == dim*n_shoot" to the top so that s0 is also directly used as obj.iv for n_shoot = 1
-                (prior to this, the first block belonging to condition "numel(s0) == dim" was also executed for n_shoot = 1, although an integration is not necessary in this case)
-        - PS_SHM_residuum:
-            --> Comment in line 96 corrected: "[dim x (2*dim+2)]" instead of "[dim x (2*dim+1)]"
-
-    Functions:
-        - initial_solution:
-            --> Added an "is" to error_text for fsolve exitflag = 2 (line 89)
-
-
-----------  
-
-@Continuation:
-        
-    - check_limits:
-        --> "<" and ">" at the checks if mu is outside the limits changed to "<=" and ">=" (lines 62 and 70)
-    - choose_stepcontrol_param:
-        --> Value of "it_nom" changed from 2 to 3 for step control method 'angle' (line 27)
-    - initial_slope:
-        --> if-condition that checks failure modified: "secant_flag == 2" removed since the Jacobian is not needed here (line 25)
-    - m_continuation:
-        --> Adapted the warn_text and info_text messages if fsolve did not converge (lines 121, 123, 124 and 137)
-
-
-Functions:
-
-    - initial_solution:
-        --> Moved the code to check the Jacobian matrix from line 76 to line 116 and added the comment in line 115 (now it is almost identical to m_continuation)
-
-
-
---------------------------------------------
--------------- v3.2.0.ConSys.2 -------------
+---------------- v3.2.0.m.1 ----------------
 --------------------------------------------
 
 Added Poincare phase condition for the periodic FDM.
@@ -123,8 +10,8 @@ Moreover, the implemented "pseudo Integral Poincare" phase condition of the peri
             --> Added property "phase_condition" with default value 'integral' (line 18)
             --> Added "opt_sol" to the input arguments of method s_PS_FDM_gatekeeper (line 41)
         - PS_FDM_residuum:
-            --> Added switch-case for the computation of the phase condition and activated the code for the Poincare phase condition (lines 79 - 87)
-            --> Added switch-case for the computation of the derivative of the phase condition and activated the code for the Poincare phase condition (lines 156 - 165)
+            --> Added switch-case for the computation of the phase condition and activated the code for the Poincare phase condition (lines 81 - 89)
+            --> Added switch-case for the computation of the derivative of the phase condition and activated the code for the Poincare phase condition (lines 147 - 155)
         - s_help_opt_approx_method_PS_SHM:
             --> Added info text for field 'phase_condition' (lines 42 - 44)
         - s_PS_FDM_gatekeeper:
@@ -136,11 +23,228 @@ Moreover, the implemented "pseudo Integral Poincare" phase condition of the peri
         - PS_SHM_residuum:
             --> Added variable "s_p" as method solution vector of the predictor point to the parameter definition block (line 20)
             --> Replaced "obj.iv(1:end-n_auto)" in line 43 by "s_p"
-            --> Corrected the computation of the Poincare phase condition to match the equation found in the literature (former lines 129 and 130 removed, new lines 130 - 133 added)
-            --> Corrected the computation of the derivative of the phase condition (former lines 200 - 207 removed, new lines 203 - 208 added)
+            --> Corrected the computation of the Poincare phase condition to match the equation found in the literature (former lines 128 and 129 removed, new lines 129 - 132 added)
+            --> Corrected the computation of the derivative of the phase condition (former lines 185 - 193 removed, new lines 188 - 194 added)
         - s_help_opt_approx_method_PS_SHM:
             --> Slightly improved the description of field 'phase_condition' (line 23)
 
     @ApproxMethod:
         - s_AM_gatekeeper:
             --> Added "opt_sol" to the input arguments of AM_PS_FDM.s_PS_FDM_gatekeeper (line 31)
+
+
+
+--------------------------------------------
+---------------- v3.2.0.m.2 ----------------
+--------------------------------------------
+
+The preceding solution is now used as reference solution (instead of predictor point) for the phase conditions.
+Moreover, the IF_up_res_data methods get the full y0 vector in the error control of initial_solution.
+
+    @AM_PS_FDM:
+    	- AM_PS_FDM:
+            --> Method IF_up_res_data: replace input argument CON by var (line 78)
+    	- IF_up_res_data:
+	        --> Renamed "var1" to "var" (lines 7 and 9 - 12)
+	        --> Use y0 instead of yp for obj.iv (line 10)
+            --> obj.iv is now var(1:end-1) in case of type double (line 12)
+
+    @AM_PS_FGM:
+    	- AM_PS_FGM/IF_up_res_data:
+	        --> Renamed "var1" to "var" (lines 112 - 116)
+	        --> Use y0 instead of yp for obj.iv (line 114)
+            --> obj.iv is now var(1:end-1) in case of type double (line 116)
+
+    @AM_PS_SHM:
+    	- AM_PS_SHM:
+    	    --> Method IF_up_res_data: replace input argument CON by var (line 44)
+    	- IF_up_res_data:
+	        --> Renamed "var1" to "var" (lines 7 and 9 - 12)
+    	    --> Use y0 instead of yp for obj.iv (line 10)
+            --> obj.iv is now var(1:end-1) in case of type double (line 12)   
+
+    @AM_QPS_FDM:
+    	- AM_PS_FDM:
+    	    --> Method IF_up_res_data: replace input argument CON by var (line 84)
+    	- IF_up_res_data:
+	        --> Renamed "var1" to "var" (lines 7 and 9 - 12)
+	        --> Use y0 instead of yp for obj.iv (line 10)
+            --> obj.iv is now var(1:end-1) in case of type double (line 12)
+
+    @AM_PS_FGM:
+    	- AM_QPS_FGM/IF_up_res_data:
+	        --> Renamed "var1" to "var" (lines 103 - 107)
+	        --> Use y0 instead of yp for obj.iv (line 105)
+            --> obj.iv is now var(1:end-1) in case of type double (line 107)
+
+    @AM_QPS_SHM:
+    	- AM_PS_SHM:
+            --> Method IF_up_res_data: replace input argument CON by var (line 58)
+    	- IF_up_res_data:
+	        --> Renamed "var1" to "var" (lines 12 and 14 - 19)
+	        --> Use y0 instead of yp for obj.iv (line 15)
+            --> obj.iv is now var(1:end-1) in case of type double (line 18)
+
+    Functions:
+    	- initial_solution:
+            --> The IF_up_res_data method now gets the full y0 vector instead of (1:end-1) (lines 178, 181 and 184)
+
+
+----------  
+
+Renamed the FGM property "phasecond" to "phase_condition" and changed the default value from 'poincare' to 'int_poincare' in the periodic case.
+
+    @AM_PS_FGM:
+	    - AM_PS_FGM:
+            --> Renamed property "phasecond" to "phase_condition" and changed its default value from 'poincare' to 'int_poincare' (line 33)
+	        --> Renamed method "phase_condition" to "phasecondition" (line 145)
+	    - phase(_)condition:
+            --> Changed method name to "phasecondition" (line 12)
+	        --> Changed "obj.phasecond" to "obj.phase_condition" (line 15)
+	    - PS_FGM_residuum:
+            --> Changed "obj.phase_condition(...)" to "obj.phasecondition(...)" (line 64)
+	    - s_help_opt_approx_method_PS_FGM:
+            --> Changed field 'phasecond' to 'phase_condition' and updated its default value (lines 19 and 20)
+	    - s_PS_FGM_gatekeeper:
+            --> Changed field 'phasecond' to 'phase_condition' (lines 18, 138, 139 and 141)
+	        --> Renamed "phasecond_allowed_fieldsvalues" to "phase_condition_allowed_fieldsvalues" (lines 27 and 141)
+
+    @AM_QPS_FGM:
+	    - AM_QPS_FGM:
+            --> Renamed property "phasecond" to "phase_condition" (line 16)
+	        --> Renamed method "phase_condition" to "phasecondition" (line 136)
+	    - phase(_)condition:
+            --> Changed method name to "phasecondition" (line 12)
+	        --> Changed "obj.phasecond" to "obj.phase_condition" (lines 15 and 19)
+	    - QPS_FGM_residuum:
+            --> "obj.phase_condition(...)" to "obj.phasecondition(...)" (line 86)
+	    - s_help_opt_approx_method_QPS_FGM:
+            --> Changed field 'phasecond' to 'phase_condition' (lines 18 and 19)
+	    - s_QPS_FGM_gatekeeper:
+            --> Changed field 'phasecond' to 'phase_condition' (lines 14, 153, 155 and 158)
+	        --> Renamed "phasecond_allowed_fieldsvalues" to "phase_condition_allowed_fieldsvalues" (lines 23 and 158)
+
+    Test:
+	    - test_FGM_PS_vdP:
+	        --> Changed field 'phasecond' to 'phase_condition' (lines 22, 33, 45, 55)
+	        --> Removed field 'phasecond' from options for the fourth continuation (line 66)
+	        --> Changed value of field 'phase_condition' from 'poincare' to 'int_poincare' for the second continuation (line 45)
+	    - test_FGM_QPS_laval:
+	        --> Changed field 'phasecond' to 'phase_condition' (line 27)
+	    - test_FGM_QPS_vdP_coupled:
+	        --> Changed field 'phasecond' to 'phase_condition' (line 29)
+
+    Tutorials: Changed field 'phasecond' to 'phase_condition' and updated the description of the field for the periodic case
+        - Example_PS_FGM (lines 110 - 111)
+        - Example_QPS_FGM (lines 130 and 175)
+        - Tutorial_PS_FGM (lines 311 - 315, 318, 649, 656 - 660 and 677)
+        - Tutorial_QPS_FGM (lines 46, 57, 330 - 336, 730, 752 - 758, 1079 and 1101 - 1107)
+
+
+----------  
+
+Renamed the Continuation property "pred" to "predictor".
+
+    @Continuation:
+	    - Continuation:
+	        --> Renamed the property "pred" to "predictor" and introduced a property "pred", which can be used to run old scripts without the need to change "pred" to "predictor" (lines 7 and 8)
+	        --> If 'pred' is defined by the user, its value is handed to 'predictor' (lines 97 - 99)
+	        --> Renamed the method "predictor" to "predictor_point" (line 122)
+	    - direction_vector:
+	        --> Changed "obj.pred" to "obj.predictor" (line 10)
+	    - m_continuation:
+	        --> Changed "obj.pred" to "obj.predictor" (line 44)
+	        --> Changed "obj.predictor()" to "obj.predictor_point()" (line 65)
+	    - predictor(_point):
+	        --> Changed method name to "predictor_point" (line 6)
+	        --> Changed "obj.pred" to "obj.predictor" (lines 10, 16 and 38)
+	    - s_CON_gatekeeper:
+	        --> Added 'predictor' to the allowed fields (line 10)
+	        --> Renamed "pred_allowed_fieldvalues" to "predictor_allowed_fieldvalues" (lines 12 and 36)
+	        --> Added the check for field 'predictor' and added the logical check that 'pred' and 'predictor' are not allowed simultaneously (line 37 and 45 - 47)
+	    - s_help_opt_cont:
+	        --> Changed the fieldname from 'pred' to 'predictor' (lines 26 and 27)
+
+    Tutorials: Changed "pred" to "predictor" 
+	    - Example_QPS_FDM (lines 56, 86, 127 and 169)
+	    - Tutorial_QPS_FDM (lines 326, 332, 458, 743, 749, 1079 and 1085)
+
+    Test: Changed "pred" to "predictor" and removed or improved some comments (lines not mentioned here)
+	    - FGM_duffing_QPS_hard (line 42)
+	    - test_EQ_laval (line 33)			        - test_EQ_parable (line 22)			            - test_EQ_pitchfork (line 23)
+	    - test_FDM_PS_duffing (line 31)			
+	    - test_FDM_QPS_duffing (line 52)		    - test_FDM_QPS_harmonic (line 32)		        - test_FDM_QPS_laval (line 39)		
+	    - test_FDM_QPS_vdP_coupled (line 36)		- test_FDM_QPS_vdP_forced (lines 35 and 103)
+	    - test_FGM_PS_duffing (new lines 35 and 47)	- test_FGM_PS_vdP (new lines 32, 44, 54 and 65)
+	    - test_FGM_QPS_duffing (line 44)		    - test_FGM_QPS_laval (new line 26)		        - test_FGM_QPS_vdP_coupled (new line 28)
+	    - test_SHM_PS_langford (new line 40)		- test_SHM_PS_laval (line 27)			        - test_SHM_PS_vdP_forced (new line 28)
+	    - test_SHM_QPS_duffing (line 39)		    - test_SHM_QPS_vdP_coupled (new line 38)	    - test_SHM_QPS_vdP_forced (new line 31)
+
+
+----------  
+
+Removed the step control method 'pid'.
+
+    @Continuation:
+	    - choose_stepcontrol_param:
+	        --> Removed the case 'pid' (former lines 38 - 45)
+	    - Continuation:
+	        --> Removed the properties "p_dx_dmu_old", "p_e_old", "p_e_old_old", "p_e" and "p_dx_dmu" (former lines 69 - 70, 74 - 75 and 88 - 89)
+	    - iterate_data:
+	        --> Removed the block related to the PID step control (former lines 18 - 21)
+	    - s_CON_gatekeeper:
+	        --> Removed 'pid' from step_control_allowed_fieldvalues (line 14)
+	        --> Moved the check of field 'step_control_param' to the block of the checks and removed the if-block for 'step_control_param' (line 42 added, former lines 43 - 52 removed)
+	    - s_help_opt_cont:
+	        --> Removed 'pid' from the description of field 'step_control' (line 42, former line 50 removed)
+	        --> Updated the description of field 'step_control_param' (lines 51 - 57)
+	    - step_control:
+	        --> Removed the case 'pid' (former lines 132 - 162)
+
+
+----------  
+
+Renamed the Continuation property "p_use_qr" to "p_use_tangent" and updated method initial_slope
+
+    @Continuation:
+        - Continuation:
+            --> Renamed the property "p_use_qr" to "p_use_tangent" (line 86)
+        - direction_vector:
+            --> Changed "obj.p_use_qr" to "obj.p_use_tangent" (lines 10 and 34)
+        - initial_slope:
+	        --> Use of variable "newtonOpts" disabled, fsolve options from CON object are used (line 8 removed, new lines 15, 18, 25 modified)
+	        --> Added AM.IF_up_res_data (lines 13, 17 and 21) and added maximum number of iterations for shooting (line 12)
+	        --> if-condition that checks failure modified: "secant_flag == 2" removed since the Jacobian is not needed here (line 28)
+            --> Changed "obj.p_use_qr" to "obj.p_use_tangent" (line 29)
+
+
+----------  
+
+@Continuation:
+    - check_limits:
+        --> "<" and ">" at the checks if mu is outside the limits changed to "<=" and ">=" (lines 62 and 70)
+    - choose_stepcontrol_param:
+        --> Value of "it_nom" changed from 2 to 3 for step control method 'angle' (line 27)
+    - Continuation:
+        --> Changed the initialisation of the property p_newton_flag from 0 to 1 (line 35)
+        --> Removed "options" from input arguments of the constructor (line 94)
+        --> Changed "options" to "DYN.opt_cont" in the input arguments of updateoptions (line 96)
+    - m_continuation:
+        --> if-condition for execution of method "direction_vector": Removed the 0 (line 56)
+        --> if-condition for execution of method "stepcontrol": Added "obj.p_local_cont_counter > 1" (line 60)
+        --> Adapted the warn_text and info_text messages if fsolve did not converge (lines 116, 118, 119 and 128)
+    - s_CON_gatekeeper:
+	    --> Adapted the spaces of the block of the field checks (lines 34 - 43)   
+
+@AM_PS_SHM:
+    - getIV:
+        --> Moved the elseif-condition "numel(s0) == dim*n_shoot" to the top so that s0 is also directly used as obj.iv for n_shoot = 1
+                (prior to this, the first block belonging to condition "numel(s0) == dim" was also executed for n_shoot = 1, although an integration is not necessary in this case)
+
+Functions:
+        - initial_solution:
+            --> Added an "is" to error_text for fsolve exitflag = 2 (line 86)
+            --> Moved the code to check the Jacobian matrix from line 76 to line 109 and added the comment in line 108 (now it is almost identical to m_continuation)
+
+costar:
+    --> Changed input argument of Continuation from "options.opt_cont" to "DYN" (line 138)

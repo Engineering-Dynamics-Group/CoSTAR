@@ -73,7 +73,6 @@ else
     [y,~,newton_flag,~,J] = fsolve(Fcn,y0,newtonOpts);
     write_log(DYN,'diary_off')                                          % Stop recording of command window for log file
 end
-% checkGradients_opts = optimoptions('fsolve',FiniteDifferenceType='forward'); checkGradients(Fcn,y,checkGradients_opts,Display='on',Tolerance=1e-5);   % Check the user-defined Jacobian matrix
 
 
 %% Check fsolve exit flags
@@ -83,7 +82,7 @@ if (newton_flag < 1) || (newton_flag == 2)
         error_text = append('ERROR: No initial solution found (fsolve exit_flag = ',num2str(newton_flag),')!');             % Set error text
         stopping_msg = 'CoSTAR stopped because corrector did not converge at initial solution.';                            % Set stopping message
     elseif newton_flag == 2
-        error_text = 'ERROR: Equation solved, but change in y smaller than the specified tolerance, or Jacobian at y is undefined (fsolve exit_flag = 2)!';     % Set error text
+        error_text = 'ERROR: Equation solved, but change in y smaller is than the specified tolerance, or Jacobian at y is undefined (fsolve exit_flag = 2)!';     % Set error text
         stopping_msg = 'CoSTAR stopped because Jacobian can be undefined at initial solution.';                             % Set stopping message
     end
     write_log(DYN,error_text)                                           % Write error text in log file
@@ -105,6 +104,9 @@ elseif newton_flag == 4
     warn_msg{end+1} = 'WARNING: Equation solved for initial solution, but magnitude of search direction is smaller than specified tolerance (fsolve exit_flag = 4)!';
     S.warnings{end+1} = warn_msg{end}(10:end);                          % Save warning in Solution object
 end
+
+% A user-defined Jacobian matrix can be checked here by executing the next line (since R2023b: function checkGradients is recommended instead of obj.fsolve_opts.CheckGradients = true)
+% checkGradients_opts = optimoptions('fsolve',FiniteDifferenceType='forward'); checkGradients(Fcn,y,checkGradients_opts,Display='on',Tolerance=1e-5);   % Check the user-defined Jacobian matrix
 
 info_text = 'Initial solution found!';                                  % This message is updated if stability is successfully computed
 
@@ -175,13 +177,13 @@ else
             if iterate == 1
                 % Corrector
                 if strcmpi(DYN.approx_method,'shooting')
-                    AM.IF_up_res_data(y0(1:(end-1)),DYN);                       % Update AM properties and set y0 as initial value
+                    AM.IF_up_res_data(y0,DYN);                                  % Update AM properties and set y0 as initial value
                     Fcn = @(y)AM.fun_Jac_wrapper_init(y,y0,DYN);                % Function wrapper for initial solution, if Jacobian is supplied
                 elseif strcmpi(DYN.approx_method,'finite-difference')           % Special corrector function for FDM due to specification of Jacobian matrix
-                    AM.IF_up_res_data(y0(1:(end-1)));                           % Update AM properties and set y0 as initial value
+                    AM.IF_up_res_data(y0);                                      % Update AM properties and set y0 as initial value
                     Fcn = @(y) AM.corr_fun_init_FDM(y,y0);                      % Set corrector-function
                 else
-                    AM.IF_up_res_data(y0(1:(end-1)));                           % Update AM properties and set y0 as initial value
+                    AM.IF_up_res_data(y0);                                      % Update AM properties and set y0 as initial value
                     Fcn = @(y)[AM.res(y);y(end)-y0(end)];                       % Define corrector-function containing the residual function and the subspace-constraint
                 end
                 newtonOpts.Display = 'off';                                     % Deactivate fsolve output

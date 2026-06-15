@@ -53,7 +53,7 @@ options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','finite-
 options.opt_init = costaropts('c1_matrix',C1_mat,'s1_matrix',S1_mat);                                                               % Property for initial solution
 options.opt_approx_method = costaropts('n_int_1',25,'scheme_1','central','approx_order_1',6,...                                     % Properties of approximation method
                                        'n_int_2',25,'scheme_2','central','approx_order_2',6);                                       % Properties of approximation method
-options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.5,'pred','secant');                                                % Properties for continuation
+options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.5,'predictor','secant');                                           % Properties for continuation
 
 % Continuation
 [S,DYN] = costar(options);                          % CoSTAR is called by costar(options)
@@ -83,7 +83,7 @@ options_kappa.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','f
 options_kappa.opt_init = costaropts('fdm_sol',FDM_sol,'n_int_1_fdm_sol',25,'n_int_2_fdm_sol',25);                                       % Property for initial solution
 options_kappa.opt_approx_method = costaropts('n_int_1',30,'points_1',[-3,-2,-1,0,1,2,3],...                                             % Properties of approximation method
                                              'n_int_2',30,'points_2',[-3,-2,-1,0,1,2,3]);                                               % Properties of approximation method
-options_kappa.opt_cont = costaropts('mu_limit',mu_limit_kappa,'step_width',0.1,'pred','secant');                                        % Properties for continuation
+options_kappa.opt_cont = costaropts('mu_limit',mu_limit_kappa,'step_width',0.1,'predictor','secant');                                   % Properties for continuation
 
 % Continuation
 [S_kappa,DYN_kappa] = costar(options_kappa);        % CoSTAR is called by costar(options)
@@ -124,7 +124,7 @@ options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','finite-
 options.opt_init = costaropts('c0',C0,'c1_matrix',C1_mat,'s1_matrix',S1_mat);                                                       % Properties for initial solution
 options.opt_approx_method = costaropts('n_int_1',30,'scheme_1','central','approx_order_1',6,...                                     % Properties of approximation method
                                        'n_int_2',30,'scheme_2','central','approx_order_2',6);                                       % Properties of the approximation method
-options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.5,'pred','secant','direction',-1);                                 % Properties for continuation
+options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.5,'predictor','secant','direction',-1);                            % Properties for continuation
 
 % Continuation
 [S,DYN] = costar(options);                          % CoSTAR is called by costar(options)
@@ -166,7 +166,7 @@ options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','finite-
 options.opt_init = costaropts('c1_matrix',C1_mat,'s1_matrix',S1_mat);                                                               % Property for initial solution
 options.opt_approx_method = costaropts('n_int_1',35,'points_1',[-4,-3,-2,-1,0,1,2],...                                              % Properties of approximation method
                                        'n_int_2',35,'points_2',[-4,-3,-2,-1,0,1,2]);                                                % Properties of approximation method
-options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',1.5,'step_control','off','pred','secant');                           % Properties for continuation
+options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',1.5,'step_control','off','predictor','secant');                      % Properties for continuation
 
 % Continuation
 [S,DYN] = costar(options);                          % CoSTAR is called by costar(options)
