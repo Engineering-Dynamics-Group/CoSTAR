@@ -7,7 +7,7 @@
 % @opt_approx_method:    user supplied option structure for the approximation method
 % @opt_init:             user supplied option structure for the initial condition
 
-function s_PS_FDM_gatekeeper(GC,system,opt_approx_method,opt_init)
+function s_PS_FDM_gatekeeper(GC,system,opt_sol,opt_approx_method,opt_init)
 
 
     %% Check the opt_approx_method structure  
@@ -15,7 +15,7 @@ function s_PS_FDM_gatekeeper(GC,system,opt_approx_method,opt_init)
     % Check if all mandatory fields are given and check if all given fields are allowed
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     opt_approx_method_mandatory_fieldnames  = {};                                           % Mandatory fieldsnames of the opt_approx_method structure
-    opt_approx_method_allowed_fieldnames    = {'n_int','scheme','approx_order','points'};   % Allowed fieldsnames of the opt_approx_method structure
+    opt_approx_method_allowed_fieldnames    = {'n_int','scheme','approx_order','points','phase_condition'};   % Allowed fieldsnames of the opt_approx_method structure
     
     GC.check_fields(opt_approx_method, 'opt_approx_method', opt_approx_method_mandatory_fieldnames, opt_approx_method_allowed_fieldnames);       
     
@@ -115,6 +115,17 @@ function s_PS_FDM_gatekeeper(GC,system,opt_approx_method,opt_init)
         %     end
         % end
         % GC.speak();
+    end
+
+    % Field 'phase_condition'
+    phase_condition_allowed_fieldvalues = {'poincare','integral'};
+    if isfield(opt_approx_method,'phase_condition')
+        GC.check_data(opt_approx_method.phase_condition,'opt_approx_method.phase_condition','char',[],phase_condition_allowed_fieldvalues);
+        if isfield(opt_sol,'non_auto_freq')
+            GC.error_msg{1,end+1} = 'You defined a phase condition via opt_approx_method.phase_condition and';
+            GC.error_msg{1,end+1} = 'the system seems to be non-autonomous since you set the option opt_sol.non_auto_freq.';
+            GC.error_msg{1,end+1} = 'However, a phase condition is only allowed for autonomous systems.';
+        end
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
