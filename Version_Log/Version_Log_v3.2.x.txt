@@ -248,3 +248,29 @@ Functions:
 
 costar:
     --> Changed input argument of Continuation from "options.opt_cont" to "DYN" (line 138)
+
+
+
+--------------------------------------------
+---------------- v3.2.0.m.3 ----------------
+--------------------------------------------
+
+Bugfix: The integral phase condition for PS SHM was not evaluated correctly
+
+    @AM_PS_SHM:
+        - AM_PS_SHM:
+            --> Added properties Z0, Z_traj and n_time and the initialisation for n_time (lines 13 - 15 and 38)
+        - getIV:
+            --> Add n_time as variable to the Parameter block (line 18)
+            --> Add the integration of the initialised solution if the integral phase condition is used (lines 64 - 83)
+        - IF_up_res_data:
+            --> Add that obj.Z_traj is copied to obj.Z0 if the integral phase condition is used (lines 15 - 18)
+        - PS_SHM_residuum:
+            --> Changed the setting of variable n_time and added Z0 to the Parameter block (lines 18 and 22 - 24)
+            --> Removed variables s_p_mat, Z_p, Z_p_mu_plus and Z_p_mu_minus and the integration/saving of the trajectory of the predictor point (former lines 43, 46, 73, 74, 98, 103, 108, 111, 113 and 116)
+            --> Removed variable "odeOpts_2", adjusted "odeOpts_1.JPattern" and changed "odeOpts_2" to "obj.odeOpts" (former lines 48, 50, 51, 108 and 113)
+            --> Adjusted the storing of the integration results in Z_traj_minus, Z_end_minus, Z_traj_mu_plus, Z_end_mu_plus, Z_traj_mu_minus and Z_end_mu_minus (lines 97, 100, 103, 104, 107 and 108)
+            --> Computation of the Poincare phase condition: Renamed variable zp_0 to z0_0 and f_zp_0 to f_z0_0 (lines 122 - 124) 
+            --> Computation of the integral phase condition: Added saving of "Z_traj" in "obj.Z_traj", renamed variable f_p to f0, and substituted Z_p by Z0 as well as f by f0 (lines 126 - 129) 
+            --> Computation of dpc/dy: Adjusted the variable names for the Poincare PC accordingly (lines 181, 184 and 186)
+            --> Computation of dpc/dy: Removed the computation for the old integral PC (former lines 197 - 261) and added the computation for the new integral PC (lines 190 - 232)

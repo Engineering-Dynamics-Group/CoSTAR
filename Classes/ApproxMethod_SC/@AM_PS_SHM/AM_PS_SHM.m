@@ -9,7 +9,11 @@ classdef AM_PS_SHM < ApproxMethod
         
         n_shoot = 2;                                                    % Number of shooting points for multiple shooting
         phase_condition = 'poincare';                                   % Phase condition
-                
+        
+        Z0                                                              % Stores the trajectory of the preceding solution (needed for the integral phase condition)
+        Z_traj                                                          % Buffers the trajectory computed in the residuum function. It is copied to Z0 in IF_up_res_data
+        n_time                                                          % Number of time evaluation points in each shooting interval for the integral phase condition
+
         %Inherited Properties
         % res, iv, error_control
     end
@@ -31,6 +35,7 @@ classdef AM_PS_SHM < ApproxMethod
         % Constructor
         function obj = AM_PS_SHM(DYN)     
             obj = updateoptions(obj,DYN.opt_approx_method);             % updateoptions method is a general method
+            obj.n_time = ceil(100/obj.n_shoot);                         % Calculate n_time (needs to be executed AFTER updateoptions but BEFORE getIV!)
             obj = setSolver(obj,obj.solver);
             obj = obj.getIV(DYN);                                       % Set initial value (has to be set here, because residual accesses iv)
         end

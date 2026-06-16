@@ -12,4 +12,9 @@ function obj = IF_up_res_data(obj,var,DYN)
         obj.iv = var(1:(end-1));                % Set iv to given solution vector x0 (only relevant in initial_solution)
     end
 
+    % If the integral phase condition is used: Get the last computed trajectory (computed in the residuum function)
+    if (DYN.n_auto == 1) && strcmpi(obj.phase_condition,'integral')
+        obj.Z0 = obj.Z_traj;                    % This is the converged solution and thus the required preceding solution for the phase condition
+    end
+    
 end
