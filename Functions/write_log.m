@@ -47,7 +47,7 @@ function write_log(DYN,varargin)
 
 
     %% Check whether a log file should be created
-    if DYN.create_log == false
+    if strcmpi(DYN.log,'off')
         return                                  % Leave function when no log file is desired
     end
 

@@ -242,9 +242,9 @@ Renamed the Continuation property "p_use_qr" to "p_use_tangent" and updated meth
                 (prior to this, the first block belonging to condition "numel(s0) == dim" was also executed for n_shoot = 1, although an integration is not necessary in this case)
 
 Functions:
-        - initial_solution:
-            --> Added an "is" to error_text for fsolve exitflag = 2 (line 86)
-            --> Moved the code to check the Jacobian matrix from line 76 to line 109 and added the comment in line 108 (now it is almost identical to m_continuation)
+    - initial_solution:
+        --> Added an "is" to error_text for fsolve exitflag = 2 (line 86)
+        --> Moved the code to check the Jacobian matrix from line 76 to line 109 and added the comment in line 108 (now it is almost identical to m_continuation)
 
 costar:
     --> Changed input argument of Continuation from "options.opt_cont" to "DYN" (line 138)
@@ -274,3 +274,79 @@ Bugfix: The integral phase condition for PS SHM was not evaluated correctly
             --> Computation of the integral phase condition: Added saving of "Z_traj" in "obj.Z_traj", renamed variable f_p to f0, and substituted Z_p by Z0 as well as f by f0 (lines 126 - 129) 
             --> Computation of dpc/dy: Adjusted the variable names for the Poincare PC accordingly (lines 181, 184 and 186)
             --> Computation of dpc/dy: Removed the computation for the old integral PC (former lines 197 - 261) and added the computation for the new integral PC (lines 190 - 232)
+
+
+
+--------------------------------------------
+---------------- v3.2.0.m.4 ----------------
+--------------------------------------------
+
+A key to disable the log file is added to opt_sol.
+
+    @DynamicalSystem:
+        - DynamicalSystem:
+            --> Renamed property "create_log" to "log" and changed its value from true to 'on' (line 54)
+        - s_DYN_gatekeeper:
+            --> Added 'log' to the allowed fieldnames (lines 16, 89, 119 and 213)
+            --> Added check for field 'log' (lines 77 - 80)
+        - s_help_opt_sol:
+            --> Added description of field 'log' (lines 58 - 59)
+
+    Functions:
+        - write_log:
+            --> Change the if-condition in line 50 to "strcmpi(DYN.log,'off')"
+
+    Test:
+        - test_FGM_PS_duffing:
+            --> Add line break and field 'log' with value 'off' to options.opt_sol of Continuation 1 (lines 34 - 35)
+        - test_FGM_PS_vdP:
+            --> Add line break and field 'log' with value 'off' to options.opt_sol of Continuation 1 - 3 (lines 31 - 32, 44 - 45 and 55 - 56)
+            --> Add line break and field 'log' with value 'on' to options.opt_sol of Continuation 4 (lines 67 - 68)
+
+    Tutorials: Added the description of the field 'log'.
+        - Tutorial_EQ
+        - Tutorial_PS_FDM (lines 197, 236 - 238, 538 and 577 - 579)
+        - Tutorial_PS_FGM (lines 210, 249 - 251, 573 and 612 - 614)
+        - Tutorial_PS_SHM (lines 186, 225 - 227, 499 and 538 - 540)
+        - Tutorial_QPS_FDM (lines 218, 258 - 260, 635, 678 - 680, 979 and 1018 - 1020)
+        - Tutorial_QPS_FGM (lines 228, 268 - 270, 649, 692 - 694, 1005 and 1044 - 1046)
+        - Tutorial_QPS_SHM (lines 221, 261 - 263, 599, 642 - 644, 923 and 962 - 964)
+
+
+----------
+
+Added the field 'phase_condition' to the tutorials and examples of PS FDM and PS SHM. Also changed its default value for PS SHM to 'integral'.
+
+@AM_PS_FDM:
+    - s_help_opt_approx_method_PS_FDM:
+        --> Slightly adapt the description of field 'phase_condition' (line 44)
+
+@AM_PS_SHM:
+    - AM_PS_SHM:
+        --> Change default value of property 'phase_condition' from 'poincare' to 'integral' (line 11)
+    - s_help_opt_approx_method_PS_SHM:
+        --> Change default value of field 'phase_condition' from 'poincare' to 'integral' and slightly adapt the description (lines 21 and 23)
+
+Tutorials:
+    - Example_PS_FDM:
+        --> Added field 'phase_condition' to the second example (line 105)
+    - Example_PS_FGM:
+        --> Corrected the value of field 'phase_condition' from 'poincare' to 'int_poincare' (line 110)
+    - Example_PS_SHM:
+        --> Added field 'phase_condition' to the second example (line 105)
+    - Tutorial_PS_FDM:
+        --> Added the description of field 'phase_condition' and added its use to the second example (lines 268, 287 - 294, 609 - 610 and 630 - 638)
+    - Tutorial_PS_FGM:
+        --> Corrected the value of field 'phase_condition' from 'poincare' to 'int_poincare' (line 655)
+    - Tutorial_PS_SHM:
+        --> Added the description of field 'phase_condition' and added its use to the second example (lines 247, 258 - 263, 555 and 565 - 572)
+
+
+----------
+
+Version_Log:
+    - Documentation/Nomenclature_and_Version_Numbering
+        --> Renamed from Documentation.txt to Nomenclature_and_Version_Numbering.txt
+        --> Update file and add section for version numbering
+    - Version_Log/Version_Log_v0.x
+        --> Renamed from Version_Log.txt to Version_Log_v0.x.txt

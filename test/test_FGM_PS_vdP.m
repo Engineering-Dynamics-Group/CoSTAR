@@ -28,7 +28,8 @@ options.opt_stability = costaropts('iterate_bfp','on');
 
 %% Continuation 1
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);
-options.opt_sol  = costaropts('display','final','stability','on','cont','on','auto_freq',auto_freq,'sol_type','periodic','approx_method','fourier-galerkin','act_param',active_parameter);
+options.opt_sol  = costaropts('cont','on','stability','on','sol_type','periodic','approx_method','fourier-galerkin', ...
+                              'auto_freq',auto_freq,'act_param',active_parameter,'display','final','log','off');
 options.opt_cont = costaropts('step_control','angle','predictor','tangent','subspace','pseudo-arc','mu_limit',mu_limit,'step_width',0.1);
 options.opt_approx_method = costaropts('n_FFT',2^6,'phase_condition','poincare');
 options.opt_init = costaropts('cmatrix',c_max,'smatrix',s_max,'c0',zeros(2,1),'Hmatrix',[0,1,3,5,7,9,11,13,15,17]);
@@ -40,7 +41,8 @@ options.opt_stability = costaropts('iterate_bfp','on');
 %% Continuation 2
 load('workspace_test_vanderPol_PS_FGM');
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);
-options.opt_sol  = costaropts('display','iter-detailed','stability','on','cont','on','auto_freq',auto_freq,'sol_type','periodic','approx_method','fourier-galerkin','act_param',active_parameter);
+options.opt_sol  = costaropts('cont','on','stability','on','sol_type','periodic','approx_method','fourier-galerkin', ...
+                              'auto_freq',auto_freq,'act_param',active_parameter,'display','iter-detailed','log','off');
 options.opt_cont = costaropts('step_control','angle','predictor','tangent','subspace','pseudo-arc','mu_limit',mu_limit,'step_width',0.1);
 options.opt_approx_method = costaropts('n_FFT',2^6,'phase_condition','int_poincare');
 options.opt_init = costaropts('FC0',FC0,'Hmatrix',[0,1,3,5,7,9,11,13,15,17]);
@@ -50,7 +52,8 @@ options.opt_init = costaropts('FC0',FC0,'Hmatrix',[0,1,3,5,7,9,11,13,15,17]);
 
 %% Continuation 3
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);
-options.opt_sol  = costaropts('display','error-control','stability','on','cont','on','auto_freq',auto_freq,'sol_type','periodic','approx_method','fourier-galerkin','act_param',active_parameter);
+options.opt_sol  = costaropts('cont','on','stability','on','sol_type','periodic','approx_method','fourier-galerkin', ...
+                              'auto_freq',auto_freq,'act_param',active_parameter,'display','error-control','log','off');
 options.opt_cont = costaropts('predictor','tangent','subspace','pseudo-arc','mu_limit',mu_limit,'step_width',0.1,'step_control','angle');
 options.opt_approx_method = costaropts('n_fft',2^4,'phase_condition','poincare','error_limit',[1e-4 1e-3]);
 options.opt_stability       = costaropts('iterate_bfp','on');
@@ -61,7 +64,8 @@ options.opt_init = costaropts('cmatrix',c_max(:,1:4),'smatrix',s_max(:,1:4),'c0'
 
 %% Continuation 4
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);
-options.opt_sol  = costaropts('display','full','stability','on','cont','on','auto_freq',auto_freq,'sol_type','periodic','approx_method','fourier-galerkin','act_param',active_parameter);
+options.opt_sol  = costaropts('cont','on','stability','on','sol_type','periodic','approx_method','fourier-galerkin', ...
+                              'auto_freq',auto_freq,'act_param',active_parameter,'display','full','log','on');
 options.opt_cont = costaropts('predictor','tangent','subspace','pseudo-arc','mu_limit',mu_limit,'step_width',0.1,'step_control','angle');
 options.opt_approx_method = costaropts('n_FFT',2^6);
 options.opt_stability       = costaropts('iterate_bfp','on');

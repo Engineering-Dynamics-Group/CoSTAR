@@ -55,4 +55,7 @@ function help_struct = s_help_opt_sol()
                                            '--> ''error-control'': Similar to ''iter-detailed'', but with additional error control information (if enabled).\n' ...
                                            '--> ''full'': All possible information are displayed. This is similar to the log file.'];
 
+    help_struct.optional.log.value = '''on'' or ''off'' \n Default: ''on''';
+    help_struct.optional.log.text  = 'Defines whether a log file of the computation is returned.';
+
 end
