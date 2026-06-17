@@ -21,17 +21,12 @@ end
 
 %% Set function and options for fsolve
 newtonOpts = optimoptions('fsolve','Display','iter-detailed','MaxFunEvals',1e5,'MaxIter',1e3,'FiniteDifferenceType','forward');
-y0 = [AM.iv;DYN.param{DYN.act_param}];
 
 if strcmpi(DYN.approx_method,'shooting')
     newtonOpts.MaxIter = 50;
-    Fcn = @(y) AM.fun_Jac_wrapper_init(y,y0);                           % Function wrapper for initial solution, if Jacobian is supplied
     newtonOpts.SpecifyObjectiveGradient = true;                         % newtonOpts.CheckGradients = true; can be used to automatically check the Jacobian matrix -> Since R2023b: checkGradients is recommended
-
 elseif strcmpi(DYN.approx_method,'finite-difference')                   % Special corrector function due to specification of Jacobian matrix
-    newtonOpts.SpecifyObjectiveGradient = true;                         % newtonOpts.CheckGradients = true; can be used to automatically check the Jacobian matrix -> Since R2023b: checkGradients is recommended
-    Fcn = @(y) AM.corr_fun_init_FDM(y,y0);
-
+    newtonOpts.SpecifyObjectiveGradient = true;                         % newtonOpts.CheckGradients = true; can be used to automatically check the Jacobian matrix -> Since R2023b: checkGradients is recommended    
 elseif strcmpi(DYN.approx_method,'fourier-galerkin')
     % The following if-blocks must be executed here for the warning and info messages to be printed to the log (if they were executed in e.g. getIV, the log does not exist yet and the printing fails!)
     % Adapt n_FFT if not supplied, and if default value is not sufficient (if it is supplied by the user it was already checked in the gatekeeper)
@@ -51,12 +46,10 @@ elseif strcmpi(DYN.approx_method,'fourier-galerkin')
         write_log(DYN,info_text)
         if ~(strcmpi(DYN.display,'off') || strcmpi(DYN.display,'final'));  disp(info_text);  end
     end
-    Fcn = @(y)[AM.res(y);y(end)-y0(end)];                               % Last entry is not necessary, but this way the Jacobian has the correct dimension
-
-else
-    Fcn = @(y)[AM.res(y);y(end)-y0(end)];
-
 end
+
+y0 = [AM.iv; DYN.param{DYN.act_param}];                                 % Initial value for the corrector
+Fcn = @(y) AM.res_fun_init(y,y0);                                       % Function wrapper to set the complete residuum function for the initial solution
 
 
 %% Corrector
@@ -176,17 +169,9 @@ else
             %%%%%%%%%% Recompute solution with in-/decreased discretization %%%%%%%%%%
             if iterate == 1
                 % Corrector
-                if strcmpi(DYN.approx_method,'shooting')
-                    AM.IF_up_res_data(y0,DYN);                                  % Update AM properties and set y0 as initial value
-                    Fcn = @(y)AM.fun_Jac_wrapper_init(y,y0,DYN);                % Function wrapper for initial solution, if Jacobian is supplied
-                elseif strcmpi(DYN.approx_method,'finite-difference')           % Special corrector function for FDM due to specification of Jacobian matrix
-                    AM.IF_up_res_data(y0);                                      % Update AM properties and set y0 as initial value
-                    Fcn = @(y) AM.corr_fun_init_FDM(y,y0);                      % Set corrector-function
-                else
-                    AM.IF_up_res_data(y0);                                      % Update AM properties and set y0 as initial value
-                    Fcn = @(y)[AM.res(y);y(end)-y0(end)];                       % Define corrector-function containing the residual function and the subspace-constraint
-                end
                 newtonOpts.Display = 'off';                                     % Deactivate fsolve output
+                AM.IF_up_res_data(y0,DYN);                                      % Update AM properties and set y0 as initial value
+                Fcn = @(y) AM.res_fun_init(y,y0);                               % Function wrapper to set the complete residuum function for the initial solution
                 [y_ec,~,newton_flag_ec,~,J_ec] = fsolve(Fcn,y0,newtonOpts);     % Solve corrector-function
 
                 % Exit flag handling I

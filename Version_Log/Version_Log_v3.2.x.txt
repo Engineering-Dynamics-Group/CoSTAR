@@ -350,3 +350,95 @@ Version_Log:
         --> Update file and add section for version numbering
     - Version_Log/Version_Log_v0.x
         --> Renamed from Version_Log.txt to Version_Log_v0.x.txt
+
+
+
+--------------------------------------------
+---------------- v3.2.0.m.5 ----------------
+--------------------------------------------
+
+The block that sets the residuum (corrector) function was reworked. It is not necessary anymore to distinguish between the different approximation methods.
+
+    @Continuation:
+        - bifurcation_stability:
+            --> Old if...else block to set the residuum function removed (former lines 40 - 51), new lines 40 and 41 added
+        Continuation:
+            --> Block to set some corrector options added to the constructor (lines 110 - 116)
+        error_control:
+            --> Old if...else block to set the residuum function removed (former lines 66 - 75), new lines 66 and 67 added
+        initial_slope:
+            --> Old if...else block to set the residuum function removed (former lines 11 - 23), new lines 12 and 13 added
+            --> Moved the computation of the initial slope into the if...else block (former line 26 to new line 21)
+            --> Added variable "y0_de" and a few comments (lines 8 - 10 and 15)
+    m_continuation:
+            --> Old if...else block to set the residuum function removed (former lines 80 - 92), new lines 80 and 81 added
+
+    @AM_EQ:
+        - AM_EQ:
+            --> Added methods res_fun_init and res_fun (lines 49 - 61)
+
+    @AM_PS_FDM:
+    	- AM_PS_FDM:
+            --> Renamed method corr_fun_init_FDM to res_fun_init (line 74)
+            --> Renamed method corr_fun_FDM to res_fun (line 75)
+            --> Added DYN to input arguments of IF_up_res_data (line 78)
+        - corr_fun_init_FDM/res_fun_init
+            --> Renamed to res_fun_init (line 13)
+        - corr_fun_FDM/res_fun
+            --> Renamed to res_fun (line 13)
+    	- IF_up_res_data:
+	        --> Added DYN to input arguments (line 7)
+
+    @AM_PS_FGM:
+        - AM_PS_FGM:
+            --> Added methods res_fun_init and res_fun (lines 139 - 153)
+    	- AM_PS_FGM/IF_up_res_data:
+	        --> Added DYN to input arguments (line 112)
+
+    @AM_PS_SHM:
+    	- AM_PS_SHM:
+            --> Renamed method fun_Jac_wrapper to res_fun (line 50)
+            --> Renamed method fun_Jac_wrapper_init to res_fun_init (line 49)
+        - fun_Jac_wrapper/res_fun
+            --> Renamed to res_fun (line 13) 
+        - fun_Jac_wrapper_init/res_fun_init
+            --> Renamed to res_fun_init (line 13)       
+
+    @AM_QPS_FDM:
+    	- AM_QPS_FDM:
+            --> Renamed method corr_fun_init_FDM to res_fun_init (line 80)
+            --> Renamed method corr_fun_FDM to res_fun (line 81)
+            --> Added DYN to input arguments of IF_up_res_data (line 84)
+        - corr_fun_init_FDM/res_fun_init
+            --> Renamed to res_fun_init (line 13)
+        - corr_fun_FDM/res_fun
+            --> Renamed to res_fun (line 13)
+    	- IF_up_res_data:
+	        --> Added DYN to input arguments (line 7)
+
+    @AM_PS_FGM:
+    	- AM_QPS_FGM:
+            --> Added methods res_fun_init and res_fun (lines 130 - 144)
+    	- AM_QPS_FGM/IF_up_res_data:
+	        --> Added DYN to input arguments (line 103)
+
+    @AM_QPS_SHM:
+    	- AM_QPS_SHM:
+            --> Renamed method fun_Jac_wrapper to res_fun (line 67)
+            --> Renamed method fun_Jac_wrapper_init to res_fun_init (line 68)
+        - fun_Jac_wrapper/res_fun
+            --> Renamed to res_fun (line 19) 
+            --> Changed variable names: f -> F, F -> g, dF -> dg, deltaFp -> delta_gp, deltaFm -> delta_gm (lines 19, 24, 25 and 30 - 32)
+        - fun_Jac_wrapper_init/res_fun_init
+            --> Renamed to res_fun_init (line 18) 
+            --> Changed variable names: f -> F, F -> g, dF -> dg, deltaFp -> delta_gp (lines 18, 23, 24, 29 and 30)
+
+    Functions:
+        - initial_solution:
+            --> The residuum function Fcn is now set outside of the if...else block and y0 is moved from before the block to after the block 
+                (former lines 24, 28, 30, 32, 34 and 54 - 58 removed, new lines 51 - 53 added)
+            --> Old if...else block to set the residuum function during the error control removed (former lines 179 - 188), new lines 173 - 174 added
+
+    Version_Log:
+        - Nomenclature_and_Version_Numbering:
+            --> Add further description for AM.IF_up_res_data and add description for the residuum function (lines 38 - 42)

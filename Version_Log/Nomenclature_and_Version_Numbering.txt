@@ -35,6 +35,11 @@ Static methods (i.e. methods that can be called without requiring an object of t
 Methods that exchange data between two different classes/objects are called "interface methods" and start with "IF_".
 --> E.g.: AM.IF_up_res_data is an interface method belonging to the ApproxMethod subclass AM. 
           It is called (inter alia) in m_continuation and passes data from the Continuation object to the AM object.
+--> AM.IF_up_res_data must be named like this and it needs to have 2 input arguments, of which the second is the DynamicalSystem object DYN.
+
+The residuum function that is passed to the corrector must be named "res_fun" or "res_fun_init".
+--> res_fun must have the input arguments y and CON (in that order).
+--> res_fun_init must have the input arguments y and y0 (in that order).
 
 
 

@@ -77,19 +77,8 @@ while  obj.p_contDo
 
 
     %%%%%%%%%%%%%%%%%%%%%%  CORRECTOR  %%%%%%%%%%%%%%%%%%%%
-    if strcmpi(DYN.approx_method,'shooting')                                    %special corrector function for quasi-periodic shooting
-        obj.fsolve_opts.MaxIter = 50;
-        AM.IF_up_res_data(obj,DYN);                                             %pass information to the ApproxMethod object
-        Fcn = @(y) AM.fun_Jac_wrapper(y,obj);                                   %set functionwrapper to provide Jacobian
-        obj.fsolve_opts.SpecifyObjectiveGradient = true;                        %Jacobian matrix is passed by the user
-    elseif strcmpi(DYN.approx_method,'finite-difference')                       %special corrector function for FDM due to specification of Jacobian matrix
-        AM.IF_up_res_data(obj);                                                 %pass information to the ApproxMethod object
-        obj.fsolve_opts.SpecifyObjectiveGradient = true;                        %Jacobian matrix is passed by the user
-        Fcn = @(y) AM.corr_fun_FDM(y,obj);                                      %set corrector-function
-    else
-        AM.IF_up_res_data(obj);                                                 %pass information to the ApproxMethod object
-        Fcn = @(y)[AM.res(y);obj.sub_con(y,obj)];                               %define corrector-function containing the residual function and the subspace-constraint
-    end
+    AM.IF_up_res_data(obj,DYN);                                                 %update AM properties
+    Fcn = @(y) AM.res_fun(y,obj);                                               %function wrapper to set the complete residuum function
     
     [obj.p_y1,~,obj.p_newton_flag,obj.p_output,obj.p_J1] = fsolve(Fcn,obj.yp,obj.fsolve_opts);      %solve corrector function
 

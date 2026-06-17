@@ -4,7 +4,7 @@
 % @obj: ApproxMethod subclass AM_PS_FDM object
 % @var1: Continuation class object OR solution vector x whose dimension was updated in the error control
 
-function obj = IF_up_res_data(obj,var)  
+function obj = IF_up_res_data(obj,var,DYN)  
 
     if isa(var,'Continuation')                  % If var is an object of Continuation
         obj.iv = var.y0(1:(end-1));             % Update the current initial condition. Used for the phase condition

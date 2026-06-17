@@ -71,11 +71,11 @@ classdef AM_PS_FDM < ApproxMethod
         obj = getWeights(obj,DYN);              % Method to get (or calculate) the weights used to approximate dz(theta_i)/dtheta
         obj = getIV(obj,DYN);                   % Method that generates an initial value for nonlinear equation solver (e.g. fsolve) to start from. Uses options defined in opt_init structure
 
-        [F,J] = corr_fun_init_FDM(obj,y,y0);        % Method that provides the residuum vector function and the corresponding Jacobian matrix for fsolve to calculate the initial solution
-        [F,J] = corr_fun_FDM(obj,y,CON);            % Method that provides the residuum vector function and the corresponding Jacobian matrix for fsolve during continuation
+        [F,J] = res_fun_init(obj,y,y0);         % Method that provides the residuum vector function and the corresponding Jacobian matrix for fsolve to calculate the initial solution
+        [F,J] = res_fun(obj,y,CON);             % Method that provides the residuum vector function and the corresponding Jacobian matrix for fsolve during continuation
         [res,J_res] = PS_FDM_residuum(obj,y,DYN);   % Method that builds the residuum of the finite-difference equation system and its Jacobian matrix
         
-        obj = IF_up_res_data(obj,var);          % Interface method: Used to pass information between continuation algorithm an this subclass
+        obj = IF_up_res_data(obj,var,DYN);      % Interface method: Used to pass information between continuation algorithm an this subclass
         IC  = getIC(obj,y,DYN,n_shoot);         % Method that extracts the state space vector z(theta=0), which is needed for stability calculation via the shooting method
 
     end

@@ -46,8 +46,8 @@ classdef AM_PS_SHM < ApproxMethod
    
         % Methods for shooting algorithms
         [res,J_res] = PS_SHM_residuum(obj,y,DYN);                       % Residuum function
-        [F,J] = fun_Jac_wrapper(obj,y,CONT);                            % Function wrapper for fsolve to evaluate jacobian "analytically"
-        [F,J] = fun_Jac_wrapper_init(obj,y,y0);                         % Function wrapper_init for fsolve to evaluate jacobian "analytically" for initial solution
+        [F,J] = res_fun(obj,y,CON);                                     % Function wrapper for the corrector to evaluate the Jacobian "analytically"
+        [F,J] = res_fun_init(obj,y,y0);                                 % Function wrapper for the corrector to evaluate the Jacobian "analytically" for the initial solution
 
     end
     
