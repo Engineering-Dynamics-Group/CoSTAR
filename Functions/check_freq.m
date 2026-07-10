@@ -11,7 +11,7 @@
 % @warn_msg:    Warning message
 
 
-function warn_msg = check_freq(argin_1,argin_2)
+function [warn_msg,flag] = check_freq(argin_1,argin_2)
 
     formatSpec = '%.0e';                        % Set format of number output
     warn_msg = '';                              % Initialize warning message as empty char array
@@ -100,6 +100,13 @@ function warn_msg = check_freq(argin_1,argin_2)
         end
 
 
+    end
+
+
+    if isempty(warn_msg)
+        flag = 1;               % Set exit flag to 1 if frequency check passed
+    else 
+        flag = 0;               % Set exit flag to 0 if frequency check failed
     end
 
 

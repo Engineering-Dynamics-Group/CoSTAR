@@ -1,6 +1,11 @@
 --------------------------------------------
----------------- v3.2.0.m.1 ----------------
+------------------ v3.2.1 ------------------
 --------------------------------------------
+
+The new version v3.2.1 is the result of the maintenance versions v3.2.0.m.1 to v3.2.0.m.6.
+
+
+---------------- v3.2.0.m.1 ----------------
 
 Added Poincare phase condition for the periodic FDM.
 Moreover, the implemented "pseudo Integral Poincare" phase condition of the periodic SHM was corrected to be the exact Poincare phase condition.
@@ -33,10 +38,7 @@ Moreover, the implemented "pseudo Integral Poincare" phase condition of the peri
             --> Added "opt_sol" to the input arguments of AM_PS_FDM.s_PS_FDM_gatekeeper (line 31)
 
 
-
---------------------------------------------
 ---------------- v3.2.0.m.2 ----------------
---------------------------------------------
 
 The preceding solution is now used as reference solution (instead of predictor point) for the phase conditions.
 Moreover, the IF_up_res_data methods get the full y0 vector in the error control of initial_solution.
@@ -89,7 +91,6 @@ Moreover, the IF_up_res_data methods get the full y0 vector in the error control
     	- initial_solution:
             --> The IF_up_res_data method now gets the full y0 vector instead of (1:end-1) (lines 178, 181 and 184)
 
-
 ----------  
 
 Renamed the FGM property "phasecond" to "phase_condition" and changed the default value from 'poincare' to 'int_poincare' in the periodic case.
@@ -140,7 +141,6 @@ Renamed the FGM property "phasecond" to "phase_condition" and changed the defaul
         - Tutorial_PS_FGM (lines 311 - 315, 318, 649, 656 - 660 and 677)
         - Tutorial_QPS_FGM (lines 46, 57, 330 - 336, 730, 752 - 758, 1079 and 1101 - 1107)
 
-
 ----------  
 
 Renamed the Continuation property "pred" to "predictor".
@@ -180,7 +180,6 @@ Renamed the Continuation property "pred" to "predictor".
 	    - test_SHM_PS_langford (new line 40)		- test_SHM_PS_laval (line 27)			        - test_SHM_PS_vdP_forced (new line 28)
 	    - test_SHM_QPS_duffing (line 39)		    - test_SHM_QPS_vdP_coupled (new line 38)	    - test_SHM_QPS_vdP_forced (new line 31)
 
-
 ----------  
 
 Removed the step control method 'pid'.
@@ -201,7 +200,6 @@ Removed the step control method 'pid'.
 	    - step_control:
 	        --> Removed the case 'pid' (former lines 132 - 162)
 
-
 ----------  
 
 Renamed the Continuation property "p_use_qr" to "p_use_tangent" and updated method initial_slope
@@ -216,7 +214,6 @@ Renamed the Continuation property "p_use_qr" to "p_use_tangent" and updated meth
 	        --> Added AM.IF_up_res_data (lines 13, 17 and 21) and added maximum number of iterations for shooting (line 12)
 	        --> if-condition that checks failure modified: "secant_flag == 2" removed since the Jacobian is not needed here (line 28)
             --> Changed "obj.p_use_qr" to "obj.p_use_tangent" (line 29)
-
 
 ----------  
 
@@ -250,10 +247,7 @@ costar:
     --> Changed input argument of Continuation from "options.opt_cont" to "DYN" (line 138)
 
 
-
---------------------------------------------
 ---------------- v3.2.0.m.3 ----------------
---------------------------------------------
 
 Bugfix: The integral phase condition for PS SHM was not evaluated correctly
 
@@ -276,10 +270,7 @@ Bugfix: The integral phase condition for PS SHM was not evaluated correctly
             --> Computation of dpc/dy: Removed the computation for the old integral PC (former lines 197 - 261) and added the computation for the new integral PC (lines 190 - 232)
 
 
-
---------------------------------------------
 ---------------- v3.2.0.m.4 ----------------
---------------------------------------------
 
 A key to disable the log file is added to opt_sol.
 
@@ -312,35 +303,33 @@ A key to disable the log file is added to opt_sol.
         - Tutorial_QPS_FGM (lines 228, 268 - 270, 649, 692 - 694, 1005 and 1044 - 1046)
         - Tutorial_QPS_SHM (lines 221, 261 - 263, 599, 642 - 644, 923 and 962 - 964)
 
-
 ----------
 
 Added the field 'phase_condition' to the tutorials and examples of PS FDM and PS SHM. Also changed its default value for PS SHM to 'integral'.
 
-@AM_PS_FDM:
-    - s_help_opt_approx_method_PS_FDM:
-        --> Slightly adapt the description of field 'phase_condition' (line 44)
-
-@AM_PS_SHM:
-    - AM_PS_SHM:
-        --> Change default value of property 'phase_condition' from 'poincare' to 'integral' (line 11)
-    - s_help_opt_approx_method_PS_SHM:
-        --> Change default value of field 'phase_condition' from 'poincare' to 'integral' and slightly adapt the description (lines 21 and 23)
-
-Tutorials:
-    - Example_PS_FDM:
-        --> Added field 'phase_condition' to the second example (line 105)
-    - Example_PS_FGM:
-        --> Corrected the value of field 'phase_condition' from 'poincare' to 'int_poincare' (line 110)
-    - Example_PS_SHM:
-        --> Added field 'phase_condition' to the second example (line 105)
-    - Tutorial_PS_FDM:
-        --> Added the description of field 'phase_condition' and added its use to the second example (lines 268, 287 - 294, 609 - 610 and 630 - 638)
-    - Tutorial_PS_FGM:
-        --> Corrected the value of field 'phase_condition' from 'poincare' to 'int_poincare' (line 655)
-    - Tutorial_PS_SHM:
-        --> Added the description of field 'phase_condition' and added its use to the second example (lines 247, 258 - 263, 555 and 565 - 572)
-
+    @AM_PS_FDM:
+        - s_help_opt_approx_method_PS_FDM:
+            --> Slightly adapt the description of field 'phase_condition' (line 44)
+    
+    @AM_PS_SHM:
+        - AM_PS_SHM:
+            --> Change default value of property 'phase_condition' from 'poincare' to 'integral' (line 11)
+        - s_help_opt_approx_method_PS_SHM:
+            --> Change default value of field 'phase_condition' from 'poincare' to 'integral' and slightly adapt the description (lines 21 and 23)
+    
+    Tutorials:
+        - Example_PS_FDM:
+            --> Added field 'phase_condition' to the second example (line 105)
+        - Example_PS_FGM:
+            --> Corrected the value of field 'phase_condition' from 'poincare' to 'int_poincare' (line 110)
+        - Example_PS_SHM:
+            --> Added field 'phase_condition' to the second example (line 105)
+        - Tutorial_PS_FDM:
+            --> Added the description of field 'phase_condition' and added its use to the second example (lines 268, 287 - 294, 609 - 610 and 630 - 638)
+        - Tutorial_PS_FGM:
+            --> Corrected the value of field 'phase_condition' from 'poincare' to 'int_poincare' (line 655)
+        - Tutorial_PS_SHM:
+            --> Added the description of field 'phase_condition' and added its use to the second example (lines 247, 258 - 263, 555 and 565 - 572)
 
 ----------
 
@@ -352,25 +341,22 @@ Version_Log:
         --> Renamed from Version_Log.txt to Version_Log_v0.x.txt
 
 
-
---------------------------------------------
 ---------------- v3.2.0.m.5 ----------------
---------------------------------------------
 
 The block that sets the residuum (corrector) function was reworked. It is not necessary anymore to distinguish between the different approximation methods.
 
     @Continuation:
         - bifurcation_stability:
             --> Old if...else block to set the residuum function removed (former lines 40 - 51), new lines 40 and 41 added
-        Continuation:
+        - Continuation:
             --> Block to set some corrector options added to the constructor (lines 110 - 116)
-        error_control:
+        - error_control:
             --> Old if...else block to set the residuum function removed (former lines 66 - 75), new lines 66 and 67 added
-        initial_slope:
+        - initial_slope:
             --> Old if...else block to set the residuum function removed (former lines 11 - 23), new lines 12 and 13 added
             --> Moved the computation of the initial slope into the if...else block (former line 26 to new line 21)
             --> Added variable "y0_de" and a few comments (lines 8 - 10 and 15)
-    m_continuation:
+        - m_continuation:
             --> Old if...else block to set the residuum function removed (former lines 80 - 92), new lines 80 and 81 added
 
     @AM_EQ:
@@ -442,3 +428,96 @@ The block that sets the residuum (corrector) function was reworked. It is not ne
     Version_Log:
         - Nomenclature_and_Version_Numbering:
             --> Add further description for AM.IF_up_res_data and add description for the residuum function (lines 38 - 42)
+
+
+---------------- v3.2.0.m.6 ----------------
+
+Add the possibility to save the DynamicalSystem object DYN and the Solution object S in a mat-file after every computed solution.
+
+    @Continuation:
+        - m_continuation:
+            --> Add saving of DYN and S into loop and after loop (lines 180 - 182 and 210 - 212)
+
+    @DynamicalSystem:
+        - DynamicalSystem:
+            --> Add property "save" with default value 'off' (line 56)
+        - s_DYN_gatekeeper:
+            --> Add 'save' to allowed fieldnames of opt_sol and add corresponding check (lines 16, 81 - 84, 93, 123 and 217)
+        - s_help_opt_sol:
+            --> Add description for field 'save' (lines 61 - 63)
+
+    Functions:
+        - initial_solution:
+            --> Add saving of DYN and S (lines 347 - 350)
+
+    Test: Added the field 'save' with value 'on' to three test-files
+        - test_EQ_laval
+        - test_FDM_QPS_duffing
+        - test_SHM_PS_vdP
+
+    Tutorials: Added the description of 'save' to the tutorials
+        - Tutorial_EQ
+        - Tutorial_PS_FDM (lines 197, 239 - 243, 543 and 585 - 589)
+        - Tutorial_PS_FGM (lines 210, 252 - 256, 578 and 620 - 624)
+        - Tutorial_PS_SHM (lines 186, 228 - 232, 504 and 546 - 550)
+        - Tutorial_QPS_FDM (lines 218, 261 - 265, 640, 686 - 690, 989 and 1031 - 1035)
+        - Tutorial_QPS_FGM (lines 228, 271 - 275, 654, 700 - 704, 1015 and 1057 - 1061)
+        - Tutorial_QPS_SHM (lines 221, 264 - 268, 604, 650 - 654, 933 and 975 - 979)
+
+----------
+
+Removed all "error" calls in order to avoid CoSTAR being stopped by a user-defined error.
+If a critical error occurs during execution now, CoSTAR saves the latest solution and is put to an end.
+
+    @DynamicalSystem:
+        - s_DYN_gatekeeper:
+            --> Adapt the output of the check_freq call and the following if-condition (lines 163, 164, 171 and 172)
+    
+    @Continuation:
+        - bifurcation_stability:
+            --> Stability is only computed if there was no critical error. If-conditions added (lines 14 - 18 and 99)
+        - check_limits:
+            --> "-- FAILED" is added to the info text in case of a critical error (lines 17 - 19)
+            --> Continuation is stopped and check_limits is exit if a critical error occured (lines 63 - 66)
+            --> Removed the code in the if...elseif-blocks when CoSTAR is terminated regularly (clear fsolve, finalize log, display output, stopping flag).
+                The stopping flag is now set directly to the property (former lines 64 - 68, 72 - 76 and 80 - 84 removed, lines 72, 76 and 80 added)
+        - Continuation:
+            --> Removed property "p_ec_flag" (former line 36)
+            --> Added properties "p_error_flag = 1" and "p_error_msg" (lines 65 and 66)
+        - error_control:
+            --> Error control is skipped in case of a critical error (lines 10 - 13)
+            --> Remove setting of property "p_ec_flag" (former lines 57, 95, 136, 147, 158, 178 and 184)
+            --> Replaced variables y1, exit_flag, output and J1 by y1_ec, newton_flag_ec, output_ec and J1_ec (lines 73, 76, 80, 93 - 96, 99, 105 and 159)
+            --> Removed writing of log file as well as saving and printing of warning message from former "exit flag handling II" and case "iterate == -1" (former lines 112 - 116 and 122 - 126)
+            --> Updated warning and info texts, added reset of properties for case "iterate == -1" (lines 115, 122, 123 and 171)
+            --> Added writing of log file as well as saving and printing of warning message and setting of obj.p_error_flag to the case where the step width can be reduced (lines 163 - 166 and 176)
+            --> Updated the code for the case where the step width cannot be reduced anymore (lines 180 - 184)
+        - m_continuation:
+            --> Replaced obj.p_ec_flag by obj.p_error_flag (lines 56 and 60)
+            --> Frequency check after predictor: Added second output argument, removed the old code but added the setting of an error message if there is an error (former lines 67 - 74 removed, new lines 67 - 69 added)
+            --> Exitflag < 1 or = 2: Removed the old code. Now the new error flag, error message and stopping message is set (former lines 84, 85, 87 - 89 and 91 - 96 removed, new lines 83, 85, 86, 88 - 90 added)
+            --> Frequency check of new solution: Code completely updated (former lines 136 - 144 removed, new lines 136 - 140 added)
+            --> Call of error control: Code completely updated (former lines 151 - 153, 155 and 156 removed, new lines 147 - 148 added)
+            --> A solution is only plotted if plotting is on and if there is no critical error (former line 175 removed, new lines 168 - 170 added)
+            --> Updated writing log as well as displaying and saving of messages when a continuation is put to an end (former lines 187 - 196 removed, new lines 183 - 207 added)
+
+    Functions:
+        - check_freq:
+            --> Added exit flag to output arguments (lines 14 and 106 - 110)
+        - initial_solution:
+            --> Moved the setting of info_text from line 105 to 75 and added setting of variable error_flag to line 74
+            --> Case "newton_flag < 1 or == 2": Added setting of error_flag and removed old code to finalize the log, display output and to invoke error (line 79 added, former lines 82 - 91 removed)
+            --> Frequency check: Code completely updated (former lines 105 - 112 removed, new lines 103 - 108 added)
+            --> Error control: Initialisation of added_output changed, error control is skipped in case of a critical error (lines 115 and 117)
+            --> Error control: Updated info/error/stopping texts and added setting of error_flag (lines 179 - 182, 203 - 206, 211 - 214, break from line 237 moved to line 241). "Exit flag handling III" removed (former lines 241 - 253)
+            --> Stability is only computed if there is no critical error (lines 261 - 265)
+            --> Code to display info/warnings and writing log completely updated (former lines 296 - 303 removed, new lines 294 - 308 added)
+            --> Code to stop CoSTAR completely updated (former lines 310 - 321 removed, new lines 315 - 338 added)
+        - write_log:
+            --> Updated finishing message (lines 141 - 144)
+
+----------
+
+@SOL_PS_FDM:
+    - SOL_PS_FDM:
+        --> Remove commented saving of fsolve_it and fval (former lines 41 - 41 and 75 - 76)

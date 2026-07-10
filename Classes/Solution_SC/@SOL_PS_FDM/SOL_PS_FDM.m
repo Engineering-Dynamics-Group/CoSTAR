@@ -37,8 +37,6 @@ classdef SOL_PS_FDM < Solution
             obj.dy(:,1)             = NaN(size(J1,1),1);                        % Initialised. Gets correctly filled by IF_arch_data
             obj.newton_flag(1,1)    = newton_flag;                              % Exit-flag of corrector (fsolve)
             obj.arclength(1,1)      = 0;                                        % Set arclength of first curve point to zero
-            % obj.fsolve_it(1,1)    = varargin{1,1}{1,5};                       % Number of iterations of fsolve
-            % obj.fval(1,1)         = varargin{1,1}{1,6};                       % norm of function value at solution point of fsolve
             
             if DYN.n_auto == 0
                 obj.freq(1,1) = DYN.non_auto_freq(y1(end,1));                   % Frequency if system is non-autonomous
@@ -72,8 +70,6 @@ classdef SOL_PS_FDM < Solution
             obj.newton_flag(1,end+1)    = CON.p_newton_flag;                        % Exit-flag of corrector (fsolve)
             obj.step_width(1,end+1)     = CON.step_width;                           % Step width
             obj.arclength(1,end+1)      = CON.p_arcl_1;                             % Arclength
-            % obj.fsolve_it(1,end+1)    = CON.p_output.iterations;                  % Number of iterations of fsolve
-            % obj.fval(1,end+1)         = norm(CON.fval)^2;                         % norm of function value at solution point of fsolve
 
             if DYN.n_auto == 0
                 obj.freq(1,end+1) = DYN.non_auto_freq(CON.p_y1(end,1));             % Frequency if system is non-autonomous

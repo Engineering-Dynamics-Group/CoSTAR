@@ -11,8 +11,11 @@ function obj = bifurcation_stability(obj,DYN,AM,S,ST)
 
 
         %% Calculate Stability
-        [obj.p_multipliers,obj.p_vectors,obj.p_n_unstable_1,obj.p_stability_flag] = ST.calc_stability(obj.p_y1,obj.p_J1);               % Compute the respective multiplier (eigenvalue, Floquet, Lyapunov Exponent)
-        
+        if obj.p_error_flag == 1
+            [obj.p_multipliers,obj.p_vectors,obj.p_n_unstable_1,obj.p_stability_flag] = ST.calc_stability(obj.p_y1,obj.p_J1);               % Compute the respective multiplier (eigenvalue, Floquet, Lyapunov Exponent)
+        else
+            obj.p_multipliers = NaN(DYN.dim,1);   obj.p_vectors = NaN(DYN.dim);   obj.p_n_unstable_1 = NaN;   obj.p_stability_flag = NaN;
+        end
 
         if obj.p_stability_flag > 0                                           % Only move forward if the stability computation was regular
         
@@ -93,7 +96,7 @@ function obj = bifurcation_stability(obj,DYN,AM,S,ST)
 
 
         %% Warning if stability computation has failed
-        else
+        elseif obj.p_stability_flag == 0
 
             warn_text = append('Stability computation failed for solution Iter = ',num2str(obj.p_local_cont_counter+1),'!');
             write_log(DYN,append('WARNING: ',warn_text))                            % Write warning in log file

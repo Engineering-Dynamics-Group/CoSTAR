@@ -13,7 +13,7 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
     system_allowed_fieldnames    = {'order','rhs','dim','param','info'};        %allowed fieldnames in the options super structure
 
     opt_sol_mandatory_fieldnames  = {'sol_type','cont','stability'};            %required fieldnames in the options super structure
-    opt_sol_allowed_fieldnames    = {'sol_type','cont','stability','approx_method','act_param','non_auto_freq','auto_freq','display','freq_limit','log'};   %allowed fieldnames in the options super structure
+    opt_sol_allowed_fieldnames    = {'sol_type','cont','stability','approx_method','act_param','non_auto_freq','auto_freq','display','freq_limit','log','save'};   %allowed fieldnames in the options super structure
 
     sol_type_allowed_fieldvalues   = {'equilibrium','eq','periodic','ps','quasiperiodic','qps'};
     display_allowed_fieldvalues = {'off','final','iter','iter-detailed','step-control','error-control','full'};
@@ -78,6 +78,10 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
     if isfield(opt_sol,'log')          
         GC.check_data(opt_sol.log,'opt_sol.log','char',[],{'on','off'});
     end
+    % Check save
+    if isfield(opt_sol,'save')          
+        GC.check_data(opt_sol.save,'opt_sol.save','char',[],{'on','off'});
+    end
     GC.speak; %This statement assures that up to now - everything is cool with the supplied data sets
 
     
@@ -85,8 +89,8 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
     if strcmpi(opt_sol.sol_type,'equilibrium') || strcmpi(opt_sol.sol_type,'eq')
 
         %Check them again (allowed fields changed... it is easier this way)
-        opt_ep_sol_mandatory_fieldnames  = {'sol_type','cont','stability'};                                 %needed fieldsnames in the options super structure
-        opt_eq_sol_allowed_fieldnames    = {'sol_type','cont','act_param','stability','display','log'};     %allowed fieldsnames in the options super structure
+        opt_ep_sol_mandatory_fieldnames  = {'sol_type','cont','stability'};                                     %needed fieldsnames in the options super structure
+        opt_eq_sol_allowed_fieldnames    = {'sol_type','cont','act_param','stability','display','log','save'};  %allowed fieldsnames in the options super structure
         GC.check_fields(opt_sol,'opt_sol',opt_ep_sol_mandatory_fieldnames,opt_eq_sol_allowed_fieldnames);
         GC.speak();
 
@@ -115,8 +119,8 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
     %% PERIODIC solution: Check values for that case (this is doubled code to some extend... but maybe a little bit clearer)
     if strcmpi(opt_sol.sol_type,'periodic') || strcmpi(opt_sol.sol_type,'ps')
 
-        opt_p_sol_mandatory_fieldnames  = {'sol_type','cont','stability','approx_method'};                                                                      %needed fieldsnames in the options super structure
-        opt_p_sol_allowed_fieldnames    = {'sol_type','cont','stability','approx_method','act_param','non_auto_freq','auto_freq','display','freq_limit','log'}; %allowed fieldsnames in the options super structure
+        opt_p_sol_mandatory_fieldnames  = {'sol_type','cont','stability','approx_method'};                                                                              %needed fieldsnames in the options super structure
+        opt_p_sol_allowed_fieldnames    = {'sol_type','cont','stability','approx_method','act_param','non_auto_freq','auto_freq','display','freq_limit','log','save'};  %allowed fieldsnames in the options super structure
 
         p_approx_method_allowed_fieldvalues = {'fourier-galerkin','fgm','shooting','shm','finite-difference','fdm'};
 
@@ -156,16 +160,16 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
             else                                                % If non_auto_freq was given as double          
                 Omega = opt_sol.non_auto_freq;
             end
-            warn_msg = check_freq(freq_limit,Omega);
-            if ~isempty(warn_msg)
+            [~,check_freq_flag] = check_freq(freq_limit,Omega);
+            if check_freq_flag == 0
                 GC.error_msg{1,end+1} = 'The initial value of the non-autonomous frequency, which you provided via opt_sol.non_auto_freq(mu),';
                 GC.error_msg{1,end+1} = append('equals Omega = ', num2str(Omega), '. This is below the frequency limit of ', num2str(freq_limit,'%.0e'), '.');
             end
         end
         if isfield(opt_sol,'auto_freq')
             GC.check_data(opt_sol.auto_freq,'opt_sol.auto_freq','double','scalar',[]);
-            warn_msg = check_freq(freq_limit,opt_sol.auto_freq);
-            if ~isempty(warn_msg)
+            [~,check_freq_flag] = check_freq(freq_limit,opt_sol.auto_freq);
+            if check_freq_flag == 0
                 GC.error_msg{1,end+1} = 'The initial value of the autonomous frequency, which you provided via opt_sol.auto_freq,';
                 GC.error_msg{1,end+1} = append('equals omega = ', num2str(opt_sol.auto_freq), '. This is below the frequency limit of ', num2str(freq_limit,'%.0e'), '.');
             end
@@ -209,8 +213,8 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
     %% QUASIPERIODIC solution: Check values for that case (this is doubled code to some extend... but maybe a little bit clearer)
     if strcmpi(opt_sol.sol_type,'quasiperiodic') || strcmpi(opt_sol.sol_type,'qps')
 
-        opt_qp_sol_mandatory_fieldnames  = {'sol_type','cont','stability','approx_method'};                                                                         %needed fieldsnames in the options super structure
-        opt_qp_sol_allowed_fieldnames    = {'sol_type','cont','stability','approx_method','act_param','non_auto_freq','auto_freq','display','freq_limit','log'};    %allowed fieldsnames in the options super structure
+        opt_qp_sol_mandatory_fieldnames  = {'sol_type','cont','stability','approx_method'};                                                                             %needed fieldsnames in the options super structure
+        opt_qp_sol_allowed_fieldnames    = {'sol_type','cont','stability','approx_method','act_param','non_auto_freq','auto_freq','display','freq_limit','log','save'}; %allowed fieldsnames in the options super structure
 
         qp_approx_method_allowed_fieldvalues = {'fourier-galerkin','fgm','shooting','shm','finite-difference','fdm'};
 
