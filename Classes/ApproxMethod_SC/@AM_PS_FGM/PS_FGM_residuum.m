@@ -61,7 +61,7 @@ function res = PS_FGM_residuum(obj,y,DYN)
    
     %% Add phase condition (only if autonomous frequencies are present)    
     if DYN.n_auto
-        res(end,1) = obj.phase_condition(FCtemp,DYN);
+        res(end,1) = obj.phasecondition(FCtemp,DYN);
     end
 
 

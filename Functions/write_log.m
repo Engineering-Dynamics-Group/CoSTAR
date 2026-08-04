@@ -47,7 +47,7 @@ function write_log(DYN,varargin)
 
 
     %% Check whether a log file should be created
-    if DYN.create_log == false
+    if strcmpi(DYN.log,'off')
         return                                  % Leave function when no log file is desired
     end
 
@@ -138,10 +138,10 @@ function write_log(DYN,varargin)
         % Print footer
         fprintf(fid,'\n');
         fprintf(fid,'---------------------------------------------------------------------------\n');
-        if ~isempty(lastwarn)
-            fprintf(fid,'-----------------------  Finished with warning(s)!  -----------------------\n');
-        elseif strcmpi(input,'finalize_error')
+        if strcmpi(input,'finalize_error')
             fprintf(fid,'-------------------------  Finished with error!  --------------------------\n');
+        elseif ~isempty(lastwarn)
+            fprintf(fid,'-----------------------  Finished with warning(s)!  -----------------------\n');
         else
             fprintf(fid,'------------------------  Successfully finished!  -------------------------\n');
         end

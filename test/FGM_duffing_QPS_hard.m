@@ -39,7 +39,7 @@ options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);       
 options.opt_sol  = costaropts('cont','on','stability','off','non_auto_freq',non_auto_freq,'sol_type','quasiperiodic','approx_method','fourier-galerkin','act_param',active_parameter);   % Properties of the solution
 options.opt_init = costaropts('C0',zeros(2,1),'Cmatrix',c_max2,'Smatrix',s_max2,'Hmatrix',K3);                                                                      % Properties for the initial solution
 options.opt_approx_method = costaropts('n_FFT',2^5,'error_control','on','error_limit',[0,0.5]);                                                                        % Properties for approx_method (e.g. Shoot)
-options.opt_cont = costaropts('pred','tangent','subspace','pseudo-arc','mu_limit',mu_limit,'max_cont_step',1e4,'direction',-1);                         % Properties for continuation
+options.opt_cont = costaropts('predictor','tangent','subspace','pseudo-arc','mu_limit',mu_limit,'max_cont_step',1e4,'direction',-1);                         % Properties for continuation
 
 % Step control
 options.opt_cont.step_width = 0.5;

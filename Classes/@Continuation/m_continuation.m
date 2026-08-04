@@ -41,7 +41,7 @@ end
 
 % Calculate second curve point with differential perturbation dmu to
 % calculate initial slope for secant predictor
-if(~strcmpi(obj.pred,'tangent'))
+if ~strcmpi(obj.predictor,'tangent')
     obj = obj.initial_slope(DYN,AM);
 end
 
@@ -53,70 +53,49 @@ end
 while  obj.p_contDo
         
     %%%%%%%%%%%%%  PREDICTOR AND STEP CONTROL  %%%%%%%%%%%%
-    if any(obj.p_newton_flag == [0,1,3,4]) && obj.p_ec_flag == 1    %direction vector needs to be calculated in the first loop and every time a new solution has been found
+    if any(obj.p_newton_flag == [1,3,4]) && (obj.p_error_flag == 1)    %direction vector needs to be calculated in the first loop and every time a new solution has been found
         obj.direction_vector();                 %calculate direction vector
     end
    
-    if any(obj.p_newton_flag == [1,3,4]) && obj.p_ec_flag == 1     %stepcontrol may be called if corrector converged and error control is fine (initialised: obj.p_newton_flag = 0, obj.p_ec_flag = 1)
+    if any(obj.p_newton_flag == [1,3,4]) && (obj.p_error_flag == 1) && (obj.p_local_cont_counter > 1)  %stepcontrol may be called if corrector converged and error control is fine, but not in the first loop
         obj.stepcontrol(DYN);                   %adapt step width
         obj.p_convergence = 1;                  %reset convergence property if corrector did not converge previously
     end     
     
-    obj.predictor();                            %calculate predicted point
+    obj.predictor_point();                      %calculate predictor point
 
-    stopping_msg = check_freq(DYN,obj.yp);                                      %check the frequencies at the predictor point (not done in predictor to be able to break the while loop)
-    if ~isempty(stopping_msg)                                                   %if frequency(s) are smaller than frequency limit
-        warn_msg = append('WARNING: Small or negative frequency(s) detected for predictor point after Iter = ',num2str(obj.p_local_cont_counter),'!');
-        S.warnings{end+1} = warn_msg(10:end);                                   %save warning in Solution object
-        obj.p_stopping_flag = stopping_msg;                                     %save stopping message
-        disp(' '); warning(warn_msg(10:end));                                   %display warning
-        if ~strcmpi(DYN.display,'off'); disp(' '); disp(stopping_msg); end      %display stopping message
-        write_log(DYN,'finalize',append(warn_msg,'\n\n',stopping_msg))          %finalize log file with warning message and message
+    [obj.p_stopping_flag,obj.p_error_flag] = check_freq(DYN,obj.yp);            %check the frequencies at the predictor point (not done in predictor to be able to break the while loop)
+    if obj.p_error_flag == 0                                                    %if frequency(s) are smaller than frequency limit
+        obj.p_error_msg = append('ERROR: Small or negative frequency(s) detected for predictor point after Iter = ',num2str(obj.p_local_cont_counter),'!');
         break                                                                   %break the continuation loop (any further computation below might fail)
     end
 
 
     %%%%%%%%%%%%%%%%%%%%%%  CORRECTOR  %%%%%%%%%%%%%%%%%%%%
-    if strcmpi(DYN.approx_method,'shooting')                                    %special corrector function for quasi-periodic shooting
-        obj.fsolve_opts.MaxIter = 50;
-        AM.IF_up_res_data(obj,DYN);                                             %pass information to the ApproxMethod object
-        Fcn = @(y) AM.fun_Jac_wrapper(y,obj);                                   %set functionwrapper to provide Jacobian
-        obj.fsolve_opts.SpecifyObjectiveGradient = true;                        %Jacobian matrix is passed by the user
-    elseif strcmpi(DYN.approx_method,'finite-difference')                       %special corrector function for FDM due to specification of Jacobian matrix
-        AM.IF_up_res_data(obj);                                                 %pass information to the ApproxMethod object
-        obj.fsolve_opts.SpecifyObjectiveGradient = true;                        %Jacobian matrix is passed by the user
-        Fcn = @(y) AM.corr_fun_FDM(y,obj);                                      %set corrector-function
-    else
-        AM.IF_up_res_data(obj);                                                 %pass information to the ApproxMethod object
-        Fcn = @(y)[AM.res(y);obj.sub_con(y,obj)];                               %define corrector-function containing the residual function and the subspace-constraint
-    end
+    AM.IF_up_res_data(obj,DYN);                                                 %update AM properties
+    Fcn = @(y) AM.res_fun(y,obj);                                               %function wrapper to set the complete residuum function
     
     [obj.p_y1,~,obj.p_newton_flag,obj.p_output,obj.p_J1] = fsolve(Fcn,obj.yp,obj.fsolve_opts);      %solve corrector function
 
     
     %%%%%%%%%%%%  EXITFLAG < 1 OR EXITFLAG = 2  %%%%%%%%%%%
     if ((obj.p_newton_flag < 1) || (obj.p_newton_flag == 2)) && (obj.step_width <= obj.step_width_limit(1,1))               %if step width is already <= minimal step width 
+        obj.p_error_flag = 0;                                                                                               %set error flag to indicate a critical error
         if obj.p_newton_flag < 1
-            warn_msg = append('WARNING: No solution found for Iter = ',num2str(obj.p_local_cont_counter+1),' (fsolve exit_flag = ',num2str(obj.p_newton_flag),')!');
-            stopping_msg = 'CoSTAR stopped because corrector did not converge and step width has reached minimal value.';   %set stopping message
+            obj.p_error_msg = append('ERROR: No solution found for Iter = ',num2str(obj.p_local_cont_counter+1),' (fsolve exit_flag = ',num2str(obj.p_newton_flag),')!');
+            obj.p_stopping_flag = 'CoSTAR stopped because corrector did not converge and step width has reached minimal value.';
         elseif obj.p_newton_flag == 2
-            warn_msg = append(['WARNING: Equation solved for Iter = ',num2str(obj.p_local_cont_counter+1),', but ' ...      %set warning message
-                              'change in y smaller than the specified tolerance, or Jacobian at y is undefined (fsolve exit_flag = 2)!']);
-            stopping_msg = 'CoSTAR stopped because Jacobian can be undefined and step width has reached minimal value.';    %set stopping message
+            obj.p_error_msg = append(['ERROR: Equation solved for Iter = ',num2str(obj.p_local_cont_counter+1),', but ' ...
+                                      'change in y smaller than the specified tolerance, or Jacobian at y is undefined (fsolve exit_flag = 2)!']);
+            obj.p_stopping_flag = 'CoSTAR stopped because Jacobian can be undefined and step width has reached minimal value.';
         end
-        S.warnings{end+1} = warn_msg(10:end);                                                       %save warning in Solution object
-        obj.p_stopping_flag = stopping_msg;                                                         %save stopping message
-        disp(' '); warning(warn_msg(10:end));                                                       %display warning
-        if ~strcmpi(DYN.display,'off'); disp(' '); disp(stopping_msg); end                          %display stopping message
-        write_log(DYN,'finalize',append(warn_msg,'\n\n',stopping_msg))                              %finalize log file with warning message and message
-        break                                                                                       %immediately break while loop, because everything else can lead to errors
     
     elseif ((obj.p_newton_flag < 1) || (obj.p_newton_flag == 2)) && (obj.step_width > obj.step_width_limit(1,1))            %if fsolve did not converge and step width is above minimal step width 
         if obj.p_newton_flag < 1
-            warn_text = append('No solution found for Iter = ',num2str(obj.p_local_cont_counter+1),' (fsolve exit_flag = ',num2str(obj.p_newton_flag),')!');
+            warn_text = append('No solution found for Iter = ',num2str(obj.p_local_cont_counter+1),' (fsolve exit_flag = ',num2str(obj.p_newton_flag),')! Trying again with reduced step width.');        
         elseif obj.p_newton_flag == 2
-            warn_text = append(['Equation solved for Iter = ',num2str(obj.p_local_cont_counter+1),', but ' ...              %set warning message
-                                'change in y smaller than the specified tolerance, or Jacobian at y is undefined (fsolve exit_flag = 2)!']);
+            warn_text = append(['Equation solved for Iter = ',num2str(obj.p_local_cont_counter+1),', but change in y is smaller than the specified ' ...
+                                'tolerance, or Jacobian at y is undefined (fsolve exit_flag = 2)! Trying again with reduced step width.']);
         end
         write_log(DYN,append('WARNING: ',warn_text))                                                % Write warning in log file
         S.warnings{end+1} = warn_text;                                                              % Save warning in Solution object
@@ -125,7 +104,7 @@ while  obj.p_contDo
         step_width_pre = 0.5.*obj.step_width;                                                       %new preliminary step width
         obj.step_width = max([step_width_pre,obj.step_width_limit(1)]);                             %set step_width. If new preliminary step width falls below minimal step width, take minimal step width
         obj.p_convergence = 0;                                                                      %set property p_convergence to zero (for resetting the step_width after convergence)
-        info_text = append('Step width adapted to stepwidth = ',num2str(obj.step_width),', because corrector did not converge or Jacobian can be undefined!');
+        info_text = append('Step width adapted to stepwidth = ',num2str(obj.step_width),'.');
         write_log(DYN,info_text)                                                                    %write info text in log file
         if strcmpi(DYN.display,'step-control') || strcmpi(DYN.display,'full'); disp(info_text); end %display info text
         continue                                                                                    %skip the remaining code and start the next loop (try again with reduced step width)
@@ -136,7 +115,6 @@ while  obj.p_contDo
     %%%%%%%%%%%%%%%%%%  FSOLVE CONVERGED  %%%%%%%%%%%%%%%%%
     % A user-defined Jacobian matrix can be checked here by executing the next line (since R2023b: function checkGradients is recommended instead of obj.fsolve_opts.CheckGradients = true)
     % checkGradients_opts = optimoptions('fsolve',FiniteDifferenceType='forward'); checkGradients(Fcn,obj.p_y1,checkGradients_opts,Display='on',Tolerance=1e-5);
-
     if obj.p_newton_flag == 3
         warn_text = append('Equation solved for Iter = ',num2str(obj.p_local_cont_counter+1),', but change in residual is smaller than specified tolerance (fsolve exit_flag = 3)!');
         write_log(DYN,append('WARNING: ',warn_text))                                                % Write warning in log file
@@ -155,27 +133,20 @@ while  obj.p_contDo
     %IMPORTANT: order of calling the following methods must not be changed
 
     %%%%%%%%%%%%%%%%%%%%%%%  FREQUENCY CHECK  %%%%%%%%%%%%%%%%%%%%%%%
-    stopping_msg = check_freq(DYN,obj.p_y1);                                    %check the frequencies of the solution
-    if ~isempty(stopping_msg)                                                   %if frequency(s) are smaller than frequency limit
-        warn_msg = append('WARNING: Small or negative frequency(s) detected for solution Iter = ',num2str(obj.p_local_cont_counter+1),'!');
-        S.warnings{end+1} = warn_msg(10:end);                                   %save warning in Solution object
-        obj.p_stopping_flag = stopping_msg;                                     %save stopping message
-        disp(' '); warning(warn_msg(10:end));                                   %display warning
-        if ~strcmpi(DYN.display,'off'); disp(' '); disp(stopping_msg); end      %display stopping message
-        write_log(DYN,'finalize',append(warn_msg,'\n\n',stopping_msg))          %finalize log file with warning message and stopping message
-        break                                                                   %break (stop) the continuation loop (any further computation below might fail)
+    if obj.p_error_flag == 1
+        [obj.p_stopping_flag,obj.p_error_flag] = check_freq(DYN,obj.p_y1);              % Check the frequencies of the solution
+        if obj.p_error_flag == 0                                                        % If frequency(s) are smaller than frequency limit
+            obj.p_error_msg = append('ERROR: Small or negative frequency(s) detected for solution Iter = ',num2str(obj.p_local_cont_counter+1),'!');
+        end
     end
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%  ERROR CONTROL  %%%%%%%%%%%%%%%%%%%%%%%
     %Control the error by adapting the discretisation. If the ansatz function is adapted, error_control solves the equation system again
     %and computes new values, which get saved and iterated, which is why the error_control must be called before IF_arch_data and iterate_data.
-    if strcmpi(AM.error_control,'on')
-        obj.error_control(S,AM,DYN);
-        if obj.p_ec_flag == 0                                                   %Error control failed and step size is larger than minimum: Reduce step size and try again (start a new iteration)
+    if strcmpi(AM.error_control,'on'); obj.error_control(S,AM,DYN);
+        if obj.p_error_flag == 2                                                %Error control failed and step size is larger than minimum: Reduce step size and try again (start a new iteration)
             continue                                                            %Skip the following methods and start the next loop (try again with reduced step width)
-        elseif obj.p_ec_flag == -1                                              %Error control failed and step size is minimal: Stop continuation
-            break                                                               %Skip the following methods because the error of the solution is too high (i.e. do not accept the solution)
         end
     end
 
@@ -188,31 +159,56 @@ while  obj.p_contDo
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%  SAVING  %%%%%%%%%%%%%%%%%%%%%%%%%%%
     S.IF_arch_data(obj,DYN,AM);                                                 %store calculated data point in Solution object
+    if strcmpi(DYN.save,'on')
+        save(append('CoSTAR_Save_',DYN.DYN_id,'.mat'),'DYN','S');               %save DYN and S in a mat-file (overrides the existing file)
+    end
 
 
     %%%%%%%%%%  PLOTTING, CHECKING LIMITS AND DISPLAY INFO  %%%%%%%%%
-    if strcmpi(obj.plot,'on'); obj.plot_contplot(S,DYN); end                    %display a continuation plot if desired
+    if strcmpi(obj.plot,'on') && (obj.p_error_flag == 1)
+        obj.plot_contplot(S,DYN)                                                %display a continuation plot if desired
+    end
 
     obj.iterate_data();                                                         %store calculated data point as current data point for next continuation step
 
     obj.check_limits(DYN);                                                      %check limits for bifurcation parameter and number of steps and display information
-    
+
+
 end
 
 
 %%%%%%%%%%%%%%%  END CONTINUATION  %%%%%%%%%%%%%
-S.stopping_flag = obj.p_stopping_flag;          %save stopping message in Solution object
+S.stopping_flag = obj.p_stopping_flag;              % Save stopping message in Solution object
 
-if ~strcmpi(DYN.display,'off')
-    disp(' ')
-    disp('-----------------------------------------------------')
-    if ~isempty(lastwarn)
-        disp('------------  Finished with warning(s)!  ------------');
-    else
-        disp('-------------- Successfully finished! ---------------')
+if obj.p_error_flag == 0                            % Stopping in case of a critical error
+    S.warnings{end+1} = obj.p_error_msg;            % Save error message in Solution object
+    disp(' '); warning(obj.p_error_msg);            % Display error
+    write_log(DYN,'finalize_error',append(obj.p_error_msg,'\n\n',obj.p_stopping_flag))  % Finalize log file with error message and stopping message
+    if ~strcmpi(DYN.display,'off')
+        disp(' '); disp(obj.p_stopping_flag); disp(' ')    % Display error text and stopping message
+        disp('-----------------------------------------------------')
+        disp('--------------  Finished with error!  ---------------')
+        disp('-----------------------------------------------------')
+        disp(' '); disp(' ')
     end
-    disp('-----------------------------------------------------')
-    disp(' '); disp(' ')
+
+elseif obj.p_error_flag == 1
+    write_log(DYN,'finalize',obj.p_stopping_flag)
+    if ~strcmpi(DYN.display,'off')                  % Regular stopping
+        disp(' '); disp(obj.p_stopping_flag); disp(' ')
+        disp('-----------------------------------------------------')
+        if ~isempty(lastwarn)
+            disp('------------  Finished with warning(s)!  ------------');
+        else
+            disp('-------------- Successfully finished! ---------------')
+        end
+        disp('-----------------------------------------------------')
+        disp(' '); disp(' ')
+    end
+end
+
+if strcmpi(DYN.save,'on')
+    save(append('CoSTAR_Save_',DYN.DYN_id,'.mat'),'DYN','S');               %save again to also catch the stopping flag saved in S
 end
 
 

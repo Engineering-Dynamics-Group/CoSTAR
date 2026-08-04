@@ -15,6 +15,7 @@ classdef AM_EQ < ApproxMethod
         s_EQ_gatekeeper(GC,system,opt_sol_method,opt_init);             % Gatekeeper method, which is called by the static ST_gatekeeper method 
         help_text = s_help_opt_approx_method_EQ();                      % Help file for the approx_method option structure 
         help_text = s_help_opt_init_EQ();                               % Help file for the approx_method option structure 
+    
     end
 
     %%%%%%%%%%%%%%%
@@ -42,10 +43,25 @@ classdef AM_EQ < ApproxMethod
                 param{DYN.act_param} = mu;
 
                 res = Fcn(x,param);                                     % Define residual function  
+
+        end
+
+        % Function wrapper that sets the complete residuum function for the initial solution
+        function F = res_fun_init(obj,y,y0)
+
+            F = [obj.res(y); y(end)-y0(end)];
+
+        end
+
+        % Function wrapper that sets the complete residuum function
+        function F = res_fun(obj,y,CON)
+
+            F = [obj.res(y); CON.sub_con(y,CON)];
+
         end
 
         % Interface methods
-        function f = IF_up_res_data(obj,CON); end                       % Nothing needs to be done here
+        function f = IF_up_res_data(obj,var,DYN); end                   % Nothing needs to be done here
         
         obj = getIV(obj,DYN);                                           % Compute initial value
 

@@ -4,7 +4,8 @@ classdef Continuation < handle
 
     properties
         cont = 'on';                                                        %Continue if cont='on', if cont='off' stop after calculation of initial solution (actually not used here)
-        pred string = 'tangent';                                            %Predictor to be used for the prediction of new curve point
+        pred string                                                         %Old property for predictor. Still here so that old scripts can be used without changing 'pred' to 'predictor'
+        predictor string = 'tangent';                                       %Predictor to be used for the prediction of new curve point
         subspace string = 'pseudo-arc';                                     %Defines the subspace-constraint to close the corrector-equation
         direction = 1;                                                      %Direction in which the curve shall be continued. 1 = positive mu-direction, -1 = negative mu-direction
         plot = 'on';                                                        %If = 'on', a continuation plot is displayed during continuation
@@ -31,8 +32,7 @@ classdef Continuation < handle
         %Parameters of predicted curve point
         p_y1 = 0;                                                             %Initialise for get method of p_arcl_1 to be well defined
         p_J1
-        p_newton_flag = 0;                                                    %Exit flag of Newton solver
-        p_ec_flag = 1;                                                        %Exit flag of error control 
+        p_newton_flag = 1;                                                    %Exit flag of Newton solver
         p_stopping_flag                                                       %Exit flag of continuation
         p_arcl_0  = 0;                                                        %arc-length of current point
         p_arcl_1  = 0;                                                        %arc-length of new point: Has its own get method
@@ -61,18 +61,15 @@ classdef Continuation < handle
     properties(Access=private)
         p_contDo uint32 = 1;                                                  %While contDo=1, do continuation, if conDo=0 stop continuation
         p_local_cont_counter uint32 = 1;                                      %Counts number of computed solutions
-        p_last_msg;                                                           %Saves the latest "Iter" messages printed to the command window
+        p_last_msg                                                            %Saves the latest "Iter" messages printed to the command window
+        p_error_flag = 1                                                      %A flag indicating that a critical error has occured (p_error_flag = 0)
+        p_error_msg                                                           %Stores the error message
 
         %Parameters of the last point
         p_dy_old                                                              %Direction vector of the predictor
         p_r_old = 1;                                                          %Factor which adapts step width
-        p_dx_dmu_old                                                          %Used for PID step control
-        p_e_old = 1;                                                          %Used for PID step control
         p_axes_values_old                                                     %Axes values of continuation plot of old solution
         p_stability_flag_old                                                  %Old exitflag of stability computation
-                
-        %Parameters of penultimate point
-        p_e_old_old = 1;                                                      %Used for PID step control
 
         %Parameter of active curve point
         p_mu0                                                                 %Continuation parameter
@@ -85,11 +82,9 @@ classdef Continuation < handle
         p_limit                                                               %needed for plotting
         p_ec_prop_save = struct('yp',[],'y0',[],'dy0',[]);                    %saves properties that are modified by error control (ec). If ec fails, they are resetted to the values stored in p_ec_prop_save
         p_r = 1;                                                              %Factor which adapts step width
-        p_e = 1;                                                              %Used for PID step control
-        p_dx_dmu                                                              %Used for PID step control
 
         p_initial_slope                                                       %Initial slope for secant predictor (only used in initial continuation step)
-        p_use_qr logical = false;                                             %Boolean to determine whether a qr decomposition has to be used to determine inital slope (only if secant method failed)
+        p_use_tangent = false;                                                %Boolean to determine whether a qr decomposition has to be used to determine inital slope (only if secant method failed)
 
     end
     %%%%%%%%%%%%%%%%
@@ -97,9 +92,12 @@ classdef Continuation < handle
     
     methods
         %% Constructor
-        function obj = Continuation(options)    
+        function obj = Continuation(DYN)
 
-            obj = updateoptions(obj,options);
+            obj = updateoptions(obj,DYN.opt_cont);
+            if ~isempty(obj.pred)                                           %If obj.pred is not empty, it was set by the user
+                obj.predictor = obj.pred;                                   %In this case, the defined predictor method must be handed to the actual predictor property used in the code
+            end
             if strcmpi(obj.step_control,'on')                               %If user sets options.opt_cont.step_control = 'on', ...
                 obj.step_control = 'angle';                                 %the default step control method 'angle' is chosen
             end 
@@ -109,7 +107,15 @@ classdef Continuation < handle
             obj.p_step_width_init = obj.step_width;                         %Set initial step_width
             %Set the step width limits if they were not given by user
             if isempty(obj.step_width_limit); obj.step_width_limit = [0.2.*obj.step_width,5.*obj.step_width]; end
-        
+
+            % Set some corrector options
+            if strcmpi(DYN.approx_method,'shooting')
+                obj.fsolve_opts.MaxIter = 50;
+                obj.fsolve_opts.SpecifyObjectiveGradient = true;            %Jacobian matrix is passed by the user
+            elseif strcmpi(DYN.approx_method,'finite-difference')
+                obj.fsolve_opts.SpecifyObjectiveGradient = true;            %Jacobian matrix is passed by the user
+            end
+
         end
 
         %% Main method
@@ -118,7 +124,7 @@ classdef Continuation < handle
         %% Methods
         obj = initial_slope(obj,DYN,AM);                                    %Calculates second curve point to determine initial slope for direction vector (secant, parable, cubic)
         obj = direction_vector(obj);                                        %Calculates the vector of the direction of the predictor (tangent, secant, ...)
-        obj = predictor(obj);                                               %Generates predictor to given point on diagram
+        obj = predictor_point(obj);                                         %Generates predictor point
         
         obj = iterate_data(obj);                                            %Iterates the relevant data: new data point 1 is now current data point 0 for next iteration
         obj = check_limits(obj,DYN);                                        %Checks, if the current continuation parameter is within the prescribed mu limit

@@ -14,7 +14,9 @@ formatSpec = '%.4f';
 % Create info text and log file entry
 info_text = append('Iter: ',num2str(local_cont_counter),' -- mu = ',num2str(obj.p_mu0,formatSpec),...
     ' -- stepwidth = ',num2str(obj.step_width,formatSpec));
-if strcmpi(DYN.stability,'on')
+if obj.p_error_flag == 0
+    info_text = append(info_text,' -- FAILED');
+elseif strcmpi(DYN.stability,'on')
     if obj.p_n_unstable_1 == 0;     info_text = append(info_text,' -- stable');
     elseif obj.p_n_unstable_1 > 0;  info_text = append(info_text,' -- unstable');   end
 end
@@ -58,30 +60,24 @@ else
 end
 
 
-% Check the stopping criteria
-if(obj.p_mu0>obj.mu_limit(1,2))         % Check if calculated curve point is above upper limit of mu
-    obj.p_contDo = 0;
-    clear fsolve;
-    stopping_text = append('CoSTAR stopped because maximal value of continuation parameter mu_max = ', num2str(obj.mu_limit(1,2)), ' was reached.');
-    write_log(DYN,'finalize',stopping_text)
-    if ~strcmpi(DYN.display,'off');  disp(' '); disp(stopping_text);  end
-    obj.p_stopping_flag = stopping_text;
+if obj.p_error_flag == 0
+    obj.p_contDo = 0;                   % Stop continuation
+    return                              % Return to m_continuation if there was a critical error (stopping criteria can be skipped)
+end
 
-elseif(obj.p_mu0<obj.mu_limit(1,1))     % Check if calculated curve point is below bottom limit of mu
+
+% Check the stopping criteria
+if(obj.p_mu0>=obj.mu_limit(1,2))        % Check if calculated curve point is above upper limit of mu
     obj.p_contDo = 0;
-    clear fsolve;
-    stopping_text = append('CoSTAR stopped because minimal value of continuation parameter mu_min = ', num2str(obj.mu_limit(1,1)), ' was reached.');
-    write_log(DYN,'finalize',stopping_text)
-    if ~strcmpi(DYN.display,'off');  disp(' '); disp(stopping_text);  end
-    obj.p_stopping_flag = stopping_text;
+    obj.p_stopping_flag = append('CoSTAR stopped because maximal value of continuation parameter mu_max = ', num2str(obj.mu_limit(1,2)), ' was reached.');
+
+elseif(obj.p_mu0<=obj.mu_limit(1,1))    % Check if calculated curve point is below bottom limit of mu
+    obj.p_contDo = 0;
+    obj.p_stopping_flag = append('CoSTAR stopped because minimal value of continuation parameter mu_min = ', num2str(obj.mu_limit(1,1)), ' was reached.');
 
 elseif(obj.p_local_cont_counter>=obj.max_cont_step)      % Check if maximal number of continuation points has been surpassed
     obj.p_contDo = 0;
-    clear fsolve;
-    stopping_text = append('CoSTAR stopped because maximal number of continuation steps max_cont_step = ', num2str(obj.max_cont_step), ' was reached.');
-    write_log(DYN,'finalize',stopping_text)
-    if ~strcmpi(DYN.display,'off');  disp(' '); disp(stopping_text);  end
-    obj.p_stopping_flag = stopping_text;
+    obj.p_stopping_flag = append('CoSTAR stopped because maximal number of continuation steps max_cont_step = ', num2str(obj.max_cont_step), ' was reached.');
 
 else
     write_log(DYN,'\n-------------------------------------')

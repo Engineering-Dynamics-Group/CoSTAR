@@ -10,7 +10,7 @@
 % @F:   "Complete" residuum vector function (equation system to be solved for y by fsolve)
 % @J:   Jacobian matrix of F
 %
-function [F,J] = corr_fun_init_FDM(obj,y,y0)
+function [F,J] = res_fun_init(obj,y,y0)
 
 %% Build the residuum vector
 [res,J_res] = obj.res(y);                       % Get the residuum of the finite-difference equation system 

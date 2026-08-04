@@ -36,7 +36,7 @@ options.opt_sol  = costaropts('sol_type','qps','approx_method','fdm','cont','on'
 options.opt_init = costaropts('c0',c0,'c1_matrix',C1_mat,'s1_matrix',S1_mat);                                                       % Properties for initial solution
 options.opt_approx_method = costaropts('n_int_1',30,'scheme_1','central','approx_order_1',6,...                                     % Properties of approximation method FDM
                                        'n_int_2',30,'scheme_2','central','approx_order_2',6);                                       % Properties of approximation method FDM
-options.opt_cont = costaropts('mu_limit',mu_limit,'pred','secant','direction',-1);                                                  % Properties for continuation
+options.opt_cont = costaropts('mu_limit',mu_limit,'predictor','secant','direction',-1);                                             % Properties for continuation
 options.opt_stability = costaropts('iterate_bfp','on','n_char_st',50);                                                              % Properties for stability
     
 % Step control options

@@ -28,7 +28,7 @@ elseif strcmpi(opt_sol.sol_type,'periodic') || strcmpi(opt_sol.sol_type,'ps')
     end
 
     if strcmpi(opt_sol.approx_method,'finite-difference') || strcmpi(opt_sol.approx_method,'fdm')
-        AM_PS_FDM.s_PS_FDM_gatekeeper(GC,system,opt_approx_method,opt_init);
+        AM_PS_FDM.s_PS_FDM_gatekeeper(GC,system,opt_sol,opt_approx_method,opt_init);
     end
 
 

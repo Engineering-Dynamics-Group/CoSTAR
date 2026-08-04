@@ -11,8 +11,11 @@ function obj = bifurcation_stability(obj,DYN,AM,S,ST)
 
 
         %% Calculate Stability
-        [obj.p_multipliers,obj.p_vectors,obj.p_n_unstable_1,obj.p_stability_flag] = ST.calc_stability(obj.p_y1,obj.p_J1);               % Compute the respective multiplier (eigenvalue, Floquet, Lyapunov Exponent)
-        
+        if obj.p_error_flag == 1
+            [obj.p_multipliers,obj.p_vectors,obj.p_n_unstable_1,obj.p_stability_flag] = ST.calc_stability(obj.p_y1,obj.p_J1);               % Compute the respective multiplier (eigenvalue, Floquet, Lyapunov Exponent)
+        else
+            obj.p_multipliers = NaN(DYN.dim,1);   obj.p_vectors = NaN(DYN.dim);   obj.p_n_unstable_1 = NaN;   obj.p_stability_flag = NaN;
+        end
 
         if obj.p_stability_flag > 0                                           % Only move forward if the stability computation was regular
         
@@ -37,18 +40,8 @@ function obj = bifurcation_stability(obj,DYN,AM,S,ST)
                         obj.yp = ST.approx_posc(DYN);                   % Function approximates the point of stability change based on the curve_container; output needs to be assigned to yp for the up_res_data method to work
         
                         % Correct
-                        if strcmpi(DYN.approx_method,'shooting')
-                            AM.IF_up_res_data(obj,DYN);
-                            Fcn = @(y) AM.fun_Jac_wrapper(y,obj);       % Set function wrapper to provide Jacobian
-                            obj.fsolve_opts.SpecifyObjectiveGradient = true;
-                        elseif strcmpi(DYN.approx_method,'finite-difference')
-                            AM.IF_up_res_data(obj);
-                            obj.fsolve_opts.SpecifyObjectiveGradient = true;
-                            Fcn = @(y) AM.corr_fun_FDM(y,obj);
-                        else
-                            AM.IF_up_res_data(obj);                                 % Archive initial solution
-                            Fcn = @(y)[AM.res(y);obj.sub_con(y,obj)];               % Define corrector-function containing the residual function and the subspace-constraint
-                        end
+                        AM.IF_up_res_data(obj,DYN);                     % Update AM properties
+                        Fcn = @(y) AM.res_fun(y,obj);                   % Function wrapper to set the complete residuum function
                         [obj.p_y_bfp,~,obj.p_newton_flag_bfp,~,obj.p_J_bfp] = fsolve(Fcn,obj.yp,obj.fsolve_opts);               % Solve corrector-function
 
                         if (obj.p_newton_flag_bfp < 1) || (obj.p_newton_flag_bfp == 2)
@@ -103,7 +96,7 @@ function obj = bifurcation_stability(obj,DYN,AM,S,ST)
 
 
         %% Warning if stability computation has failed
-        else
+        elseif obj.p_stability_flag == 0
 
             warn_text = append('Stability computation failed for solution Iter = ',num2str(obj.p_local_cont_counter+1),'!');
             write_log(DYN,append('WARNING: ',warn_text))                            % Write warning in log file

@@ -15,9 +15,11 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
     Fcn = DYN.rhs;                                      % RHS of the system
     n_auto = DYN.n_auto;                                % Number of autonomous frequencies
     n_shoot = obj.n_shoot;                              % Number of shooting points
-    n_time = ceil(100/obj.n_shoot);                     % Number of time evaluation points in each shooting interval for the integral phase condition
+    n_time = obj.n_time;                                % Number of time evaluation points in each shooting interval for the integral phase condition
     s = y(1:(end-1-n_auto));                            % Method solution vector (hyper-vector of shooting points [z_0; z_1; ...; z_n])
+    s0 = obj.iv(1:end-n_auto);                          % Method solution vector at the predictor point (obj.iv(end) is the autonomous frequency if present)
     mu = y(end);                                        % Continuation parameter
+    Z0 = obj.Z0;                                        % Get the trajectory of the preceding solution for evaluating the integral phase condition
 
     if n_auto == 0
         omega = DYN.non_auto_freq(mu);                  % Angular frequency (non-autonomous system)
@@ -39,15 +41,11 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
     dT = T/n_shoot;                                     % Time span for each shooting operation (integration)
     T_int = [0:dT:(n_shoot-1)*dT; dT:dT:n_shoot*dT].';  % Define time intervals for the shooting operation (integration)
     z0_mat = reshape(s,dim,n_shoot);                    % Reshape s to a matrix of size [dim x n_shoot]
-    s_p_mat = reshape(obj.iv(1:end-n_auto),dim,n_shoot);% Matrix of shooting points at the predictor point (obj.iv(end) is the autonomous frequency if present)
     Z_traj = zeros(dim,n_time,n_shoot);                 % Stores the trajectory for evaluating the integral phase condition
     Z_end = zeros(dim,n_shoot);                         % Stores the end points of integration (could be stored in Z_traj as well, but using Z_end is more convenient)
-    Z_p = zeros(dim,n_time,n_shoot);                    % Stores the trajectory of the predictor point for evaluating the integral phase condition
     odeOpts_1 = obj.odeOpts;                            % Use these options for the integrations with perturbed z_i (because that is where the FCN_wrapper is used)
-    odeOpts_2 = obj.odeOpts;                            % Use these options for the integrations with perturbed mu (FCN_wrapper is used as well)
     if strcmpi(obj.solver,'ode15s') || strcmpi(obj.solver,'ode23s') || strcmpi(obj.solver,'ode23t') || strcmpi(obj.solver,'ode23tb')
-        odeOpts_1.JPattern = kron(speye(2*dim+2),spones(ones(dim)));    % Specify the Jacobian pattern for implicit solvers (used for time step, not corrector step)
-        odeOpts_2.JPattern = kron(speye(2),spones(ones(dim)));          % Specify the Jacobian pattern for implicit solvers (used for time step, not corrector step)
+        odeOpts_1.JPattern = kron(speye(2*dim+1),spones(ones(dim)));    % Specify the Jacobian pattern for implicit solvers (used for time step, not corrector step)
     end
     
     % Preparation for integration: needed for calculating the Jacobian
@@ -69,8 +67,6 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
     Z_traj_mu_minus = zeros(dim,n_time,n_shoot);                                % Stores the trajectory for "- delta" perturbed mu
     Z_end_mu_plus  = zeros(dim,n_shoot);                                        % Stores the end points of the integration for the "+ delta" perturbed mu
     Z_end_mu_minus = zeros(dim,n_shoot);                                        % Stores the end points of the integration for the "- delta" perturbed mu
-    Z_p_mu_plus = zeros(dim,n_time,n_shoot);                                    % Stores the trajectory at the predictor point for "+ delta" perturbed mu
-    Z_p_mu_minus = zeros(dim,n_time,n_shoot);                                   % Stores the trajectory at the predictor point for "- delta" perturbed mu
     if n_auto == 0                                      % Non-autonomous case
         T_mu_plus  = 2*pi./DYN.non_auto_freq(mu+delta_mu);                      % Perturbed periodic time by "+ delta"
         T_mu_minus = 2*pi./DYN.non_auto_freq(mu-delta_mu);                      % Perturbed periodic time by "- delta"
@@ -94,25 +90,22 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
     % to need more iterations. Not only does this influence the computation time negatively, it can also lead to the step control reducing the step size.
     for k=1:n_shoot
         % Create a [dim x (2*dim+1)] matrix Z0_mat storing the initial condition to integrate column-wise  
-        Z0_mat = [z0_mat(:,k), Z_dim_plus(:,(k-1)*dim+1:k*dim), Z_dim_minus(:,(k-1)*dim+1:k*dim), s_p_mat(:,k)];    % Take z_k, the perturbed z_k and z_k^(P) (z_k at predictor) (need to be integrated for J)
+        Z0_mat = [z0_mat(:,k), Z_dim_plus(:,(k-1)*dim+1:k*dim), Z_dim_minus(:,(k-1)*dim+1:k*dim)];      % Take z_k and the perturbed z_k (need to be integrated for J)
         [~,Z] = obj.solver_function(@(t,Z) FCN_wrapper(t,Z,dim,@(t,z)Fcn(t,z,param)), linspace(T_int(k,1),T_int(k,2),n_time+1), Z0_mat, odeOpts_1); 
         Z_traj(:,:,k)       = Z(1:end-1,1:dim).';                   % Save the trajectory (not Z(t_end) because it will be equal to Z(t_start) of the next interval after convergence)
         Z_traj_plus(:,:,k)  = Z(1:end-1,dim+1:(dim+1)*dim).';       % Save the trajectory of the "+ delta" perturbed initial conditions
-        Z_traj_minus(:,:,k) = Z(1:end-1,(dim+1)*dim+1:end-dim).';   % Save the trajectory of the "- delta" perturbed initial conditions
-        Z_p(:,:,k)          = Z(1:end-1,end-dim+1:end).';           % Save the trajectory at the predictor point
+        Z_traj_minus(:,:,k) = Z(1:end-1,end-dim*dim+1:end).';       % Save the trajectory of the "- delta" perturbed initial conditions
         Z_end(:,k)       = Z(end,1:dim).';                          % Take the unperturbed state vectors at t_end
         Z_end_plus(:,k)  = Z(end,dim+1:(dim+1)*dim).';              % Take the "+ delta" perturbed state vectors at t_end
-        Z_end_minus(:,k) = Z(end,(dim+1)*dim+1:end-dim).';          % Take the "- delta" perturbed state vectors at t_end
+        Z_end_minus(:,k) = Z(end,end-dim*dim+1:end).';              % Take the "- delta" perturbed state vectors at t_end
         % Now do a second/third integration with perturbed mu-value (needed for Jacobian - can be deactivated when it is calculated by fsolve)
-        [~,Z_mu_plus]  = obj.solver_function(@(t,Z) FCN_wrapper(t,Z,dim,@(t,z)Fcn(t,z,param_mu_plus)), linspace(T_int_mu_plus(k,1),T_int_mu_plus(k,2),n_time+1), [z0_mat(:,k),s_p_mat(:,k)], odeOpts_2); 
-        Z_traj_mu_plus(:,:,k) = Z_mu_plus(1:end-1,1:dim).';         % Save the "+ delta" perturbed mu trajectory
-        Z_end_mu_plus(:,k) = Z_mu_plus(end,1:dim).';                % Take the state vector of the "+ delta" perturbed mu trajectory at t_end
-        Z_p_mu_plus(:,:,k) = Z_mu_plus(1:end-1,dim+1:end).';        % Save the "+ delta" perturbed mu trajectory at the predictor point
+        [~,Z_mu_plus]  = obj.solver_function(@(t,Z) FCN_wrapper(t,Z,dim,@(t,z)Fcn(t,z,param_mu_plus)), linspace(T_int_mu_plus(k,1),T_int_mu_plus(k,2),n_time+1), z0_mat(:,k), obj.odeOpts);
+        Z_traj_mu_plus(:,:,k) = Z_mu_plus(1:end-1,:).';             % Save the "+ delta" perturbed mu trajectory
+        Z_end_mu_plus(:,k) = Z_mu_plus(end,:).';                    % Take the state vector of the "+ delta" perturbed mu trajectory at t_end
         if calc_stability                                           % Only required when using central finite difference for Jacobian
-            [~,Z_mu_minus] = obj.solver_function(@(t,Z) FCN_wrapper(t,Z,dim,@(t,z)Fcn(t,z,param_mu_minus)), linspace(T_int_mu_minus(k,1),T_int_mu_minus(k,2),n_time+1), [z0_mat(:,k),s_p_mat(:,k)], odeOpts_2);
-            Z_traj_mu_minus(:,:,k) = Z_mu_minus(1:end-1,1:dim).';   % Save the "- delta" perturbed mu trajectory
-            Z_end_mu_minus(:,k) = Z_mu_minus(end,1:dim).';          % Take the state vector of the "- delta" perturbed mu trajectory at t_end
-            Z_p_mu_minus(:,:,k) = Z_mu_minus(1:end-1,dim+1:end).';  % Save the "- delta" perturbed mu trajectory at the predictor point
+            [~,Z_mu_minus] = obj.solver_function(@(t,Z) FCN_wrapper(t,Z,dim,@(t,z)Fcn(t,z,param_mu_minus)), linspace(T_int_mu_minus(k,1),T_int_mu_minus(k,2),n_time+1), z0_mat(:,k), obj.odeOpts);
+            Z_traj_mu_minus(:,:,k) = Z_mu_minus(1:end-1,:).';       % Save the "- delta" perturbed mu trajectory
+            Z_end_mu_minus(:,k) = Z_mu_minus(end,:).';              % Take the state vector of the "- delta" perturbed mu trajectory at t_end
         end
     end
 
@@ -124,13 +117,16 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
         res = s_end - s_perm;                           % Residuum
     elseif n_auto == 1
         switch obj.phase_condition                      % Compute the phase condition
-            case 'poincare'                             
-                f_s_p = reshape(Fcn(0,s_p_mat,param),dim*n_shoot,1);                                    % Evaluate the RHS at predictor point s_p
-                pc = f_s_p.' * (s - reshape(s_p_mat,dim*n_shoot,1));                                    % Poincare phase condition
+            case 'poincare'
+                z_0 = s(1:dim);                                                                         % State space vector at theta = 0
+                z0_0 = s0(1:dim);                                                                       % State space vector at the preceding point for theta = 0
+                f_z0_0 = Fcn(0,z0_0,param);                                                             % Evaluate Fcn for the phase condition
+                pc = f_z0_0' * (z_0 - z0_0);                                                            % Poincare phase condition
             case 'integral'
+                obj.Z_traj = Z_traj;                                                                    % Save the trajectory so that it can be used directly as Z0 when the next solution is computed (see IF_up_res_data)
                 f = reshape(Fcn(0,reshape(Z_traj,dim,n_shoot*n_time),param),dim*n_shoot*n_time,1);      % Evaluate the RHS at the n_shoot*n_time evaluation points
-                f_p = reshape(Fcn(0,reshape(Z_p,dim,n_shoot*n_time),param),dim*n_shoot*n_time,1);       % Evaluate the RHS for the predictor point (not needed now, but later on for dpc/domega in the Jacobian)
-                pc = f.' * (reshape(Z_traj,dim*n_shoot*n_time,1) - reshape(Z_p,dim*n_shoot*n_time,1));  % * T / (n_time*n_shoot); % Integral phase condition
+                f0 = reshape(Fcn(0,reshape(Z0,dim,n_shoot*n_time),param),dim*n_shoot*n_time,1);         % Evaluate the RHS for the predictor point
+                pc = f0.' * (reshape(Z_traj,dim*n_shoot*n_time,1) - reshape(Z0,dim*n_shoot*n_time,1));  % * T / (n_time*n_shoot); % Integral phase condition
         end
         % Residuum equation
         res = [s_end - s_perm;                          % Residuum
@@ -182,82 +178,58 @@ function [res,J_res] = PS_SHM_residuum(obj,y,DYN)
         switch obj.phase_condition
             
             case 'poincare'                     % Poincare phase condition
-                dpc_ds = f_s_p.';                                                                               % dpc/ds
-                dpc_domega = 0;                                                                                 % dpc/domega = 0 (phase condition is independent of the frequency)
-                f_mu_plus = reshape(Fcn(0,s_p_mat,param_mu_plus),dim*n_shoot,1);                                % Evaluate the RHS at predictor point s_p with perturbed mu
-                if calc_stability                                                                               % Use central finite difference
-                    f_mu_minus = reshape(Fcn(0,s_p_mat,param_mu_minus),dim*n_shoot,1);                          % Evaluate the RHS at predictor point s_p with perturbed mu
-                    dpc_dmu = (f_mu_plus - f_mu_minus).' * (s - reshape(s_p_mat,dim*n_shoot,1)) / (2*delta_mu); % dpc/dmu
-                else                                                                                            % Use forward finite difference
-                    dpc_dmu = (f_mu_plus - f_s_p).' * (s - reshape(s_p_mat,dim*n_shoot,1)) / delta_mu;          % dpc/dmu
+                dpc_ds = [f_z0_0', zeros(1,(n_shoot-1)*dim)];                                                           % dpc/ds of Poincare phase condition
+                dpc_domega = 0;                                                                                         % dpc/domega = 0 (phase condition is independent of the frequency)
+                if calc_stability                                                                                       % Use central finite difference
+                    dpc_dmu = (Fcn(0,z0_0,param_mu_plus) - Fcn(0,z0_0,param_mu_minus)).' * (z_0 - z0_0) / (2*delta_mu); % dpc/dmu
+                else                                                                                                    % Use forward finite difference
+                    dpc_dmu = (Fcn(0,z0_0,param_mu_plus) - f_z0_0).' * (z_0 - z0_0) / delta_mu;                         % dpc/dmu
                 end
             
             case 'integral'                     % Integral phase condition
-                dpc_ds = zeros(1,dim*n_shoot);                                      % Initialise
-                dpc_domega = 0;                                                     % Initialise -> dpc_domega is iteratively computed and added up in a loop
-                for k = 1:n_shoot                                                   % Loop over the shooting points / interval -> Implementation without very difficult and complicated
-                    Delta_k = repmat(Delta(:,(k-1)*dim+1:k*dim),1,n_time);          % Part of matrix Delta that belongs to k-th shooting point and repeated n_time times -> size: [dim x dim*n_time]
-                    f_k = f((k-1)*dim*n_time+1:k*dim*n_time);                       % Part of f (Fcn evaluated for all ~100 evaluation points) that belongs to k-th interval -> size: [dim*n_time x 1]
-                    f_p_k = f_p((k-1)*dim*n_time+1:k*dim*n_time);                   % Like f above, but for the predictor point
-                    Z_traj_k = reshape(Z_traj(:,:,k),dim*n_time,1);                 % Solution trajectory within the k-th interval -> size: [dim*n_time x 1]
-                    Z_p_k = reshape(Z_p(:,:,k),dim*n_time,1);                  	    % Predictor trajectory within the k-th interval -> size: [dim*n_time x 1]
-                    % We need to compute some derivatives w.r.t. the evaluation points z_j = z(t_j,z_k), where the index j describes the evaluation points within the k-th interval -> j = 1, ..., n_time and z_{j=1} = z_k
-                    % Therefore: The z_j needs to be perturbed like the shooting points above. We also need a corresponding Delta matrix storing the individual step widths delta_(j,m) = h*(1+abs(Z_(j,m)) for num. diff.
-                    Z_dim_j = reshape(repmat(Z_traj(:,:,k),dim,1),dim,n_time*dim);  % This is a [dim x n_time*dim] matrix where each z_j is repeated dim times
-                    Delta_j = h.*(repmat(eye(dim),1,n_time) + sparse(repmat(1:1:dim,1,n_time),1:1:n_time*dim,abs(Z_traj_k),dim,n_time*dim));
-                    Z_dim_j_plus  = Z_dim_j + Delta_j;                              % This is a [dim x n_time*dim] matrix containing all "+ Delta" perturbed z_j
-                    Z_dim_j_minus = Z_dim_j - Delta_j;                              % This is a [dim x n_time*dim] matrix containing all "- Delta" perturbed z_j
-                    if calc_stability
-                        % Approximate the derivatives df(z_j(z_k),mu)/dz_k. The matrices are arranged as: [df(z_0(z_k),mu)/dz_k, df(z_1(z_k),mu)/dz_k, ...] = [dim x dim*n_time]
-                        df_dz_k = (Fcn(0,reshape(Z_traj_plus(:,:,k),dim,dim*n_time),param) - Fcn(0,reshape(Z_traj_minus(:,:,k),dim,dim*n_time),param)) ./ repmat(2.*nonzeros(Delta_k)',dim,1);
-                        % Approximate the derivatives df(z_j,mu)/dz_j (matrices arranged like above)
-                        df_dz_j = (Fcn(0,Z_dim_j_plus,param) - Fcn(0,Z_dim_j_minus,param)) ./ repmat(2.*nonzeros(Delta_j)',dim,1);
-                        % Approximate the derivatives dz_j(z_k)/dz_k (matrices arranged like above)
-                        dz_j_dz_k = (reshape(Z_traj_plus(:,:,k),dim,dim*n_time) - reshape(Z_traj_minus(:,:,k),dim,dim*n_time)) ./ repmat(2.*nonzeros(Delta_k)',dim,1);
-                    else
-                        % Approximate the derivatives df(z_j(z_k),mu)/dz_k. The matrices are arranged as: [df(z_0(z_k),mu)/dz_k, df(z_1(z_k),mu)/dz_k, ...] = [dim x dim*n_time]
-                        df_dz_k = (Fcn(0,reshape(Z_traj_plus(:,:,k),dim,dim*n_time),param) - Fcn(0,Z_dim_j,param)) ./ repmat(nonzeros(Delta_k)',dim,1);
-                        % Approximate the derivatives df(z_j,mu)/dz_j (matrices arranged like above)
-                        df_dz_j = (Fcn(0,Z_dim_j_plus,param) - Fcn(0,Z_dim_j,param)) ./ repmat(nonzeros(Delta_j)',dim,1);
-                        % Approximate the derivatives dz_j(z_k)/dz_k (matrices arranged like above)
-                        dz_j_dz_k = (reshape(Z_traj_plus(:,:,k),dim,dim*n_time) - reshape(Z_dim_j,dim,dim*n_time)) ./ repmat(nonzeros(Delta_k)',dim,1);
-                    end
-                    df_dz_k = reshape(permute(reshape(df_dz_k,dim,dim,n_time),[1 3 2]),dim*n_time,dim);         % Reshape matrices [M1, M2, ... , Md] ([dim x dim*n_time]) into [M1; M2; ... ; Md] ([dim*n_time x dim])
-                    dz_j_dz_k = reshape(permute(reshape(dz_j_dz_k,dim,dim,n_time),[1 3 2]),dim*n_time,dim);     % Reason: We need this particular structure to compute dpc/dz_k by matrix multiplication without a loop
-                    % dpc_ds:
-                    % Do a loop over the n_time evaluation points (t_j,z_j) -> only necessary to compute df_dz_k = df_dz_j * dz_j_dz_k or to compute dpc_ds via direct numerical differentiation
-                    % for j = 1:n_time
-                        % df_dz_k((j-1)*dim+1:j*dim,:) = df_dz_j((j-1)*dim+1:j*dim,:) * dz_j_dz_k((j-1)*dim+1:j*dim,:);       % Alternative way of computing df(z_j(z_k),mu)/dz_k -> quasi identical to method above
-                        % Alternative method to compute dpc_ds: "Direct" numerical differentiation of the phase condition without exploiting product (and chain) rule -> slower than other method
-                        % Z_k_j_plus = reshape(Z_traj_plus(:,j,k),dim,dim);         % [dim x dim] matrix of the d different z_j after perturbing z_k by "+ delta" in each dimension
-                        % Z_k_j_minus = reshape(Z_traj_minus(:,j,k),dim,dim);       % [dim x dim] matrix of the d different z_j after perturbing z_k by "- delta" in each dimension
-                        % Z_j_mat = Z_dim_j(:,(j-1)*dim+1:j*dim);                   % [dim x dim] matrix where the unperturbed z_j is repeated d times
-                        % Z_p_j = repmat(Z_p_traj(:,j,k),1,dim);                    % [dim x dim] matrix where z_p(t_j) (z_j at predictor point) is repeated d times
-                        % if calc_stability                                         % If this method is used: temp = zeros(1,dim) needs to be initialised before the loop is executed
-                        %     dpc_dz_k = dpc_dz_k + diag(Fcn(0,Z_k_j_plus,param).' * (Z_k_j_plus - Z_p_j) - Fcn(0,Z_k_j_minus,param).' * (Z_k_j_minus - Z_p_j)).' ./ (2.*nonzeros(Delta_k(:,1:dim))).';
-                        % else
-                        %     dpc_dz_k = dpc_dz_k + diag(Fcn(0,Z_k_j_plus,param).' * (Z_k_j_plus - Z_p_j) - Fcn(0,Z_j_mat,param).' * (Z_j_mat - Z_p_j)).' ./ nonzeros(Delta_k(:,1:dim)).';
-                        % end
-                    % end
-                    % dpc_ds(1,(k-1)*dim+1:k*dim) = dpc_dz_k;                                                   % dpc/dz_k when using the "direct" numerical differentiation
-                    dpc_ds(1,(k-1)*dim+1:k*dim) = (Z_traj_k - Z_p_k).' * df_dz_k + f_k.' * dz_j_dz_k;           % dpc/dz_k
-                    % dpc_domega:
-                    df_dz_j_mat = kron(speye(n_time),spones(ones(dim)));            % Create a [n_time*dim x n_time*dim] block diagonal matrix with ones(dim)
-                    df_dz_j_mat(logical(df_dz_j_mat)) = df_dz_j;                    % Replace all ones in df_dz_j_mat with the derivatives df(z_j,mu)/dz_j
-                    j_vec = reshape(repmat(0:n_time-1,dim,1),dim*n_time,1);         % Create a vector containing dim times 0, dim times 1, ..., dim times (n_time-1)
-                    dpc_domega = dpc_domega - 2*pi/(n_time*n_shoot*omega^2) * ((df_dz_j_mat*f_k).' * (j_vec.*(Z_traj_k - Z_p_k)) + f_k.'*(j_vec.*(f_k-f_p_k)));  
+                % Calculating dpc_ds and dpc_domega with a loop: The loop is not required, but this code is easier to understand than the vectorized variant below
+                % dpc_ds = zeros(1,dim*n_shoot);                                      % Initialise
+                % dpc_domega = 0;                                                     % Initialise -> dpc_domega is iteratively computed and added up in a loop
+                % for k = 1:n_shoot
+                %     Delta_k = repmat(Delta(:,(k-1)*dim+1:k*dim),1,n_time);          % Part of matrix Delta that belongs to k-th shooting point and repeated n_time times -> size: [dim x dim*n_time]
+                %     f_k = f((k-1)*dim*n_time+1:k*dim*n_time);                       % Part of f (Fcn evaluated for all ~100 evaluation points) that belongs to k-th interval -> size: [dim*n_time x 1]
+                %     f0_k = f0((k-1)*dim*n_time+1:k*dim*n_time);                     % Part of f (Fcn evaluated for all ~100 evaluation points) that belongs to k-th interval -> size: [dim*n_time x 1]
+                %     Z_dim_j = repmat(Z_traj(:,:,k),dim,1);                          % This is a [dim*dim x n_time] matrix where each z_j is repeated dim times below
+                %     if calc_stability                                               % Approximate the derivatives dz_j(z_k)/dz_k (matrices arranged like above)
+                %         dz_j_dz_k = reshape(Z_traj_plus(:,:,k) - Z_traj_minus(:,:,k),dim,dim*n_time) ./ repmat(2.*nonzeros(Delta_k)',dim,1);
+                %     else
+                %         dz_j_dz_k = reshape(Z_traj_plus(:,:,k) - Z_dim_j,dim,dim*n_time) ./ repmat(nonzeros(Delta_k)',dim,1);
+                %     end
+                %     dz_j_dz_k = reshape( permute( reshape(dz_j_dz_k,dim,dim,n_time), [1 3 2] ), dim*n_time, dim);   % We need this particular structure to compute dpc/dz_k by matrix multiplication without a loop
+                %     % dz_j_dz_k now stores the n_time [dim x dim] matrices dz_j/dz_k below each other (before the line above, these matrices were stored right next to each other)
+                %     dpc_ds(1,(k-1)*dim+1:k*dim) = f0_k.' * dz_j_dz_k;                                 % dpc/dz_k
+                %     dpc_domega = dpc_domega - 2*pi/(n_time*n_shoot*omega^2) * f0_k.'*(j_vec.*f_k);    % dpc/domega
+                % end
+                % Calculating dpc_ds and dpc_domega without a loop:
+                Delta_exp = repmat(reshape(Delta,dim,dim,n_shoot),1,n_time,1);      % We need the Delta matrix (n_time)-times to compute dz_j_dz_k: Delta = [dim x dim*n_shoot] -> Delta_exp = [dim x dim*n_time x n_shoot]
+                Z_traj_dim = repmat(Z_traj,dim,1,1);                                % This is needed to compute dz_j_dz_k via forward difference
+                if calc_stability                                                   % Approximate the derivatives dz_j(z_k)/dz_k
+                    dz_j_dz_k = reshape(Z_traj_plus - Z_traj_minus,dim,dim*n_time,n_shoot) ./ repmat(2.*reshape(nonzeros(Delta_exp),1,dim*n_time,n_shoot),dim,1);
+                else
+                    dz_j_dz_k = reshape(Z_traj_plus - Z_traj_dim,dim,dim*n_time,n_shoot) ./ repmat(reshape(nonzeros(Delta_exp),1,dim*n_time,n_shoot),dim,1);
                 end
+                dz_j_dz_k = reshape( permute( reshape(dz_j_dz_k,dim,dim,n_time,n_shoot), [1 3 2 4] ), dim*n_time, dim*n_shoot );    % We need this particular structure for the multiplikation with f0
+                % dz_j_dz_k stores the n_time*n_shoot [dim x dim] matrices dz_j/dz_k in the k-th "column" and the j-th "row". The reshape(f0,...).' below stores in the k-th row the f(z0_{k,j}) for all j 
+                f0_dz_j_dz_k = reshape(f0,dim*n_time,n_shoot).' * dz_j_dz_k;        % This product evaluates all f(z0_{k,j}).' * dz_j/dz_k (for all combinations of the two k). However, we only need products of matching k
+                eval_mat = logical( kron(speye(n_shoot),ones(1,dim)) );             % Evaluation matrix to obtain the products of matching k. They can be found on the "pseudo-diagonal" defined by the kron()-product
+                dpc_ds = reshape(f0_dz_j_dz_k(eval_mat),1,dim*n_shoot);             % dpc/ds | The reshape is needed because a row vector is returned for n_shoot = 1, while a column vector is returned for > 1
+                j_vec = reshape(repmat(0:n_time-1,dim,1),dim*n_time,1);             % Create a vector containing dim times 0, dim times 1, ..., dim times (n_time-1)
+                J_vec = repmat(j_vec,n_shoot,1);                                    % j_vec is repeated n_shoot times since j_vec is only for the k-th shooting point (but it is constant for all k)
+                dpc_domega = - 2*pi/(n_time*n_shoot*omega^2) * f0.'*(J_vec.*f);     % dpc_domega
                 % dpc_dmu:
                 if calc_stability
-                    df_dmu = (Fcn(0,reshape(Z_traj_mu_plus,dim,n_time*n_shoot),param_mu_plus) - Fcn(0,reshape(Z_traj_mu_minus,dim,n_time*n_shoot),param_mu_minus)) ./ (2*delta_mu);
+                    df0_dmu = (Fcn(0,reshape(Z0,dim,n_time*n_shoot),param_mu_plus) - Fcn(0,reshape(Z0,dim,n_time*n_shoot),param_mu_minus)) ./ (2*delta_mu);
                     dz_j_dmu = (reshape(Z_traj_mu_plus,dim,n_time*n_shoot) - reshape(Z_traj_mu_minus,dim,n_time*n_shoot)) ./ (2*delta_mu);
-                    dz_p_dmu = (reshape(Z_p_mu_plus,dim,n_time*n_shoot) - reshape(Z_p_mu_minus,dim,n_time*n_shoot)) ./ (2*delta_mu);
                 else
-                    df_dmu = (Fcn(0,reshape(Z_traj_mu_plus,dim,n_time*n_shoot),param_mu_plus) - Fcn(0,reshape(Z_traj,dim,n_time*n_shoot),param)) ./ delta_mu;
+                    df0_dmu = (Fcn(0,reshape(Z0,dim,n_time*n_shoot),param_mu_plus) - Fcn(0,reshape(Z0,dim,n_time*n_shoot),param)) ./ delta_mu;
                     dz_j_dmu = (reshape(Z_traj_mu_plus,dim,n_time*n_shoot) - reshape(Z_traj,dim,n_time*n_shoot)) ./ delta_mu;
-                    dz_p_dmu = (reshape(Z_p_mu_plus,dim,n_time*n_shoot) - reshape(Z_p,dim,n_time*n_shoot)) ./ delta_mu;
                 end
-                dpc_dmu = reshape(df_dmu,dim*n_time*n_shoot,1).' * reshape(Z_traj - Z_p,dim*n_time*n_shoot,1) + f.' * reshape(dz_j_dmu - dz_p_dmu,dim*n_time*n_shoot,1);
+                dpc_dmu = reshape(df0_dmu,dim*n_time*n_shoot,1).' * reshape(Z_traj - Z0,dim*n_time*n_shoot,1) + f0.' * reshape(dz_j_dmu,dim*n_time*n_shoot,1);
         end
     end
          

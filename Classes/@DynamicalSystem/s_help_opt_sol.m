@@ -55,4 +55,11 @@ function help_struct = s_help_opt_sol()
                                            '--> ''error-control'': Similar to ''iter-detailed'', but with additional error control information (if enabled).\n' ...
                                            '--> ''full'': All possible information are displayed. This is similar to the log file.'];
 
+    help_struct.optional.log.value = '''on'' or ''off'' \n Default: ''on''';
+    help_struct.optional.log.text  = 'Defines whether a log file of the computation is returned.';
+
+    help_struct.optional.save.value = '''on'' or ''off'' \n Default: ''off''';
+    help_struct.optional.save.text  = ['If enabled, CoSTAR saves the DynamicalSystem object DYN and the Solution object S in a mat-file after every computed solution.\n' ...
+                                       'This can be used to save the already computed data in the case that CoSTAR terminates suddenly due to an error.'];
+
 end

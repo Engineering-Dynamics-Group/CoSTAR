@@ -38,5 +38,8 @@ function help_struct = s_help_opt_approx_method_PS_FDM()
                                                'E.g. when ''points'' is set to [-2,-1,0,1], dz(theta_i)/dtheta is approximated by the state space vectors z at the grid points (i-2), (i-1), (i) and (i+1). \n' ...
                                                'Note: All elements of ''points'' must be unique. ' ... % and p must not be greater than n_int. 
                                                'Moreover, the properties ''scheme'' and ''approx_order'' are not allowed when specifying ''points''.'];
-
+    
+    help_struct.optional.phase_condition.value  = '''poincare'' or ''integral''\n Default: ''integral''';
+    help_struct.optional.phase_condition.text   = ['Defines the phase condition (PC), which is only allowed for autonomous systems. The PC is required to compute the frequency, which is an unknown variable for autonomous systems.\n' ...
+                                                   'The Poincare PC is easier to compute, while the Integral PC minimises shifts in the solution profile, which is why the Integral PC is recommended.'];
 end

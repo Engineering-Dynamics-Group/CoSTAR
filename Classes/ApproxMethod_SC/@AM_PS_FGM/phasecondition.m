@@ -9,10 +9,10 @@
 %equation.
 
 
-function ph = phase_condition(obj,FCtemp,DYN)
+function ph = phasecondition(obj,FCtemp,DYN)
 
 
-switch obj.phasecond
+switch obj.phase_condition
 
     case 'poincare' %This one works at the moment.
 
@@ -37,7 +37,7 @@ switch obj.phasecond
         p_n_hh = obj.p_n_hh;
 
         %!!! This needs attention w.r.t. matrix size, if adaption of higher harmonics is incorporated!!!
-        FC0 = [x0((dim+1):(p_n_hh)*dim)-1i.*x0(((p_n_hh)*dim+1):(end-1))];          %Assemble complex Fourrier vector of the previously known solution (or start point of Newton-Scheme at the first curve point)
+        FC0 = x0((dim+1):(p_n_hh)*dim)-1i.*x0(((p_n_hh)*dim+1):(end-1));            %Assemble complex Fourrier vector of the previously known solution (or start point of Newton-Scheme at the first curve point)
         FCtemp0 = reshape(FC0,[dim,p_n_hh-1]);                                      %Reshape to matrix
         ph = -sum(obj.hmatrix(2:end).*sum(imag(conj(FCtemp(:,2:end)).*FCtemp0),1)); %Analytical solution of the integral Poincare condition (possible for FGM)
 

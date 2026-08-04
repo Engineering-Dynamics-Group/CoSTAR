@@ -24,7 +24,7 @@ if isempty(obj.step_control_param)                                      % If ste
 
 
         case 'angle'
-            it_nom = 2;                                                 % Nominal number of corrector iterations
+            it_nom = 3;                                                 % Nominal number of corrector iterations
             alpha_nom = 3;                                              % Nominal angle in degrees between the direction vectors at the last two points
             obj.step_control_param = [it_nom, alpha_nom];               % Setting the parameter array
 
@@ -33,16 +33,6 @@ if isempty(obj.step_control_param)                                      % If ste
             it_nom = 2;                                                 % Nominal number of corrector iterations
             alpha_nom = 3;                                              % Nominal angle in degrees between the direction vectors at the last two points
             obj.step_control_param = [it_nom, alpha_nom];               % Setting the parameter array
-
-
-        case 'pid'
-            it_nom = 2;                                                 % Nominal number of corrector iterations
-            tol = 0.1;                                                  % Reference value
-            % Valli, Elias, Carey, Coutinho (2009) - "PID adaptive control of incremental and arc-length continuation": kP = 0.075; kI = 0.175; kD = 0.01;
-            kP = 0.075;
-            kI = 0.175;
-            kD = 0.01;
-            obj.step_control_param = [it_nom, tol, kP, kI, kD];         % Setting the parameter array
 
     end
 

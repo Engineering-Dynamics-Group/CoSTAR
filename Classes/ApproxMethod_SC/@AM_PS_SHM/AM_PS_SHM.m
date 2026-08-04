@@ -8,8 +8,12 @@ classdef AM_PS_SHM < ApproxMethod
         solver_function function_handle                                 % Function handle for the actual ODE integrator function
         
         n_shoot = 2;                                                    % Number of shooting points for multiple shooting
-        phase_condition = 'poincare';                                   % Phase condition
-                
+        phase_condition = 'integral';                                   % Phase condition
+        
+        Z0                                                              % Stores the trajectory of the preceding solution (needed for the integral phase condition)
+        Z_traj                                                          % Buffers the trajectory computed in the residuum function. It is copied to Z0 in IF_up_res_data
+        n_time                                                          % Number of time evaluation points in each shooting interval for the integral phase condition
+
         %Inherited Properties
         % res, iv, error_control
     end
@@ -31,18 +35,19 @@ classdef AM_PS_SHM < ApproxMethod
         % Constructor
         function obj = AM_PS_SHM(DYN)     
             obj = updateoptions(obj,DYN.opt_approx_method);             % updateoptions method is a general method
+            obj.n_time = ceil(100/obj.n_shoot);                         % Calculate n_time (needs to be executed AFTER updateoptions but BEFORE getIV!)
             obj = setSolver(obj,obj.solver);
             obj = obj.getIV(DYN);                                       % Set initial value (has to be set here, because residual accesses iv)
         end
         
         % Interface Methods
-        obj = IF_up_res_data(obj,CON,DYN);                              % This methods modifies the superclass method
+        obj = IF_up_res_data(obj,var,DYN);                              % This methods modifies the superclass method
         obj = getIV(obj,DYN);
    
         % Methods for shooting algorithms
         [res,J_res] = PS_SHM_residuum(obj,y,DYN);                       % Residuum function
-        [F,J] = fun_Jac_wrapper(obj,y,CONT);                            % Function wrapper for fsolve to evaluate jacobian "analytically"
-        [F,J] = fun_Jac_wrapper_init(obj,y,y0);                         % Function wrapper_init for fsolve to evaluate jacobian "analytically" for initial solution
+        [F,J] = res_fun(obj,y,CON);                                     % Function wrapper for the corrector to evaluate the Jacobian "analytically"
+        [F,J] = res_fun_init(obj,y,y0);                                 % Function wrapper for the corrector to evaluate the Jacobian "analytically" for the initial solution
 
     end
     

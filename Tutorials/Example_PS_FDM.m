@@ -102,7 +102,7 @@ options.system   = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','
 options.opt_sol = costaropts('sol_type','periodic','approx_method','finite-difference','cont','on','stability','on', ...    % Properties of the solution
                              'auto_freq',auto_freq,'act_param',active_parameter);                                           % Properties of the solution
 options.opt_init = costaropts('c1',C1,'s1',S1);                                                                             % Property for initial solution
-options.opt_approx_method = costaropts('n_int',100,'points',[-4,-3,-2,-1,0,1,2]);                                           % Properties of approximation method
+options.opt_approx_method = costaropts('n_int',100,'points',[-4,-3,-2,-1,0,1,2],'phase_condition','integral');              % Properties of approximation method
 options.opt_cont = costaropts('mu_limit',mu_limit);                                                                         % Properties for continuation
 
 % Continuation

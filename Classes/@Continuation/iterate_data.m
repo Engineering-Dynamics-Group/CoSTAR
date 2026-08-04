@@ -14,10 +14,5 @@ function obj = iterate_data(obj)
     obj.p_r_old         = obj.p_r;                          % Factor which adapts step width
     obj.p_n_unstable_0       = obj.p_n_unstable_1;          % Number of unstable multipliers
     obj.p_stability_flag_old = obj.p_stability_flag;        % Exitflag of stability computation
-  
-    if strcmpi(obj.step_control,'pid')
-        obj.p_e_old_old  = obj.p_e_old;                     % Used for PID step control
-        obj.p_e_old      = obj.p_e;                         % Used for PID step control
-    end
     
 end

@@ -9,12 +9,13 @@ classdef AM_PS_FDM < ApproxMethod
         n_int = 100;            % Number of hyper-time intervals DeltaTheta into which the hyper-time period 2*pi is divided, i.e. 2*pi = n_int * DeltaTheta
         scheme = 'central';     % Discretization scheme used to approximate the derivation dz(theta_i)/dtheta
         approx_order = 6;       % Order of finite-difference approximation of dz(theta_i)/dtheta
-        points                  % Stores the local grid point indices sigma_k which are used to approximate dz/dtheta at theta_i using z_(i+sigma_k) = z(theta_i + sigma_k * DeltaTheta)               
+        points                  % Stores the local grid point indices sigma_k which are used to approximate dz/dtheta at theta_i using z_(i+sigma_k) = z(theta_i + sigma_k * DeltaTheta)
         weights;                % Stores the weighting factors needed to approximate dz(theta_i)/dtheta by dz_i/dtheta = 1/DeltaTheta * sum_(k=1)^p ( w_(sigma_k) * z_(i+sigma_k) )
         c0                      % Fourier-coefficient of 0-th order to create the initial solution vector
         c1                      % Fourier-coefficient of 1-st order cosine term to create the initial solution vector
         s1                      % Fourier-coefficient of 1-st order sine term to create the initial solution vector
         fdm_sol                 % Already calculated method solution vector s used as an initial value to calculate the initial solution
+        phase_condition = 'integral';   % Phase condition
 
         % Inherited properties from superclass ApproxMethod
         % res function_handle                                           % Residual function defined by a solution method (e.g. Shoot)
@@ -35,12 +36,12 @@ classdef AM_PS_FDM < ApproxMethod
     %%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%
 
-    methods(Static)                                                     % Static methods: can be called without creating an object of class AM_PS_FDM
+    methods(Static)                                                         % Static methods: can be called without creating an object of class AM_PS_FDM
 
-        s_PS_FDM_gatekeeper(GC,system,opt_approx_method,opt_init);      % Gatekeeper method, which is called by the static s_AM_gatekeeper method to check the inputs at the beginning 
+        s_PS_FDM_gatekeeper(GC,system,opt_sol,opt_approx_method,opt_init);  % Gatekeeper method, which is called by the static s_AM_gatekeeper method to check the inputs at the beginning 
         
-        help_struct = s_help_opt_approx_method_PS_FDM();                % Help struct for the opt_approx_method option structure 
-        help_struct = s_help_opt_init_PS_FDM();                         % Help struct for the opt_init option structure
+        help_struct = s_help_opt_approx_method_PS_FDM();                    % Help struct for the opt_approx_method option structure 
+        help_struct = s_help_opt_init_PS_FDM();                             % Help struct for the opt_init option structure
 
     end
 
@@ -70,11 +71,11 @@ classdef AM_PS_FDM < ApproxMethod
         obj = getWeights(obj,DYN);              % Method to get (or calculate) the weights used to approximate dz(theta_i)/dtheta
         obj = getIV(obj,DYN);                   % Method that generates an initial value for nonlinear equation solver (e.g. fsolve) to start from. Uses options defined in opt_init structure
 
-        [F,J] = corr_fun_init_FDM(obj,y,y0);        % Method that provides the residuum vector function and the corresponding Jacobian matrix for fsolve to calculate the initial solution
-        [F,J] = corr_fun_FDM(obj,y,CON);            % Method that provides the residuum vector function and the corresponding Jacobian matrix for fsolve during continuation
+        [F,J] = res_fun_init(obj,y,y0);         % Method that provides the residuum vector function and the corresponding Jacobian matrix for fsolve to calculate the initial solution
+        [F,J] = res_fun(obj,y,CON);             % Method that provides the residuum vector function and the corresponding Jacobian matrix for fsolve during continuation
         [res,J_res] = PS_FDM_residuum(obj,y,DYN);   % Method that builds the residuum of the finite-difference equation system and its Jacobian matrix
         
-        obj = IF_up_res_data(obj,CON);          % Interface method: Used to pass information between continuation algorithm an this subclass
+        obj = IF_up_res_data(obj,var,DYN);      % Interface method: Used to pass information between continuation algorithm an this subclass
         IC  = getIC(obj,y,DYN,n_shoot);         % Method that extracts the state space vector z(theta=0), which is needed for stability calculation via the shooting method
 
     end
