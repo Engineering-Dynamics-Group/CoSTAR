@@ -65,6 +65,8 @@ classdef Continuation < handle
         p_error_flag = 1                                                      %A flag indicating that a critical error has occured (p_error_flag = 0)
         p_error_msg                                                           %Stores the error message
 
+        p_returnTol = 1e-3;                                                   %Tolerance for the detection of curve return
+
         %Parameters of the last point
         p_dy_old                                                              %Direction vector of the predictor
         p_r_old = 1;                                                          %Factor which adapts step width

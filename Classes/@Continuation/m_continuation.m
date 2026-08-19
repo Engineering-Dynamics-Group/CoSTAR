@@ -152,7 +152,7 @@ while  obj.p_contDo
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%% Check Return %%%%%%%%%%%%%%%%%%%%%%%%
     % [obj.p_contDo, obj.p_stopping_flag] = checkReturn(obj.p_y1,[S.s;S.mu],obj.p_contDo,obj.p_stopping_flag);
-    % obj.checkReturn([S.s;S.mu]);
+    obj.checkReturn([S.s;S.mu]);
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%  STABILITY  %%%%%%%%%%%%%%%%%%%%%%%%%
     %Calculate the Lyapunov stability. If a bifurcation point is found, the location of the point can be iterated
