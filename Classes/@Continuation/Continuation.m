@@ -128,6 +128,7 @@ classdef Continuation < handle
         
         obj = iterate_data(obj);                                            %Iterates the relevant data: new data point 1 is now current data point 0 for next iteration
         obj = check_limits(obj,DYN);                                        %Checks, if the current continuation parameter is within the prescribed mu limit
+        obj = checkReturn(obj,x,y);                                         %Checks, if curve returns on itself
 
         obj = stepcontrol(obj,DYN);                                         %Method adapts step width according to achieve a determined number of Newton iterations
         obj = choose_stepcontrol_param(obj);                                %Method defining the default values of step_control_param
