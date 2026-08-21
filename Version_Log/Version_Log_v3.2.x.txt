@@ -1,4 +1,32 @@
 --------------------------------------------
+------------------ v3.2.2 ------------------
+--------------------------------------------
+
+The new version v3.2.2 is the result of the feature bracnch returnCheck.
+
+
+	@Continuation:
+		- Continuation:
+			--> Added property "p_returnTol" with default value 1e-3
+			--> Added method "checkReturn"
+
+		- m_continuation:
+			--> If statement added to check Return if approx_method is other than fourier-galerkin (lines 154 - 163)
+			--> Auxilary array "freqVec" contains the autonomous frequencies of previous curve points (line 158) (Possible to add a property which contains the autonmous frequencies in the future)
+			--> Call for method checkReturn added (line 162)
+
+		- checkReturn: (new method)
+			--> Method of class Continuation
+			--> Receives previous curve points with (!!!) the autonomous frequencies [s;om]
+			
+
+	@test:
+		- New test function "test_SHM_PS_vdP_forced_checkReturn" added
+			--> Checks if continuation terminates if curve returns on itself
+
+
+
+--------------------------------------------
 ------------------ v3.2.1 ------------------
 --------------------------------------------
 
