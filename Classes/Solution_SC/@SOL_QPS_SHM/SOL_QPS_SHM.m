@@ -12,6 +12,7 @@ classdef SOL_QPS_SHM < Solution
         phi                                                                                 % Phase values for each characteristic
         n_char                                                                              % Number of characteristics
         n                                                                                   % Number of state-space variables
+        n_shoot                                                                             % Number of shooting points
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%
     methods
@@ -20,6 +21,7 @@ classdef SOL_QPS_SHM < Solution
             obj.odeOpts = AM.odeOpts;                                                       % Fetch ode-solver options
             obj.n_char = AM.n_char;                                                         % Fetch number of characteristics
             obj.n = AM.n;                                                                   % Fetch number of state-space variables
+            obj.n_shoot = AM.n_shoot;
         end
         
         function IF_arch_init_data(obj,y1,J1,Ik,newton_flag,phi,DYN,varargin)               % Interface method for archiving the data of the initial solution

@@ -16,10 +16,16 @@ Fcn = DYN.rhs;                                                          % Set Fc
 dim = obj.n;                                                            % Get the state-space dimension
 param = DYN.param;                                                      % Get the param-array
 n_char = obj.n_char;                                                    % Get the number of characteristics
+n_shoot = obj.n_shoot;                                                  % Get the number of shooting points
 index = options.index;                                                  % Get the index of the solution
 n_evals = numel(index);                                                 % Get the number of solution points to be calculated
 mu = obj.mu(1,index);                                                   % Get the mu-values
-s1 = reshape(obj.s(:,index),dim,n_char,n_evals);                        % Get solution vectors at desired mu-values and reshape them
+
+
+s_nodes = reshape(obj.s(:,index),[dim,n_shoot,n_char,n_evals]);         % Get all nodes (boundary and inner nodes) used for the multiple shooting method
+s1 = reshape(s_nodes(:,1,:,:),[dim,n_char,n_evals]);                    % Select the first node, i.e. the node on the boundary, for every characteristic
+
+
 freq = obj.freq(:,index);                                               % Get the corresponding frequencies
 phi = obj.phi;                                                          % Get the phi-values
 if size(options.resolution,2) == 2

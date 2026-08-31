@@ -7,6 +7,7 @@ classdef AM_QPS_SHM < ApproxMethod
         mu0                                                                 %Initial value of mu
         n                                                                   %Dimension of state-space
         n_char = 100;                                                       %Number of characteristics
+        n_shoot = 1;
         Ik                                                                  %Integration interval
         phi
         odeOpts = odeset('RelTol',1e-8,'AbsTol',1e-10);                     %options for the ODE integrators.
@@ -55,21 +56,27 @@ classdef AM_QPS_SHM < ApproxMethod
 
         %% Methods
         %interface methods
-        obj = IF_up_res_data(obj,var,DYN);                              % This methods modifies the superclass method. var1 can be either y0 (see method QPS_SHM_calc_stability) or CON
+        obj = IF_up_res_data(obj,var1,DYN);                             % This methods modifies the superclass method. var1 can be either y0 (see method QPS_SHM_calc_stability) or CON
         obj = getIV(obj,DYN);                                           % Method generates initial value for shooting method from point in state-space
         IC  = getIC(obj,y,DYN,n_char_st);                               % Method that interpolates the initial vectors z(0,theta_2) (potentially needed needed for stability calculation)
+        Z0 = initializeShootingNodes(obj,Z_C0,FW,T);                    % Function that calculates the complete [dim, n_shoot, n_char]-matrix needed as initial values for the (multiple-)shooting method.
 
         %% Methods for shooting algorithms
         [f,J] = qp_SHM_non_auto_fun(obj,y,DYN);                         % Residual for non-autonomous case for quasi-periodic shooting algorithm
         [f,J] = qp_SHM_mixed_fun(obj,y,DYN);                            % Residual for mixed case for quasi-periodic shooting algorithm
         [f,J] = qp_SHM_auto_fun(obj,y,DYN);                             % Residual for full-autonomous case for quasi-periodic shooting algorithm
 
-        [F,J] = res_fun(obj,y,CON);                                     % Function wrapper for the corrector to evaluate the Jacobian "analytically"
-        [F,J] = res_fun_init(obj,y,y0);                                 % Function wrapper for the corrector to evaluate the Jacobian "analytically" for the initial solution
+        [f,J] = fun_Jac_wrapper(obj,y,CONT);                            % Function wrapper for fsolve to evaluate jacobian "analytically"
+        [f,J] = fun_Jac_wrapper_init(obj,y,y0);                         % Function wrapper_init for fsolve to evaluate jacobian "analytically" for initial solution
 
         f = FcnWrapperODE2(obj,t,z,Fcn,PHI);                            % Function wrapper for ode-solver                             
         f = FcnWrapperODE5(obj,t,z,Fcn,PHI);                            % Function wrapper for ode-solver  
         
+        %% Helper methods for multiple shooting
+        M = perturbMatr(obj,input_matrix,dim,n_char);
+        M = perturbMatrSub(obj,input_matrix,dim,n_char,n_shoot);
+        M = expandResidualMatr(obj,input_matrix,dim,n_char,n_shoot);
+
         P = poincare_int(obj,F,F1,Omega,Ik);                            % Poincare phase condition
     end
 end

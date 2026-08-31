@@ -17,4 +17,6 @@ function help_struct = s_help_opt_approx_method_QPS_SHM()
     help_struct.optional.n_char.value   = 'positive integer \n e.g.: 10, 20, 30, ... \n Default: 100';
     help_struct.optional.n_char.text    = 'Defines the number of characteristics which are "shot" over the manifold. More characteristics improve the resolution but lead to higher numerical cost. Use a high number for complex manifolds.';
     
+    help_struct.optional.n_shoot.value  = 'positive integer \n e.g.: 1, 2, 3, 4, ... \n Default: 1';
+    help_struct.optional.n_shoot.text   = 'Number of intervals into which the period of a solution is divided for multiple shooting. n_shoot = 1 is denoted as single shooting method, while n_shoot > 1 represents multiple shooting.';
 end

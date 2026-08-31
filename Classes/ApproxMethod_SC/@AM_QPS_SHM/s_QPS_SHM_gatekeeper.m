@@ -11,7 +11,7 @@
 function s_QPS_SHM_gatekeeper(GC,system,opt_sol,opt_approx_method,opt_init)
 
 opt_approx_method_mandatory_fieldnames  = {};                               %mandatory fieldsnames in the opt_approx structure
-opt_approx_method_allowed_fieldnames    = {'solver','n_char'};              %allowed fieldsnames in the opt_approx structure
+opt_approx_method_allowed_fieldnames    = {'solver','n_char','n_shoot'};              %allowed fieldsnames in the opt_approx structure
 
 opt_init_mandatory_fieldnames  = {};                                        %mandatory fieldsnames in the opt_init structure
 opt_init_allowed_fieldnames    = {'iv','c0','c1_matrix','s1_matrix'};       %allowed fieldsnames in the opt_init structure
@@ -46,6 +46,17 @@ if isfield(opt_approx_method,'n_char')
     GC.speak();
 end
 
+% Field 'n_shoot'
+if isfield(opt_approx_method,'n_shoot')            
+    GC.check_data(opt_approx_method.n_shoot,'opt_approx_method.n_shoot','double','scalar','positive');
+    if mod(opt_approx_method.n_shoot,1)~=0
+        GC.error_msg{1,end+1} = append('The value of the options field opt_approx_method.n_shoot is ',num2str(opt_approx_method.n_shoot),', but it must be an integer!');
+    end
+    if opt_approx_method.n_shoot == 0
+        GC.error_msg{1,end+1} = append('The value of the options field opt_approx_method.n_shoot is 0, but it must be a positive integer (> 0)!');
+    end
+end
+GC.speak;
 
 %% Check the the opt_init_method structure
 GC.check_fields(opt_init,'opt_init',opt_init_mandatory_fieldnames,opt_init_allowed_fieldnames);

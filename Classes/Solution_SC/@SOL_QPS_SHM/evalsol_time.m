@@ -19,7 +19,8 @@ for k =1:N
     idx     = index(k);                                                                                                                     % Get index
     freq    = obj.freq(:,idx);                                                                                                              % Get frequencies
     mu_temp =  obj.mu(1,idx);                                                                                                               % Get bifurcation parameter
-    s_temp  = reshape(obj.s,[DYN.dim,obj.n_char,size(obj.mu,2)]);                                                                           % Reshape vector s 
+    s_nodes = reshape(obj.s,[DYN.dim,obj.n_shoot,obj.n_char,size(obj.mu,2)]);                                                               % Reshape the vector s to ...
+    s_temp = reshape(s_nodes(:,1,:,:),[DYN.dim,obj.n_char,size(obj.mu,2)]);                                                                 % ... extract only the first node of every characteristic
     
     Fcn = DYN.rhs;                                                                                                                          % RHS of ODE
     param = DYN.param;                                                                                                                      % Set parameters
