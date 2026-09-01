@@ -150,21 +150,21 @@ while  obj.p_contDo
         end
     end
 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%% Check Return %%%%%%%%%%%%%%%%%%%%%%%%
-    % Checks if curve returns to a previously computed part of the curve.
-    % Not available for Fourier-Galerkin method 
-    if(~strcmpi(DYN.approx_method,'fourier-galerkin'))
-        if(DYN.n_auto~=0)                                                   % Get autonomous frequencies
-            freqVec = S.freq(DYN.n_freq-DYN.n_auto+1:end,:);
-        else
-            freqVec = [];
-        end
-        obj.checkReturn([S.s;freqVec;S.mu]);                                % Check if curve returned on itself
-    end
+
     %%%%%%%%%%%%%%%%%%%%%%%%%%%  STABILITY  %%%%%%%%%%%%%%%%%%%%%%%%%
     %Calculate the Lyapunov stability. If a bifurcation point is found, the location of the point can be iterated
     %IMPORTANT: Has to be called after the error_control step
-    if strcmpi(DYN.stability,'on'); obj.bifurcation_stability(DYN,AM,S,ST); end
+    if strcmpi(DYN.stability,'on')
+        obj.bifurcation_stability(DYN,AM,S,ST);
+    end
+
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%% CHECK RETURN %%%%%%%%%%%%%%%%%%%%%%%%
+    % Checks if curve returns to a previously computed part of the curve
+    % IMPORTANT: Has to be called after error control and stability, but before saving
+    if strcmpi(AM.error_control,'off') && (obj.p_error_flag == 1)                              
+        obj.check_return(DYN,S);                                                %check if curve returned on itself
+    end
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%  SAVING  %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -176,7 +176,7 @@ while  obj.p_contDo
 
     %%%%%%%%%%  PLOTTING, CHECKING LIMITS AND DISPLAY INFO  %%%%%%%%%
     if strcmpi(obj.plot,'on') && (obj.p_error_flag == 1)
-        obj.plot_contplot(S,DYN)                                                %display a continuation plot if desired
+        obj.plot_contplot(S,DYN);                                               %display a continuation plot if desired
     end
 
     obj.iterate_data();                                                         %store calculated data point as current data point for next continuation step
