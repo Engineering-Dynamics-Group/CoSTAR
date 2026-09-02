@@ -65,6 +65,8 @@ classdef Continuation < handle
         p_error_flag = 1                                                      %A flag indicating that a critical error has occured (p_error_flag = 0)
         p_error_msg                                                           %Stores the error message
 
+        p_returnTol = 1e-3;                                                   %Tolerance for the detection of curve return
+
         %Parameters of the last point
         p_dy_old                                                              %Direction vector of the predictor
         p_r_old = 1;                                                          %Factor which adapts step width
@@ -127,7 +129,8 @@ classdef Continuation < handle
         obj = predictor_point(obj);                                         %Generates predictor point
         
         obj = iterate_data(obj);                                            %Iterates the relevant data: new data point 1 is now current data point 0 for next iteration
-        obj = check_limits(obj,DYN);                                        %Checks, if the current continuation parameter is within the prescribed mu limit
+        obj = check_limits(obj,DYN);                                        %Checks if the current continuation parameter is within the prescribed mu limit
+        obj = check_return(obj,DYN,S);                                      %Checks if curve returns on itself
 
         obj = stepcontrol(obj,DYN);                                         %Method adapts step width according to achieve a determined number of Newton iterations
         obj = choose_stepcontrol_param(obj);                                %Method defining the default values of step_control_param

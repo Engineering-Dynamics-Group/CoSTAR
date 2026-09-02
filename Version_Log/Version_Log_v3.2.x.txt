@@ -521,3 +521,26 @@ If a critical error occurs during execution now, CoSTAR saves the latest solutio
 @SOL_PS_FDM:
     - SOL_PS_FDM:
         --> Remove commented saving of fsolve_it and fval (former lines 41 - 41 and 75 - 76)
+
+
+
+--------------------------------------------
+------------------ v3.2.2 ------------------
+--------------------------------------------
+
+The new version v3.2.2 is the result of the feature branch returnCheck.
+
+	@Continuation:
+		- Continuation:
+			--> Added property "p_returnTol" with default value 1e-3 (line 68)
+			--> Added method "check_return" (line 133)
+        - check_limits:
+            --> Fixed a bug: the text '-- FAILED' is now only added to "info_text" if the stability is computed and obj.p_n_unstable_1 is not 0 and not > 0 (lines 17 - 21)
+		- check_return: (new method)
+			--> Completely added
+		- m_continuation:
+			--> Call for method check_return added after stability (line 162 - 167)		
+
+	test:
+        - test_SHM_PS_vdP_forced:
+		    --> Added test case where the continuation curve is a closed loop

@@ -14,11 +14,11 @@ formatSpec = '%.4f';
 % Create info text and log file entry
 info_text = append('Iter: ',num2str(local_cont_counter),' -- mu = ',num2str(obj.p_mu0,formatSpec),...
     ' -- stepwidth = ',num2str(obj.step_width,formatSpec));
-if obj.p_error_flag == 0
-    info_text = append(info_text,' -- FAILED');
-elseif strcmpi(DYN.stability,'on')
+if strcmpi(DYN.stability,'on')
     if obj.p_n_unstable_1 == 0;     info_text = append(info_text,' -- stable');
-    elseif obj.p_n_unstable_1 > 0;  info_text = append(info_text,' -- unstable');   end
+    elseif obj.p_n_unstable_1 > 0;  info_text = append(info_text,' -- unstable');
+    else;                           info_text = append(info_text,' -- FAILED');
+    end
 end
 write_log(DYN,info_text)
 
