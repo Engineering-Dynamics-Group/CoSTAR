@@ -37,6 +37,103 @@ end
 T = 2*pi/Omega(1,index(1));
 Ik = [0,T];
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%% Residual-only evaluation
+if nargout < 2
+
+    dT = (Ik(2)-Ik(1))/n_shoot;
+    T_start = Ik(1) + (0:n_shoot-1)*dT;
+    T_end   = Ik(1) + (1:n_shoot)*dT;
+
+    % Only unperturbed trajectories are needed.
+    Z_SubEnd = zeros(dim,n_shoot,n_char,'like',Z0_nodes);
+
+    FW = @(t,z)obj.FcnWrapperODE2( ...
+        t,z,@(t,z)DYN.rhs(t,z,param),PHI);
+
+    for i = 1:n_shoot
+
+        Z_start = reshape( ...
+            Z0_nodes(:,i,:),[dim*n_char,1]);
+
+        [~,Z] = obj.solver_function( ...
+            FW, ...
+            [T_start(i),T_end(i)], ...
+            Z_start, ...
+            obj.odeOpts);
+
+        Z_SubEnd(:,i,:) = reshape( ...
+            Z(end,:).',[dim,1,n_char]);
+
+    end
+
+    %% Quasiperiodic boundary residual
+    Z_end = reshape( ...
+        Z_SubEnd(:,end,:),[dim,n_char]);
+
+    finPhases = mod( ...
+        obj.phi(index(2),:) + T*Omega(index(2)), ...
+        2*pi);
+
+    [finPhasesSorted,sortindex] = sort(finPhases);
+
+    inverseSortindex = zeros(size(sortindex));
+    inverseSortindex(sortindex) = 1:n_char;
+
+    Z_boundary = reshape( ...
+        Z0_nodes(:,1,:),[dim,n_char]);
+
+    boundarySpline = csape( ...
+        [obj.phi(index(2),:),2*pi], ...
+        [Z_boundary,Z_boundary(:,1)], ...
+        'periodic');
+
+    Z_boundaryMapped = reshape( ...
+        fnval(boundarySpline,finPhasesSorted), ...
+        [dim,n_char]);
+
+    boundaryResidualSorted = ...
+        Z_end(:,sortindex) - Z_boundaryMapped;
+
+    boundaryResidual = ...
+        boundaryResidualSorted(:,inverseSortindex);
+
+    %% Assemble complete residual vector
+    node_index = reshape( ...
+        1:n_state,[dim,n_shoot,n_char]);
+
+    boundary_rows = reshape( ...
+        node_index(:,end,:),[],1);
+
+    f = zeros(n_state,1,'like',Z0_nodes);
+
+    if n_shoot > 1
+
+        interior_start_nodes = reshape( ...
+            node_index(:,1:end-1,:),[],1);
+
+        interior_end_nodes = reshape( ...
+            node_index(:,2:end,:),[],1);
+
+        f(interior_start_nodes) = ...
+            Z_SubEnd(interior_start_nodes) ...
+            - Z0_nodes(interior_end_nodes);
+
+    end
+
+    f(boundary_rows) = boundaryResidual(:);
+
+    return
+end
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %% Perturb initial values
 dz = sqrt(eps)*(1 + max(max(max(abs(Z0_nodes)))));                          % Define a small perturbation value
 

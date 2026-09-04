@@ -26,7 +26,7 @@ F = [g;y(end,1)-y0(end,1)];                                                 % Ad
 %% Build Jacobian
 dmu = sqrt(eps)*(1+abs(y(end,1)));                                          % Calculate differential for bifurcation parameter
 dy = [zeros(n-1,1);dmu];                                                    % Define vector of differential for derivative with respect to mu
-[delta_g,~] =  obj.res(y+dy);                                               % Calulate residual of Quasi-periodic shooting for perturbed bifurcation parameter
+delta_g =  obj.res(y+dy);                                               % Calulate residual of Quasi-periodic shooting for perturbed bifurcation parameter
 J = [[dg,(delta_g-g)./dmu];[zeros(1,n-1),1]];                               % Calulate Jacobian for initial solution of quasi-periodic shooting
 
 end
