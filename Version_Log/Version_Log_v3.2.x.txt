@@ -567,3 +567,13 @@ Bugfix: The frequencies of the bifurcation point for QPS SHM are saved correctly
             --> Added a reshape to the saving of the frequencies in the non-autonomous case (lines 45, 72 and 91)
             --> Adapted the saving of the frequencies in the full-autonomous case (lines 49, 76 and 95)
             --> Corrected the saving of the frequencies for the bifurcation point: Replaced p_y1 by p_y_bfp (lines 91, 93 and 95)
+
+
+----------
+
+Added display info and log file entry for the bifurcation point. The "Iter" number is also increased by one when a bifurcation point has been computed.
+
+    @Continuation:
+        - bifurcation_stability:
+            --> Increase local_cont_counter by one when a bifurcation point has been computed (line 81)
+            --> Added display info and log file entry for the bifurcation point (lines 82 - 86)

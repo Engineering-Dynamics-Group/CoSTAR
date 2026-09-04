@@ -76,6 +76,14 @@ function obj = bifurcation_stability(obj,DYN,AM,S,ST)
 
                         % IF_arch_bfp_data MUST be called before clean_curve_container for the identify_bifurcation method to work properly
                         S.IF_arch_bfp_data(obj,DYN,AM,ST);                          % Stores the data of the iterated bifurcation point
+
+                        % Print display text and write log
+                        obj.p_local_cont_counter = obj.p_local_cont_counter + 1;                % Set counter to next integer
+                        bfp_info_text = append('Iter: ',num2str(obj.p_local_cont_counter),' -- mu = ',num2str(obj.p_y_bfp(end),'%.4f'),...
+                                               ' -- Bifurcation Point -- ',cell2mat(S.bifurcation{end,1}));
+                        disp(bfp_info_text)                                                     % Display info text
+                        obj.p_last_msg = sprintf('%s%s\n',obj.p_last_msg,bfp_info_text);        % Save info text into the last messages variable
+                        write_log(DYN,bfp_info_text)                                            % Write info in log file
                     
                     else
 
