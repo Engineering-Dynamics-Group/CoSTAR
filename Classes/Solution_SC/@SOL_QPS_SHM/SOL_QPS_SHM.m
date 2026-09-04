@@ -35,18 +35,18 @@ classdef SOL_QPS_SHM < Solution
             obj.phi                    = phi;                                               
             
             if strcmpi(DYN.stability,'on')
-                obj.multipliers(:,1)    = varargin{1,1}{1,2};
-                obj.vectors(:,:,1)      = varargin{1,1}{1,5};
-                obj.n_unstable(1,1)     = varargin{1,1}{1,3}; 
-                obj.stability_flag(1,1) = varargin{1,1}{1,4};
+                obj.multipliers(:,1)    = varargin{1,1}{1,2};                               % Ljapunov exponents
+                obj.vectors(:,:,1)      = varargin{1,1}{1,5};                               % There are no vectors related to Ljapunov exponents, so this is empty
+                obj.n_unstable(1,1)     = varargin{1,1}{1,3};                               % Indiacting number of unstable multipliers
+                obj.stability_flag(1,1) = varargin{1,1}{1,4};                               % Exitflag of stability computation
             end
 
             if DYN.n_auto == 0                                      
-                obj.freq(:,end+1) = DYN.non_auto_freq(y1(end,1));                           % Non-autonomous case both frequencies by function DYN.non_auto_freq
+                obj.freq(:,end+1) = reshape(DYN.non_auto_freq(y1(end,1)),2,1);              % Non-autonomous case both frequencies by function DYN.non_auto_freq
             elseif DYN.n_auto == 1
-                obj.freq(:,end+1) = [DYN.non_auto_freq(y1(end,1));y1(end-1,1)];             % Mixed case non-autonomous frequency by function DYN.non_auto_freq, autonomous frequency by solution vector
+                obj.freq(:,end+1) = [DYN.non_auto_freq(y1(end,1)); y1(end-1,1)];            % Mixed case non-autonomous frequency by function DYN.non_auto_freq, autonomous frequency by solution vector
             elseif DYN.n_auto == 2
-                obj.freq(:,end+1) = [y1(end-2,1);y1(end-1,1)];                              % Full-autonomous case both autonomous frequency by solution vector
+                obj.freq(:,end+1) = y1(end-2:end-1,1);                                      % Full-autonomous case both autonomous frequency by solution vector
             end
             
         end
@@ -62,18 +62,18 @@ classdef SOL_QPS_SHM < Solution
             obj.arclength(1,end+1)  = CON.p_arcl_1;                                         % Current value of arclength
             
             if strcmpi(DYN.stability,'on')
-                obj.multipliers(:,end+1)    = CON.p_multipliers;                            %
-                obj.vectors(:,:,end+1)      = CON.p_vectors;                                %
+                obj.multipliers(:,end+1)    = CON.p_multipliers;                            % Ljapunov exponents
+                obj.vectors(:,:,end+1)      = CON.p_vectors;                                % There are no vectors related to Ljapunov exponents, so this is empty
                 obj.n_unstable(1,end+1)     = CON.p_n_unstable_1;                           % Indiacting number of unstable multipliers
                 obj.stability_flag(1,end+1) = CON.p_stability_flag;                         % Exitflag of stability computation
             end
 
             if DYN.n_auto == 0                                         
-                obj.freq(:,end+1) = DYN.non_auto_freq(CON.p_y1(end,1));                     % Non-autonomous case both frequencies by function DYN.non_auto_freq
+                obj.freq(:,end+1) = reshape(DYN.non_auto_freq(CON.p_y1(end,1)),2,1);        % Non-autonomous case both frequencies by function DYN.non_auto_freq
             elseif DYN.n_auto == 1
                 obj.freq(:,end+1) = [DYN.non_auto_freq(CON.p_y1(end,1));CON.p_y1(end-1,1)]; % Mixed case non-autonomous frequency by function DYN.non_auto_freq, autonomous frequency by solution vector
             elseif DYN.n_auto == 2
-                obj.freq(:,end+1) = [CON.p_y1(end-2,1);CON.p_y1(end-1,1)];                  % Full-autonomous case both autonomous frequency by solution vector
+                obj.freq(:,end+1) = CON.p_y1(end-2:end-1,1);                                % Full-autonomous case both autonomous frequency by solution vector
             end 
         end
 
@@ -88,11 +88,11 @@ classdef SOL_QPS_SHM < Solution
             obj.arclength(1,end+1)  = CON.p_arclength_bfp;
 
             if DYN.n_auto == 0                                         
-                obj.freq(:,end+1) = DYN.non_auto_freq(CON.p_y1(end,1));                     % Non-autonomous case both frequencies by function DYN.non_auto_freq
+                obj.freq(:,end+1) = reshape(DYN.non_auto_freq(CON.p_y_bfp(end,1)),2,1);             % Non-autonomous case both frequencies by function DYN.non_auto_freq
             elseif DYN.n_auto == 1
-                obj.freq(:,end+1) = [DYN.non_auto_freq(CON.p_y1(end,1));CON.p_y1(end-1,1)]; % Mixed case non-autonomous frequency by function DYN.non_auto_freq, autonomous frequency by solution vector
+                obj.freq(:,end+1) = [DYN.non_auto_freq(CON.p_y_bfp(end,1)); CON.p_y_bfp(end-1,1)];  % Mixed case non-autonomous frequency by function DYN.non_auto_freq, autonomous frequency by solution vector
             elseif DYN.n_auto == 2
-                obj.freq(:,end+1) = [CON.p_y1(end-2,1);CON.p_y1(end-1,1)];                  % Full-autonomous case both autonomous frequency by solution vector
+                obj.freq(:,end+1) = CON.p_y_bfp(end-2:end-1,1);                                     % Full-autonomous case both autonomous frequency by solution vector
             end 
 
             obj.multipliers(:,end+1)    = CON.p_multipliers_bfp;                    % Ljapunov exponents

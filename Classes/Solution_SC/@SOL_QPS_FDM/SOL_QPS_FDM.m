@@ -54,8 +54,8 @@ classdef SOL_QPS_FDM < Solution
             obj.local_gridpoint_weights_2 = AM.weights_2';                      % Weights related to local grid point indices in theta_2-direction
 
             if strcmpi(DYN.stability,'on')
-                obj.multipliers(:,1)    = varargin{1,1}{1,2};                   % Floquet multipliers
-                obj.vectors(:,:,1)      = varargin{1,1}{1,5};                   % Eigenvectors related to Floquet multipliers
+                obj.multipliers(:,1)    = varargin{1,1}{1,2};                   % Ljapunov exponents
+                obj.vectors(:,:,1)      = varargin{1,1}{1,5};                   % There are no vectors related to Ljapunov exponents, so this is empty
                 obj.n_unstable(1,1)     = varargin{1,1}{1,3};                   % Number of unstable multipliers
                 obj.stability_flag(1,1) = varargin{1,1}{1,4};                   % Exitflag of stability computation
             end
@@ -86,8 +86,8 @@ classdef SOL_QPS_FDM < Solution
             end
 
             if strcmpi(DYN.stability,'on')
-                obj.multipliers(:,end+1)    = CON.p_multipliers;                    % Floquet multipliers
-                obj.vectors(:,:,end+1)      = CON.p_vectors;                        % Eigenvectors related to Floquet multipliers
+                obj.multipliers(:,end+1)    = CON.p_multipliers;                    % Ljapunov exponents
+                obj.vectors(:,:,end+1)      = CON.p_vectors;                        % There are no vectors related to Ljapunov exponents, so this is empty
                 obj.n_unstable(1,end+1)     = CON.p_n_unstable_1;                   % Number of unstable multipliers
                 obj.stability_flag(1,end+1) = CON.p_stability_flag;                 % Exitflag of stability computation
             end

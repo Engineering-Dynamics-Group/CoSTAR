@@ -544,3 +544,36 @@ The new version v3.2.2 is the result of the feature branch returnCheck.
 	test:
         - test_SHM_PS_vdP_forced:
 		    --> Added test case where the continuation curve is a closed loop
+
+
+
+--------------------------------------------
+------------------ v3.2.3 ------------------
+--------------------------------------------
+
+Bugfix: The frequencies of the bifurcation point for QPS SHM are saved correctly now.
+
+    @SOL_QPS_FDM:
+        - SOL_QPS_FDM:
+            --> Corrected some comments regarding the multipliers and vectors (lines 57 - 58 and 89 - 90)
+
+    @SOL_QPS_FGM:
+        - SOL_QPS_FGM:
+            --> Corrected some comments regarding the multipliers and vectors (lines 52 - 53 and 93 - 94)
+
+    @SOL_QPS_SHM:
+        - SOL_QPS_SHM:
+            --> Added comments to lines 38 - 41 and 65 - 66
+            --> Added a reshape to the saving of the frequencies in the non-autonomous case (lines 45, 72 and 91)
+            --> Adapted the saving of the frequencies in the full-autonomous case (lines 49, 76 and 95)
+            --> Corrected the saving of the frequencies for the bifurcation point: Replaced p_y1 by p_y_bfp (lines 91, 93 and 95)
+
+
+----------
+
+Added display info and log file entry for the bifurcation point. The "Iter" number is also increased by one when a bifurcation point has been computed.
+
+    @Continuation:
+        - bifurcation_stability:
+            --> Increase local_cont_counter by one when a bifurcation point has been computed (line 81)
+            --> Added display info and log file entry for the bifurcation point (lines 82 - 86)

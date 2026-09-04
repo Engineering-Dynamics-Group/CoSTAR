@@ -49,8 +49,8 @@ classdef SOL_QPS_FGM < Solution
             end
 
             if strcmpi(DYN.stability,'on')
-                obj.multipliers(:,1)    = varargin{1,1}{1,2};                   % Floquet multipliers
-                obj.vectors(:,:,1)      = varargin{1,1}{1,5};                   % Eigenvectors related to Floquet multipliers
+                obj.multipliers(:,1)    = varargin{1,1}{1,2};                   % Ljapunov exponents
+                obj.vectors(:,:,1)      = varargin{1,1}{1,5};                   % There are no vectors related to Ljapunov exponents, so this is empty
                 obj.n_unstable(1,1)     = varargin{1,1}{1,3};                   % Number of unstable multipliers
                 obj.stability_flag(1,1) = varargin{1,1}{1,4};                   % Exitflag of stability computation
             end
@@ -64,7 +64,7 @@ classdef SOL_QPS_FGM < Solution
         %@DYN:  DynamicalSystem class object
         %@AM:   AM_QPS_FGM class object
 
-        function IF_arch_data(obj,CON,DYN,AM)                                                  %Interface method for archiving the data of the continuation
+        function IF_arch_data(obj,CON,DYN,AM)                                                 %Interface method for archiving the data of the continuation
 
             obj.s{1,end+1}          = CON.p_y1(1:(end-1-DYN.n_auto),1);                       %approximation method vector 
             obj.mu(1,end+1)         = CON.p_y1(end,1);                                        %continuation parameter 
@@ -90,8 +90,8 @@ classdef SOL_QPS_FGM < Solution
             end
 
             if strcmpi(DYN.stability,'on')
-                obj.multipliers(:,end+1)    = CON.p_multipliers;                    % Floquet multipliers
-                obj.vectors(:,:,end+1)      = CON.p_vectors;                        % Eigenvectors related to Floquet multipliers
+                obj.multipliers(:,end+1)    = CON.p_multipliers;                    % Ljapunov exponents
+                obj.vectors(:,:,end+1)      = CON.p_vectors;                        % There are no vectors related to Ljapunov exponents, so this is empty
                 obj.n_unstable(1,end+1)     = CON.p_n_unstable_1;                   % Number of unstable multipliers
                 obj.stability_flag(1,end+1) = CON.p_stability_flag;                 % Exitflag of stability computation
             end
