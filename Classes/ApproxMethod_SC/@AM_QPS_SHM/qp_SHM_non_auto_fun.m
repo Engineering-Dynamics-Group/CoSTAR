@@ -37,10 +37,6 @@ end
 T = 2*pi/Omega(1,index(1));
 Ik = [0,T];
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
 %% Residual-only evaluation
 if nargout < 2
 
@@ -129,10 +125,7 @@ if nargout < 2
     return
 end
 
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Compute Residual and Jacobian
 
 %% Perturb initial values
 dz = sqrt(eps)*(1 + max(max(max(abs(Z0_nodes)))));                          % Define a small perturbation value
