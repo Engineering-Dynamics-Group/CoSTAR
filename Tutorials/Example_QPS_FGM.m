@@ -127,7 +127,7 @@ options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','fourier
                              'non_auto_freq',non_auto_freq,'auto_freq',auto_freq,'act_param',active_parameter);                     % Properties of the solution
 options.opt_init = costaropts('hmatrix',Hmatrix,'c0',C0,'cmatrix',Cmatrix,'smatrix',Smatrix);                                       % Property for initial solution
 options.opt_approx_method = costaropts('n_FFT',2^6,'error_control','on','error_limit',[1e-4,1e-2],'ec_iter_max',10, ...             % Properties of the approximation method
-                                       'n_hh_max',50,'phasecond','int_poincare');                                                   % Properties of the approximation method
+                                       'n_hh_max',50,'phase_condition','int_poincare');                                             % Properties of the approximation method
 options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.01,'direction',-1);                                                % Properties for continuation
 
 % Continuation
@@ -172,7 +172,7 @@ options.opt_sol = costaropts('sol_type','quasiperiodic','approx_method','fourier
                              'auto_freq',auto_freq,'act_param',active_parameter);                                                   % Properties of the solution
 options.opt_init = costaropts('hmatrix',Hmatrix,'c0',C0,'cmatrix',Cmatrix,'smatrix',Smatrix);                                       % Property for initial solution
 options.opt_approx_method = costaropts('n_FFT',2^6,'error_control','on','error_limit',[1e-3,1e-1],'ec_iter_max',10, ...             % Properties of the approximation method
-                                       'n_hh_max',50,'phasecond','int_poincare');                                                   % Properties of the approximation method
+                                       'n_hh_max',50,'phase_condition','int_poincare');                                             % Properties of the approximation method
 options.opt_cont = costaropts('mu_limit',mu_limit,'step_width',0.01);                                                               % Properties for continuation
 
 % Continuation

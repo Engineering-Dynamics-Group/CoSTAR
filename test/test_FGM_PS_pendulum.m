@@ -30,8 +30,8 @@ options.system  = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'first_in
 options.opt_sol = costaropts('cont','on','stability','off','sol_type','periodic','approx_method','fgm', ...                 % Properties of the solution
                              'auto_freq',auto_freq,'act_param',active_parameter,'display','full');                          % Properties of the solution
 options.opt_init = costaropts('Hmatrix',[0,1],'c0',[0;0],'cmatrix',C1,'smatrix',S1);                                        % Property for initial solution
-options.opt_approx_method = costaropts('n_fft',2^6,'phasecond','int_poincare','error_limit',[1e-3 1e-2]);                   % Properties of approximation method
-options.opt_cont = costaropts('mu_limit',mu_limit,'step_control','on','step_width',0.15,'pred','tangent');                  % Properties for continuation
+options.opt_approx_method = costaropts('n_fft',2^6,'phase_condition','int_poincare','error_limit',[1e-3 1e-2]);             % Properties of approximation method
+options.opt_cont = costaropts('mu_limit',mu_limit,'step_control','on','step_width',0.15,'predictor','tangent');             % Properties for continuation
 
 % Step control options
 % Available step control methods: 'off', 'on', 'corrector_iterations', 'norm_corrector', 'combination', 'angle', ('pid')
@@ -59,8 +59,8 @@ options_2.system  = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param_2,'firs
 options_2.opt_sol = costaropts('cont','on','stability','off','sol_type','periodic','approx_method','fgm', ...               % Properties of the solution
                                'auto_freq',sqrt(g/mu_limit_2(1)),'act_param',active_parameter_2,'display','full');          % Properties of the solution
 options_2.opt_init = costaropts('Hmatrix',[0,1],'c0',[0;0],'cmatrix',C1,'smatrix',S1);                                      % Property for initial solution
-options_2.opt_approx_method = costaropts('n_fft',2^6,'phasecond','poincare','error_limit',[1e-3 1e-2]);                     % Properties of approximation method
-options_2.opt_cont = costaropts('mu_limit',mu_limit_2,'step_control','off','step_width',1.5,'pred','secant');               % Properties for continuation
+options_2.opt_approx_method = costaropts('n_fft',2^6,'phase_condition','poincare','error_limit',[1e-3 1e-2]);               % Properties of approximation method
+options_2.opt_cont = costaropts('mu_limit',mu_limit_2,'step_control','off','step_width',1.5,'predictor','secant');          % Properties for continuation
 
 [S_2,DYN_2] = costar(options_2);                % Calculate initial solution and continue the curve
 

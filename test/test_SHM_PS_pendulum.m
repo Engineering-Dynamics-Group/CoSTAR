@@ -29,7 +29,7 @@ options.opt_sol = costaropts('cont','on','stability','off','sol_type','periodic'
                              'auto_freq',auto_freq,'act_param',active_parameter,'display','full');                          % Properties of the solution
 options.opt_init = costaropts('ic',ic);                                                                                     % Property for initial solution
 options.opt_approx_method = costaropts('solver','ode45','n_shoot',5,'phase_condition','integral');                          % Properties of approximation method
-options.opt_cont = costaropts('mu_limit',mu_limit,'step_control','on','step_width',0.3,'pred','tangent');                   % Properties for continuation
+options.opt_cont = costaropts('mu_limit',mu_limit,'step_control','on','step_width',0.3,'predictor','tangent');              % Properties for continuation
 
 % Step control options
 % Available step control methods: 'off', 'on', 'corrector_iterations', 'norm_corrector', 'combination', 'angle', ('pid')
@@ -58,7 +58,7 @@ options_2.opt_sol = costaropts('cont','on','stability','off','sol_type','periodi
                                'auto_freq',sqrt(g/mu_limit_2(1)),'act_param',active_parameter_2,'display','full');          % Properties of the solution
 options_2.opt_init = costaropts('ic',ic);                                                                                   % Property for initial solution
 options_2.opt_approx_method = costaropts('solver','ode45','n_shoot',5,'phase_condition','poincare');                        % Properties of approximation method
-options_2.opt_cont = costaropts('mu_limit',mu_limit_2,'step_control','off','step_width',1.5,'pred','secant');               % Properties for continuation
+options_2.opt_cont = costaropts('mu_limit',mu_limit_2,'step_control','off','step_width',1.5,'predictor','secant');          % Properties for continuation
 
 [S_2,DYN_2] = costar(options_2);                % Calculate initial solution and continue the curve
 

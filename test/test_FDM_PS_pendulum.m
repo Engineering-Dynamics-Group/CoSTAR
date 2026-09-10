@@ -31,7 +31,7 @@ options.opt_sol = costaropts('cont','on','stability','off','sol_type','periodic'
                              'auto_freq',auto_freq,'act_param',active_parameter,'display','full');                          % Properties of the solution
 options.opt_init = costaropts('c0',zeros(2,1),'c1',C1,'s1',S1);                                                             % Property for initial solution
 options.opt_approx_method = costaropts('n_int',200,'scheme','central','approx_order',6,'phase_condition','integral');       % Properties of approximation method FDM
-options.opt_cont = costaropts('mu_limit',mu_limit,'step_control','on','step_width',1.5,'pred','tangent');                   % Properties for continuation
+options.opt_cont = costaropts('mu_limit',mu_limit,'step_control','on','step_width',1.5,'predictor','tangent');              % Properties for continuation
 
 % Step control options
 % Available step control methods: 'off', 'on', 'corrector_iterations', 'norm_corrector', 'combination', 'angle', ('pid')
@@ -60,7 +60,7 @@ options_2.opt_sol = costaropts('cont','on','stability','off','sol_type','periodi
                                'auto_freq',sqrt(g/mu_limit_2(1)),'act_param',active_parameter_2,'display','full');            % Properties of the solution
 options_2.opt_init = costaropts('c0',zeros(2,1),'c1',C1,'s1',S1);                                                             % Property for initial solution
 options_2.opt_approx_method = costaropts('n_int',200,'scheme','central','approx_order',6,'phase_condition','poincare');       % Properties of approximation method FDM
-options_2.opt_cont = costaropts('mu_limit',mu_limit_2,'step_control','off','step_width',1.5,'pred','secant');                 % Properties for continuation
+options_2.opt_cont = costaropts('mu_limit',mu_limit_2,'step_control','off','step_width',1.5,'predictor','secant');            % Properties for continuation
 
 [S_2,DYN_2] = costar(options_2);                % Calculate initial solution and continue the curve
 

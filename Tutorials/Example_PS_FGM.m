@@ -107,8 +107,8 @@ options.system   = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','
 options.opt_sol = costaropts('sol_type','periodic','approx_method','fourier-galerkin','cont','on','stability','on', ...         % Properties of the solution
                              'auto_freq',auto_freq,'act_param',active_parameter);                                               % Properties of the solution
 options.opt_init = costaropts('hmatrix',Hmatrix,'c0',C0,'cmatrix',Cmatrix,'smatrix',Smatrix);                                   % Property for initial solution
-options.opt_approx_method = costaropts('n_FFT',2^6,'phasecond','poincare','error_control','on','error_limit',[1e-4, 1e-3],...   % Properties of approximation method
-                                       'ec_iter_max',5,'n_hh_max',50);                                                          % Properties of approximation method
+options.opt_approx_method = costaropts('n_FFT',2^6,'phase_condition','int_poincare','error_control','on',...                    % Properties of approximation method
+                                       'error_limit',[1e-4, 1e-3],'ec_iter_max',5,'n_hh_max',50);                               % Properties of approximation method
 options.opt_cont = costaropts('mu_limit',mu_limit);                                                                             % Properties for continuation
 
 % Continuation
