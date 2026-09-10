@@ -7,7 +7,7 @@ classdef DynamicalSystem
     %% Properties    
     properties(Constant)
         % Constant properties cannot be changed (read-only)
-        costar_version = '3.2.0.ConSys.4';                              %release versions (e.g. 3.1) should be defined as ' 3.1 ' (see the space between the ' and the numbers)
+        costar_version = '3.2.0.ConSys.6';                              %release versions (e.g. 3.1) should be defined as ' 3.1 ' (see the space between the ' and the numbers)
     end
 
 
@@ -52,7 +52,7 @@ classdef DynamicalSystem
 
     properties(Hidden)
         % Hidden properties are not visible in property lists or in results from calls to get, set, or the properties functions
-        create_log = false;                                              %defines whether a log file is created (used by the development team)
+        log = 'off';                                                     %defines whether a log file is created (used by the development team)
         display = 'iter';                                               %Controls the command window output
     end
 

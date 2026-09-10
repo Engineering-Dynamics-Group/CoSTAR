@@ -1,0 +1,90 @@
+%%%%% CoSTAR Nomenclature and Version Numbering %%%%%
+
+
+General Variable Nomenclature
+---------------------------------------------------------------------------------------------------
+
+z		solution vector of the state or system space (first or second order ode)
+s		solution vector of the solution method: does not contain the autonomous frequencies
+x 		solution vector of the solution method: contains s and possibly the autonomous frequencies
+y		solution vector of the continuation: contains x and the continuation parameter	(y0 is the initial solution)		
+
+ic 		initial condition: point in state space
+iv		initial value: start vector for newton iteration (potentially including autonomous frequency: s0 or x0)
+	
+Object names are all capital letters, except for the object of the related class:
+        obj     object of the class to which a method belongs (e.g. the object CON is called obj in all methods of the Continuation class)
+        DYN     object of class DynamicalSystem
+        AM      object of one of the subclasses of the superclass ApproxMethod
+        CON     object of class continuation
+        S       object of one of the subclasses of the superclass Solution
+        ST      object of one of the subclasses of the superclass Stability
+
+All variables which contain a number of something start with "n_", e.g. n_auto contains the number of autonomous frequencies.
+
+
+
+Method Nomenclature
+---------------------------------------------------------------------------------------------------
+
+Static methods (i.e. methods that can be called without requiring an object of the class) start with "s_". These include:
+--> Gatekeeper methods of the classes (e.g. "s_DYN_gatekeeper" of class DynamicalSystem)
+--> Help methods of the (sub-)classes (e.g. "s_help_system" of class DynamicalSystem)
+--> Mthods selecting the correct subclass (e.g. "s_method_selection" of class ApproxMethod)
+
+Methods that exchange data between two different classes/objects are called "interface methods" and start with "IF_".
+--> E.g.: AM.IF_up_res_data is an interface method belonging to the ApproxMethod subclass AM. 
+          It is called (inter alia) in m_continuation and passes data from the Continuation object to the AM object.
+
+
+
+Property and Variable Dimensions Related with the Solution
+---------------------------------------------------------------------------------------------------
+
+The last dimension of any property of a Solution subclass S is the continuation dimension.
+--> E.g.: size(S.mu) = [1,50]:	50 continuation steps were performed
+          size(S.s)  = [10,50]:	50 continuation steps were performed for a 10-dimensional method solution vector
+	  
+The solutions returned by the postprocessing methods contplot, solget and solplot follow the general array structure
+[domain-dimensions x state-space-dimensions x continuation-dimension].
+--> E.g.: size(solget_out.solution_eval) = [200,3,50]:  A periodic solution with 3-dimensional state space is returned at 200 points on the domain. 50 continuation steps were performed.
+		  size(solget_out.time) = [200,1,50]:           The one-dimensional time vector for the example above is returned at 200 points on the domain and for all 50 continuation solutions.
+          size(contplot_out.z) = [1,50]	                Each of the 50 continuation solutions were reduced to a single numerical value in order to plot the solutions in a bifurcation diagram.
+                                                        Therefore, the domain- and state-space-dimensions are omitted.
+
+
+Version Numbering and Branching Logic
+---------------------------------------------------------------------------------------------------
+
+The CoSTAR version numbering follows the general structure
+
+            v3.R.D.x.y,   e.g.   v3.2.1.m.4
+
+The actual version number depends on the branch: 
+    --> Release versions on the main branch only consist of the first two numbers. 
+    --> Development versions on the Development branch consist of the first three numbers.
+    --> Versions on other branches (e.g. feature or maintenance branch) consist of the complete number.
+
+v3.R (e.g. v3.2): Release versions on the main branch
+    --> R-th main release of CoSTAR on GitHub. It is also labelled and tagged in GitHub.
+    --> The leading 3 corresponds to the first GitHub release of CoSTAR. All versions building upon that start with v3.
+    --> A new release should be published when huge/important changes/additions were made to the code (e.g. new approximation method or huge improvements to the error control).
+    --> A new release version is related with merging the Development branch into the main branch.
+
+v3.R.D (e.g. v3.2.1): Development versions on the Development branch
+    --> D-th development version that is based on the release v3.R (i.e. v3.R.D is branching off from v3.R).
+    --> Development versions are iterated until a new release is published (e.g. v3.2.1, v3.2.2, ...). The counter D starts again for a new release (e.g. v3.3.1, v3.3.2, ...).
+    --> A new development version is related with merging another branch (v3.R.D.x.y) into the Development branch.    
+    --> The Development branch should ONLY be merged into the main branch for a new release version and NOT between two releases.
+
+v3.R.D.x.y (e.g. v3.2.1.m.4): Versions on other branches (not main or Development)
+    --> Branches based on the development version v3.R.D (i.e. v3.R.D.x.y is branching off from v3.R.D).
+    --> x is replaced by a character key that specifies the purpose or topic of the branch:
+            b: bugfix(es)
+            m: maintenance (i.e. general improvements and changes to the code, can also include bugfixes)
+            fn: feature (i.e. complete new features or enhancements to existing features) with number n (e.g. f1)
+            or a descriptive key defined by the developer (e.g. ConSys for the implementation of conservative systems)
+    --> y is the iterating number within v3.R.D.x. It should be increased with each commit that edits the code.
+    --> The complete version number only exists within the local branch. However, the ending x.y can be identical to another branch as long as the first three numbers are different.
+    --> The branch should be merged into the Development branch when the code development within the local branch is completed. 
+    --> By merging, the development version number should be increased and the branch related to v3.R.D.x should be deleted.

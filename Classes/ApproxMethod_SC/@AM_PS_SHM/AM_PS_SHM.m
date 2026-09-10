@@ -8,12 +8,12 @@ classdef AM_PS_SHM < ApproxMethod
         solver_function function_handle                                 % Function handle for the actual ODE integrator function
         
         n_shoot = 2;                                                    % Number of shooting points for multiple shooting
-        phase_condition = 'poincare';                                   % Phase condition
-
+        phase_condition = 'integral';                                   % Phase condition
+        
         Z0                                                              % Stores the trajectory of the preceding solution (needed for the integral phase condition)
         Z_traj                                                          % Buffers the trajectory computed in the residuum function. It is copied to Z0 in IF_up_res_data
         n_time                                                          % Number of time evaluation points in each shooting interval for the integral phase condition
-                
+        
         %Inherited Properties
         % res, iv, error_control
     end

@@ -31,7 +31,8 @@ options.opt_stability = costaropts('iterate_bfp','on');
 %% Continuation 1
 load('workspace_test_duffing_PS_FGM');
 options.system   = costaropts('order',1,'rhs',Fcn,'param',param,'dim',2);
-options.opt_sol  = costaropts('display','iter-detailed','stability','on','cont','on','non_auto_freq',non_auto_freq,'sol_type','periodic','approx_method','fourier-galerkin','act_param',active_parameter);
+options.opt_sol  = costaropts('cont','on','stability','on','sol_type','periodic','approx_method','fourier-galerkin', ...
+                              'non_auto_freq',non_auto_freq,'act_param',active_parameter,'display','iter-detailed','log','off');
 options.opt_cont = costaropts('step_control','angle','direction',1,'predictor','tangent','subspace','pseudo-arc','mu_limit',mu_limit,'step_width',0.1);
 options.opt_approx_method = costaropts('n_FFT',2^6,'error_control','off');
 options.opt_init = costaropts('C0',zeros(2,1),'Cmatrix',c_max,'Smatrix',s_max,'Hmatrix',[0,1,3,5]);

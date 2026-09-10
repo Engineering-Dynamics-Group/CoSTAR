@@ -574,3 +574,16 @@ Renamed the Continuation property "p_use_qr" to "p_use_tangent" and updated meth
 Functions:
     - initial_solution:
 	    --> Added f to the output arguments of fsolve for the case that the property display was set to 'off' or 'final' (line 70)
+
+
+
+--------------------------------------------
+-------------- v3.2.0.ConSys.6 -------------
+--------------------------------------------
+
+This is a cherry pick from the commit to version v3.2.0.m.4.
+    --> A key to disable the log file is added to opt_sol.
+    --> Added the field 'phase_condition' to the tutorials and examples of PS FDM and PS SHM. Also changed its default value for PS SHM to 'integral'.
+    --> Updated and renamed Documentation.txt and added explanation of version numbering
+
+For details, see Version_log_v3.2.x.txt.
