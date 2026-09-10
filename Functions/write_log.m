@@ -138,10 +138,10 @@ function write_log(DYN,varargin)
         % Print footer
         fprintf(fid,'\n');
         fprintf(fid,'---------------------------------------------------------------------------\n');
-        if ~isempty(lastwarn)
-            fprintf(fid,'-----------------------  Finished with warning(s)!  -----------------------\n');
-        elseif strcmpi(input,'finalize_error')
+        if strcmpi(input,'finalize_error')
             fprintf(fid,'-------------------------  Finished with error!  --------------------------\n');
+        elseif ~isempty(lastwarn)
+            fprintf(fid,'-----------------------  Finished with warning(s)!  -----------------------\n');
         else
             fprintf(fid,'------------------------  Successfully finished!  -------------------------\n');
         end

@@ -54,6 +54,7 @@ classdef DynamicalSystem
         % Hidden properties are not visible in property lists or in results from calls to get, set, or the properties functions
         log = 'off';                                                     %defines whether a log file is created (used by the development team)
         display = 'iter';                                               %Controls the command window output
+        save = 'off';                                                   %defines whether DYN and S are saved in a .mat file after every computed solution
     end
 
 

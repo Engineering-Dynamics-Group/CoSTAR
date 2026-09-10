@@ -33,7 +33,6 @@ classdef Continuation < handle
         p_y1 = 0;                                                             %Initialise for get method of p_arcl_1 to be well defined
         p_J1
         p_newton_flag = 1;                                                    %Exit flag of Newton solver
-        p_ec_flag = 1;                                                        %Exit flag of error control 
         p_stopping_flag                                                       %Exit flag of continuation
         p_arcl_0  = 0;                                                        %arc-length of current point
         p_arcl_1  = 0;                                                        %arc-length of new point: Has its own get method
@@ -62,7 +61,9 @@ classdef Continuation < handle
     properties(Access=private)
         p_contDo uint32 = 1;                                                  %While contDo=1, do continuation, if conDo=0 stop continuation
         p_local_cont_counter uint32 = 1;                                      %Counts number of computed solutions
-        p_last_msg;                                                           %Saves the latest "Iter" messages printed to the command window
+        p_last_msg                                                            %Saves the latest "Iter" messages printed to the command window
+        p_error_flag = 1                                                      %A flag indicating that a critical error has occured (p_error_flag = 0)
+        p_error_msg                                                           %Stores the error message
 
         %Parameters of the last point
         p_dy_old                                                              %Direction vector of the predictor

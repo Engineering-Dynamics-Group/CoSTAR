@@ -589,4 +589,9 @@ Cherry pick from the commit to version v3.2.0.m.4:
 Cherry pick from the commit to version v3.2.0.m.5:
     --> Generalised the setting of the residuum function for the corrector
 
+Cherry pick from the commit to version v3.2.0.m.6:
+    --> Added the possibility to save the DynamicalSystem object DYN and the Solution object S in a mat-file after every computed solution
+    --> Removed all "error" calls in order to avoid CoSTAR being stopped by a user-defined error.
+        If a critical error occurs during execution now, CoSTAR saves the latest solution and is put to an end.
+
 For details, see Version_log_v3.2.x.txt.
