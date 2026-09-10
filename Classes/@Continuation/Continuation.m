@@ -107,6 +107,13 @@ classdef Continuation < handle
             %Set the step width limits if they were not given by user
             if isempty(obj.step_width_limit); obj.step_width_limit = [0.2.*obj.step_width,5.*obj.step_width]; end
 
+            % Set some corrector options
+            if strcmpi(DYN.approx_method,'shooting')
+                obj.fsolve_opts.MaxIter = 50;
+                obj.fsolve_opts.SpecifyObjectiveGradient = true;            %Jacobian matrix is passed by the user
+            elseif strcmpi(DYN.approx_method,'finite-difference')
+                obj.fsolve_opts.SpecifyObjectiveGradient = true;            %Jacobian matrix is passed by the user
+            end
             if isfield(DYN.system,'first_integral') 
                 obj.fsolve_opts = optimoptions(obj.fsolve_opts,'Algorithm','levenberg-marquardt');
             end

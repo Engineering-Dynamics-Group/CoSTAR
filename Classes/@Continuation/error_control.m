@@ -63,16 +63,8 @@ function obj = error_control(obj,S,AM,DYN)
         %%%%%%%%%% Recompute solution with in-/decreased discretization %%%%%%%%%%
         if iterate == 1
             % Recalculate a new curve point with de-/increased discretisation if error is not fine -> use natural parametrization here since we use the mu-value of obj.p_y1
-            if strcmpi(DYN.approx_method,'shooting')                        % Special corrector function for SHM due to specification of Jacobian matrix
-                AM.IF_up_res_data(obj,DYN);                                 % Pass information to the ApproxMethod object
-                Fcn = @(y) AM.fun_Jac_wrapper_init(y,obj.p_y1);             % Set functionwrapper to provide Jacobian
-            elseif strcmpi(DYN.approx_method,'finite-difference')           % Special corrector function for FDM due to specification of Jacobian matrix
-                AM.IF_up_res_data(obj);                                     % Pass information to the ApproxMethod object
-                Fcn = @(y) AM.corr_fun_init_FDM(y,obj.p_y1);                % Set corrector-function
-            else
-                AM.IF_up_res_data(obj);                                     % Pass information to the ApproxMethod object                
-                Fcn = @(y)[AM.res(y);y(end)-obj.p_y1(end)];                 % Define corrector-function containing the residual function and the subspace-constraint
-            end
+            AM.IF_up_res_data(obj,DYN);                                     % Update AM properties
+            Fcn = @(y) AM.res_fun_init(y,obj.p_y1);                         % Function wrapper to set the complete residuum function
 
             [y1,~,exit_flag,output,J1] = fsolve(Fcn,obj.yp,obj.fsolve_opts);          % Solve corrector-function
 

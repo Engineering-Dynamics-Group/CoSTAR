@@ -109,7 +109,7 @@ classdef AM_PS_FGM < ApproxMethod
         %Interface methods: This is an abstract method and must be defined
         %It passes information between the continuation algrithm and the ApproxMethod subclass
         %@var1: Continuation class object OR solution vector x whose dimension was updated in the error control
-        function obj = IF_up_res_data(obj,var)
+        function obj = IF_up_res_data(obj,var,DYN)
             if isa(var,'Continuation')                  % If var is an object of Continuation
                 obj.iv = var.y0(1:(end-1));             % Update the current initial condition. Used for the phase condition
             elseif isa(var,'double')                    % var should be a solution vector (type double) in all other cases
@@ -135,6 +135,22 @@ classdef AM_PS_FGM < ApproxMethod
         res = PS_FGM_residuum(obj,y,DYN);
         obj = getIV(obj,DYN);
         IC  = getIC(obj,y,DYN,n_shoot);                                     %Method for getting an initial point in state space on the periodic solution orbit             
+
+        % Function wrapper that sets the complete residuum function for the initial solution
+        % @y:   Curve point (solution vector)
+        % @y0:  Initial value for the corrector
+        % @F:   Complete residuum vector
+        function F = res_fun_init(obj,y,y0)
+            F = [obj.res(y); y(end)-y0(end)];
+        end
+
+        % Function wrapper that sets the complete residuum function
+        % @y:    Curve point (solution vector)
+        % @CONT: Continuation class object
+        % @F:    Complete residuum vector
+        function F = res_fun(obj,y,CON)
+            F = [obj.res(y); CON.sub_con(y,CON)];
+        end
         
     end
 

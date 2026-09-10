@@ -581,9 +581,12 @@ Functions:
 -------------- v3.2.0.ConSys.6 -------------
 --------------------------------------------
 
-This is a cherry pick from the commit to version v3.2.0.m.4.
+Cherry pick from the commit to version v3.2.0.m.4:
     --> A key to disable the log file is added to opt_sol.
     --> Added the field 'phase_condition' to the tutorials and examples of PS FDM and PS SHM. Also changed its default value for PS SHM to 'integral'.
     --> Updated and renamed Documentation.txt and added explanation of version numbering
+
+Cherry pick from the commit to version v3.2.0.m.5:
+    --> Generalised the setting of the residuum function for the corrector
 
 For details, see Version_log_v3.2.x.txt.

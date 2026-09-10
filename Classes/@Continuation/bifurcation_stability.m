@@ -37,18 +37,8 @@ function obj = bifurcation_stability(obj,DYN,AM,S,ST)
                         obj.yp = ST.approx_posc(DYN);                   % Function approximates the point of stability change based on the curve_container; output needs to be assigned to yp for the up_res_data method to work
         
                         % Correct
-                        if strcmpi(DYN.approx_method,'shooting')
-                            AM.IF_up_res_data(obj,DYN);
-                            Fcn = @(y) AM.fun_Jac_wrapper(y,obj);       % Set function wrapper to provide Jacobian
-                            obj.fsolve_opts.SpecifyObjectiveGradient = true;
-                        elseif strcmpi(DYN.approx_method,'finite-difference')
-                            AM.IF_up_res_data(obj);
-                            obj.fsolve_opts.SpecifyObjectiveGradient = true;
-                            Fcn = @(y) AM.corr_fun_FDM(y,obj);
-                        else
-                            AM.IF_up_res_data(obj);                                 % Archive initial solution
-                            Fcn = @(y)[AM.res(y);obj.sub_con(y,obj)];               % Define corrector-function containing the residual function and the subspace-constraint
-                        end
+                        AM.IF_up_res_data(obj,DYN);                     % Update AM properties
+                        Fcn = @(y) AM.res_fun(y,obj);                   % Function wrapper to set the complete residuum function
                         [obj.p_y_bfp,~,obj.p_newton_flag_bfp,~,obj.p_J_bfp] = fsolve(Fcn,obj.yp,obj.fsolve_opts);               % Solve corrector-function
 
                         if (obj.p_newton_flag_bfp < 1) || (obj.p_newton_flag_bfp == 2)
