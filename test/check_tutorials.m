@@ -37,6 +37,7 @@ function check_tutorials(varargin)
         code_word{1,1} = varargin{1,1};
         code_word{1,2} = varargin{1,2};
     end
+    code_word = upper(code_word);
     
 
     n_files = 0;                                    % Number of files to be executed
@@ -54,6 +55,7 @@ function check_tutorials(varargin)
 
     end
 
+    filenames = filenames(~cellfun('isempty',filenames));
     save('files.mat','n_files','filenames')         % Save important variables because "clear" in the tutorial files clears all variables
 
 
