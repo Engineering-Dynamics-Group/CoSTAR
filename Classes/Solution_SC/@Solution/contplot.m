@@ -204,7 +204,7 @@ end
 
 % Settings
 if isfield(options,'figure')
-    figure(options.figure);                     % Use existing figure
+    set(groot,'CurrentFigure',options.figure);  % Use existing figure
     set(gcf,'DefaultLineLineWidth',2)
 else
     figure;                                     % Create new plot figure

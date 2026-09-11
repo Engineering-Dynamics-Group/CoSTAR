@@ -190,12 +190,12 @@ end
     S(2:end,:) = 2*S(2:end,:);      % Formerly, it was "2:end-1", but end-1 is only correct when f(end) is the Nyquist frequency (not included here)
     
     if strcmpi(output,'polar')
-        S1 = abs(S);
-        S2 = atan2(-imag(S),real(S));
+        S1 = abs(S);                    % Amplitude A
+        S2 = atan2(imag(S),real(S));    % Phase angle alpha = atan2(-S/C) = atan2(-(-imag(S))/real(S))
 
     elseif  strcmpi(output,'cartesian')
-        S1 =  real(S);
-        S2 = -imag(S);
+        S1 =  real(S);                  % Cosine coefficients C
+        S2 = -imag(S);                  % Sine coefficients S
 
     else 
         error('Identifier for output format of the return argument is not known. Possible formats are ''polar'' or ''cartesian''.');

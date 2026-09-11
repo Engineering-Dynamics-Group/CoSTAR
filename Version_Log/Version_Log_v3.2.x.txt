@@ -577,3 +577,62 @@ Added display info and log file entry for the bifurcation point. The "Iter" numb
         - bifurcation_stability:
             --> Increase local_cont_counter by one when a bifurcation point has been computed (line 81)
             --> Added display info and log file entry for the bifurcation point (lines 82 - 86)
+
+
+----------
+
+Bugfix: The phase angle is computed correctly now when evaluating a solution in frequency space
+
+    @SOL_PS_FGM:
+        - evalsol_frequency:
+            --> Removed the minus in the computation of the phase angle (new line 53 / old line 43)
+
+    @SOL_PS_FGM:
+        - evalsol_frequency:
+            --> Removed the minus in the computation of the phase angle (new line 56 / old line 47)
+
+    Functions:
+        - costarFFT:
+            --> Removed the minus in the computation of the phase angle and added some comments (lines 193, 194, 197 and 198)
+
+
+----------
+
+Bugfix: Corrected and improved the check of the resolution in the evalsol_frequency methods of the FGM.
+
+    @SOL_PS_FGM:
+        - evalsol_frequency:
+            --> Added a new check of the resolution (lines 22 - 30)
+            --> Removed the "if res > n_hh" and the corresponding else-block (former lines 45 and 86 - 94)
+
+    @SOL_QPS_FGM:
+        - evalsol_frequency:
+            --> Added a new check of the resolution (lines 22 - 30)
+            --> Removed the "if res > n_hh" and the corresponding else-block (former lines 49 and 71 - 78)
+
+    Tutorials: Updated the following tutorials:
+        - Tutorial_Postprocessing_solget        - Tutorial_Postprocessing_solplot
+
+
+----------
+
+Improved the behaviour of the figure window during live plots. The figure is not forced as active window anymore.
+
+    @Solution:
+        - contplot:
+            --> Replaced the figure(options.figure) call by setting the current figure in groot (line 207)
+
+
+----------
+
+Small check_costar and check_tutorials improvements: A codeword can be supplied in lower cases as well now.
+check_costar: the tmp variable is initialised.
+
+    test:
+        - check_costar:
+            --> Deleted the unnecessary "select" variable (former line 22)
+            --> The codewords are converted to upper cases now (lines 36, 41 and 42)
+            --> Initialise the tmp variable and remove empty entries after scanning all test file names (lines 49 and 72)
+        - check_tutorials:
+            --> The codewords are converted to upper cases now (line 40)
+            --> Empty entries are removed from the variable filenames after scanning all test file names (line 58)
