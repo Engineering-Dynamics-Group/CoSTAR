@@ -19,7 +19,6 @@ function check_costar(varargin)
     [filepath,~,~] = fileparts(mfilename('fullpath'));
     addpath(genpath(filepath));                         %So that the data folder is also included.
    
-    select = 0;
     cd(filepath)
         cd .. 
         code_path = cd;
@@ -34,16 +33,20 @@ function check_costar(varargin)
         %nothing to do here
     elseif size(varargin,2) == 1
         code_word_1 = varargin{1,1};
+        code_word_1 = upper(code_word_1);
         select_1 = 1;
     elseif size(varargin,2) == 2
         code_word_1 = varargin{1,1};
         code_word_2 = varargin{1,2};
+        code_word_1 = upper(code_word_1);
+        code_word_2 = upper(code_word_2);
         select_2 = 1;
     end
   
 
     %% Select the files
     files = dir(fullfile(filepath, 'test_*.m')); %Get the names of all .m-files in the folder, which start with test_
+    tmp = cell(1,size(files,1));                 %Initialize cell array to store test script names
     counter = 0;
     for ii = 1:size(files,1)
 
@@ -66,6 +69,8 @@ function check_costar(varargin)
         end
 
     end
+    tmp = tmp(~cellfun('isempty',tmp));          %Remove empty entries from the cell array
+    
 
     %% Do the testing
     set(0,'DefaultFigureVisible','off'); %Suppress all figure windows

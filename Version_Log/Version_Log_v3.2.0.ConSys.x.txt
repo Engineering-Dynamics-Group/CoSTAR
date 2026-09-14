@@ -594,4 +594,10 @@ Cherry pick from the commit to version v3.2.0.m.6:
     --> Removed all "error" calls in order to avoid CoSTAR being stopped by a user-defined error.
         If a critical error occurs during execution now, CoSTAR saves the latest solution and is put to an end.
 
+Cherry pick from commit fdb3bda (bugfixes) on bugfix branch:
+    --> Corrected FFT phase angle computation for FGM evalsol_frequency as well as costarFFT
+    --> Corrected and improved resolution check for FGM evalsol_frequency
+    --> Improved figure window behaviour during live plots
+    --> Small improvements for check_costar and check_tutorials
+
 For details, see Version_log_v3.2.x.txt.
