@@ -20,7 +20,8 @@ Z = permute(reshape(s,[DYN.dim,AM.n_int_1,AM.n_int_2]),[2,3,1]);            % Re
 DeltaMu = y1(end,1)-S.mu(1,end);
 
 indFL = indicatorLocking(OMEGA,DeltaMu);                                    % Evaluate indicator function for locking
-indFS_A = indicatorSuppArea(Z);
+indFS = indicatorSuppArea(Z);							% Poincare Area
+% indFS = indicatorSuppArc(Z);							% Arclength
 
 % Check stopping criterion for Frequency Locking
 if(indFL<tolL)
@@ -29,7 +30,7 @@ if(indFL<tolL)
 end
 
 % Check stopping criterion for Suppressive Synchronization
-[chi_S, idx] = min(indFS_A,[],1);
+[chi_S, idx] = min(indFS,[],1);
 if(chi_S<tolS)
     obj.p_contDo = 0;
     obj.p_stopping_flag = append('CoSTAR stopped because solution synchronized by Suppresive Synchronization of Omega_', num2str(idx),'!');
@@ -82,4 +83,36 @@ rMax2 = max(rAveraged2(:,:),[],2);                                          % Ta
 chi = pi.*[rMax2;rMax1].^2;                                                 % Calculate indicator function as areas of max averaged radii of Poincare sections
                                                                             % rMax1 and rMax2 are switched, so that the correct frequency that synchronizes
                                                                             % is identified
+end
+
+
+function chi = indicatorSuppArc(Z)
+
+NN = size(Z);
+N = NN(1:2);
+dim = NN(3);
+p = 2;
+
+dtheta1 = 2*pi/N(1,2);
+dtheta2 = 2*pi/N(1,1);
+
+for l=1:N(1,1)
+    A1(l,:) = sum(sqrt(1+((Z(l,2:end,:)-Z(l,1:end-1,:))/(dtheta1)).^2),2).*dtheta1;
+end
+A1averaged = mean(A1,1);
+
+for l=1:N(1,2)
+    A2(l,:) = sum(sqrt(1+((Z(2:end,l,:)-Z(1:end-1,l,:))/(dtheta2)).^2),1).*dtheta2;
+end
+A2averaged = mean(A2,1);
+
+
+S = zeros(dim,p);
+S(:,1) = A1averaged(1,:)-2*pi;
+S(:,2) = A2averaged(1,:)-2*pi;
+
+sig = svd(S);
+
+chi = sig;
+
 end
