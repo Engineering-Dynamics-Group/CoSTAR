@@ -145,7 +145,7 @@ FW = @(t,z)obj.FcnWrapperODE2(t,z,@(t,z)DYN.rhs(t,z,param),PHI_s);  % Function w
 
 %% Construct initial guess for all shooting nodes (if n_shoot > 1)
 %% As of now, the multiple shooting method is only defined for the non-autonomous case!
- if n_shoot > 1 && DYN.n_auto==0
+ if n_shoot > 1 && (DYN.n_auto==0 || DYN.n_auto==1)
         Z_C0 = reshape(IV_boundary,[dim,n_char]);                           % Shape the initial value on the boundary back into a matrix
     
         Z0 = obj.initializeShootingNodes(Z_C0,FW,T);                        % Construct the additional IVs for the multiple shooting method
@@ -164,20 +164,15 @@ if DYN.n_auto==0
 
 elseif DYN.n_auto==1
 
-    obj.iv = [IV_boundary;Omega(1,2)];                                                                   % Append obj.iv with autonomous frequencies
-    T_char = linspace(0,2*pi/Omega(1,1),reso);                                                  % Integration time for characteristics
+    if n_shoot > 1
+        obj.iv = [Z0(:);Omega(1,2)];
+    else
+        obj.iv = [IV_boundary;Omega(1,2)];
+    end                                                                     % Append obj.iv with autonomous frequencies
 
-    % Get reference solution for phase-condition                          
-    [~,V] = obj.solver_function(FW,T_char,IV_boundary,obj.odeOpts);                                      % Integrate along characteristics to be able to calculate gradient
-    W = permute(reshape(V,[reso,dim,n_char]),[1,3,2]);                                          % Reshape solution
-    
-    for j = 1:DYN.dim
-        [~,F1(:,:,j)] = gradient(W(:,:,j),PHI(2,2),Xchar(1,2));                                 % Calculate gradient
-    end
-    obj.Y_old{1,1} = Xchar;                                                                     % Save integration interval
-    obj.Y_old{1,2} = W;                                                                         % Save reference solution
-    obj.Y_old{1,3} = F1;                                                                        % Save derivative of reference solution with respect to theta2
-
+    % Get reference solution for phase-condition
+    Z0_nodes = reshape(obj.iv(1:end-1),[dim,n_shoot,n_char]);              % Reshape all reference shooting nodes
+    obj = obj.updatePhaseReference(Z0_nodes,Omega,param,DYN);             % Integrate each reference segment from its own node
 
 elseif DYN.n_auto==2
 

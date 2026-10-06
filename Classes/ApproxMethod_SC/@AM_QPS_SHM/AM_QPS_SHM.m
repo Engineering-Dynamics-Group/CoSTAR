@@ -19,6 +19,7 @@ classdef AM_QPS_SHM < ApproxMethod
         dt = 0.1;
 
         Y_old                                                               %Values of manifold of last solution point (for phase condition in autonomous case)
+        phase_reference = []                                                %Values, gradients and normalized grids of the mixed reference segments
         reso_phase = 50;                                                    %Resolution for time integration to determine phase condition
 
         c0                      % Fourier-coefficient of 0-th order to create the initial solution vector
@@ -76,7 +77,10 @@ classdef AM_QPS_SHM < ApproxMethod
         M = perturbMatr(obj,input_matrix,dim,n_char);
         M = perturbMatrSub(obj,input_matrix,dim,n_char,n_shoot);
         M = expandResidualMatr(obj,input_matrix,dim,n_char,n_shoot);
+        [Ik_phase,tau_phase,F1_phase] = getPhaseGrids(obj,T);            % Common time grids and fixed reference gradients for the mixed case
+        obj = updatePhaseReference(obj,Z0_nodes,Omega,param,DYN);       % Reconstruct the mixed reference from the individual shooting nodes
 
         P = poincare_int(obj,F,F1,Omega,Ik);                            % Poincare phase condition
+        P = poincare_int_multiple(obj,F,F1,Omega,Ik);                   % Integral poincare phase condition over all shooting intervals
     end
 end
