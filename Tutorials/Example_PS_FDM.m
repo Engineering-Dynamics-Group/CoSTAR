@@ -43,7 +43,7 @@ Fcn =  @(t,z,param) duffing(t,z,param);             % Right-hand side of dz/dtau
 dFcn_dz =  @(t,z,param) duffing_Jac(t,z,param);     % Jacobian df(tau,z,kappa,D,eta,g)/dz of the RHS
 
 % Options
-options.system = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'jacobian',dFcn_dzn,'info','Continuation of Duffing Equation');   % Properties of the system
+options.system = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'jacobian',dFcn_dz,'info','Continuation of Duffing Equation');    % Properties of the system
 options.opt_sol = costaropts('sol_type','periodic','approx_method','finite-difference','cont','on','stability','on', ...    % Properties of the solution
                              'non_auto_freq',non_auto_freq,'act_param',active_parameter);                                   % Properties of the solution
 options.opt_init = costaropts('c1',C1,'s1',S1);                                                                             % Property for initial solution
@@ -100,7 +100,7 @@ Fcn = @(t,z,param) vdP_auto(t,z,param);             % Right-hand side of dz/dtau
 dFcn_dz = @(t,z,param) vdP_auto_Jac(t,z,param);     % Jacobian df(z,epsilon)/dz of the RHS
 
 % Options
-options.system   = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'jacobian',dFcn_dzn,'info','Continuation of van der Pol Oscillator');   % Properties of the system
+options.system   = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'jacobian',dFcn_dz,'info','Continuation of van der Pol Oscillator');    % Properties of the system
 options.opt_sol = costaropts('sol_type','periodic','approx_method','finite-difference','cont','on','stability','on', ...    % Properties of the solution
                              'auto_freq',auto_freq,'act_param',active_parameter);                                           % Properties of the solution
 options.opt_init = costaropts('c1',C1,'s1',S1);                                                                             % Property for initial solution
