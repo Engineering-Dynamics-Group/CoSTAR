@@ -9,8 +9,8 @@
 
 function s_DYN_gatekeeper(GC,system,opt_sol)
 
-    system_mandatory_fieldnames  = {'order','rhs','dim'};                       %required fieldnames in the options super structure
-    system_allowed_fieldnames    = {'order','rhs','dim','param','info'};        %allowed fieldnames in the options super structure
+    system_mandatory_fieldnames  = {'order','rhs','dim'};                               %required fieldnames in the options super structure
+    system_allowed_fieldnames    = {'order','rhs','jacobian','dim','param','info'};     %allowed fieldnames in the options super structure
 
     opt_sol_mandatory_fieldnames  = {'sol_type','cont','stability'};            %required fieldnames in the options super structure
     opt_sol_allowed_fieldnames    = {'sol_type','cont','stability','approx_method','act_param','non_auto_freq','auto_freq','display','freq_limit','log','save'};   %allowed fieldnames in the options super structure
@@ -37,6 +37,9 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
 
     %Check the optional fields now 
     %%%%%%%%%%%%%%%%%%%%
+    if isfield(system,'jacobian')
+        GC.check_data(system.jacobian,'system.jacobian','function_handle', [] ,[]);
+    end
     if isfield(system,'param')
         if isfield(opt_sol,'act_param')         % The field act_param must be supplied if param is supplied (due to param{DYN.act_param} is the residuum functions)
             GC.check_data(system.param,'system.param','cell', {'scalar','vector'},[]); 
@@ -102,6 +105,12 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
         if nargin(system.rhs) ~= 2
             GC.error_msg{1,end+1} = append(['Your solution type is "',opt_sol.sol_type, '" via opt_sol.sol_type. ',...
                                             'Your right hand side via system.rhs has ',num2str(nargin(system.rhs)),' argument(s), but it needs the arguments (z,param).']); 
+        end
+        GC.speak();
+
+        %Check number of arguments into the Jacobian (like for RHS above)
+        if isfield(system,'jacobian') && nargin(system.jacobian) ~= 2
+            GC.error_msg{1,end+1} = append('Your Jacobian of the right hand side via system.jacobian has ',num2str(nargin(system.jacobian)),' argument(s). However, it requires exactly 2 arguments (z,param) for equilibrium solutions.'); 
         end
         GC.speak();
 
@@ -207,6 +216,12 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
         end
         GC.speak();
 
+        %Check number of arguments into the Jacobian (like for RHS above)
+        if isfield(system,'jacobian') && nargin(system.jacobian) ~= 3
+            GC.error_msg{1,end+1} = append('Your Jacobian of the right hand side via system.jacobian has ',num2str(nargin(system.jacobian)),' argument(s). However, it requires exactly 3 arguments (t,z,param) for periodic solutions.'); 
+        end
+        GC.speak();
+
     end
 
 
@@ -298,6 +313,12 @@ function s_DYN_gatekeeper(GC,system,opt_sol)
         if nargin(system.rhs) ~=3
             GC.error_msg{1,end+1} = append(['Your solution type is "',opt_sol.sol_type, '" via opt_sol.sol_type. ',...
                                             'Your right hand side via system.rhs has ',num2str(nargin(system.rhs)),' argument(s), but it needs the arguments (t,z,param).']); 
+        end
+        GC.speak();
+
+        %Check number of arguments into the Jacobian (like for RHS above)
+        if isfield(system,'jacobian') && nargin(system.jacobian) ~= 3
+            GC.error_msg{1,end+1} = append('Your Jacobian of the right hand side via system.jacobian has ',num2str(nargin(system.jacobian)),' argument(s). However, it requires exactly 3 arguments (t,z,param) for periodic solutions.'); 
         end
         GC.speak();
         

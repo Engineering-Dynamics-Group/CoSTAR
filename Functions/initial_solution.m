@@ -23,7 +23,9 @@ end
 
 newtonOpts = optimoptions('fsolve','Display','iter-detailed','MaxFunEvals',1e5,'MaxIter',1e3,'FiniteDifferenceType','forward');
 
-if strcmpi(DYN.approx_method,'shooting')
+if strcmpi(DYN.sol_type,'equilibrium')
+    newtonOpts.SpecifyObjectiveGradient = true;
+elseif strcmpi(DYN.approx_method,'shooting')
     newtonOpts.MaxIter = 50;
     newtonOpts.SpecifyObjectiveGradient = true;                         % newtonOpts.CheckGradients = true; can be used to automatically check the Jacobian matrix -> Since R2023b: checkGradients is recommended
 elseif strcmpi(DYN.approx_method,'finite-difference')                   % Special corrector function due to specification of Jacobian matrix

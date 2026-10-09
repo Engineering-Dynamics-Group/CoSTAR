@@ -11,14 +11,15 @@ epsilon0 = mu_limit(1);                         % mu-value at start of continuat
 param = {epsilon0};                             % Parameter array
 active_parameter = 1;                           % Defines where the continuation parameter is located within param
 
-Fcn = @(t,z,param) vdP_auto(t,z,param);
+Fcn = @(t,z,param) vdP_auto(t,z,param);         % Right-hand-side of ODE
+dFcn_dz = @(t,z,param) vdP_auto_Jac(t,z,param); % Jacobian of the RHS
 
 auto_freq = 1;                                  % Initial autonomous frequency
 C1 = [2;0];   S1 = [0;-2];                      % Fourier-coefficients to create an initial value for fsolve to find the first point on the curve
 
 
 %% Properties
-options.system   = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','continuation of van der Pol oscillator');   % Properties of the system
+options.system   = costaropts('order',1,'dim',2,'rhs',Fcn,'jacobian',dFcn_dz,'param',param,'info','continuation of van der Pol oscillator');    % Properties of the system
 options.opt_sol = costaropts('sol_type','periodic','approx_method','finite-difference','cont','on','stability','on', ...    % Properties of the solution
                              'auto_freq',auto_freq,'act_param',active_parameter);                                           % Properties of the solution
 options.opt_init = costaropts('c0',zeros(2,1),'c1',C1,'s1',S1);                                                             % Property for initial solution

@@ -97,8 +97,8 @@ function [res,J_res] = PS_FDM_residuum(obj,y,DYN)
     % where pc is the phase condition and where omega is the autonomous frequency (for g, s and mu, see the other explanations in this script).
     % In the following, the derivatives dg/ds and dg/dmu are calculated as they are needed in any case
     
-    h = sqrt(eps);                              % Set the step size used to calculate particular derivatives using forward finite difference
-    % h = eps^(1/3);                            % OPTIONAL: Set the step size used to calculate particular derivatives using central finite difference
+    % h = sqrt(eps);                            % Set the step size used to calculate particular derivatives using forward finite difference
+    h = eps^(1/3);                              % OPTIONAL: Set the step size used to calculate particular derivatives using central finite difference
 
     % Calculate dg/ds
     % dg_ds = omega/DeltaTheta .* d(Z_i_sigma * w)/ds - d(reshape(Fcn_eval,n_int*dim,1))/ds consists of two main parts: 
@@ -109,13 +109,15 @@ function [res,J_res] = PS_FDM_residuum(obj,y,DYN)
     % The elements of dFcn_ds_mat that are ~= 0 are calculated using forward (OPTIONAL: central) finite difference and provisionally stored in dFcn_ds
     % The step width to calculate the k-th column of dFcn(t_i,z_i,param)/dz_i is h_(i,k) = h*(1+abs(z_(i,k)), where z_(i,k) is the k-th component of z_i
     % In order to save computing time, the code is vectorized and therefore only one (OPTIONAL: two) evaluation of Fcn is needed
-    theta_dim = reshape(repmat(theta,dim,1),1,n_int*dim);               % This is a (1 x n_int*dim) vector where each theta_i is repeated dim times
-    Z_dim = reshape(repmat(Z,dim,1),dim,n_int*dim);                     % This is a (dim x n_int*dim) matrix where each z_i is repeated dim times
-    H = h.*(repmat(eye(dim),1,n_int) + sparse(repmat(1:1:dim,1,n_int),1:1:n_int*dim,abs(s),dim,n_int*dim));     % H stores the individual step widths h_(i,j) = h*(1+abs(Z_(i,j))
-    Z_dim_plus_h = Z_dim + H;                                           % Pertub Z_dim by + H
+    % theta_dim = reshape(repmat(theta,dim,1),1,n_int*dim);             % This is a (1 x n_int*dim) vector where each theta_i is repeated dim times
+    % Z_dim = reshape(repmat(Z,dim,1),dim,n_int*dim);                   % This is a (dim x n_int*dim) matrix where each z_i is repeated dim times
+    % H = h.*(repmat(eye(dim),1,n_int) + sparse(repmat(1:1:dim,1,n_int),1:1:n_int*dim,abs(s),dim,n_int*dim));     % H stores the individual step widths h_(i,j) = h*(1+abs(Z_(i,j))
+    % Z_dim_plus_h = Z_dim + H;                                         % Pertub Z_dim by + H
     % Z_dim_minus_h = Z_dim - H;                                        % Pertub Z_dim by - H (OPTIONAL: needed for central finite difference)
-    dFcn_ds = (Fcn(1/omega.*theta_dim,Z_dim_plus_h,param) - reshape(repmat(Fcn_eval,dim,1),dim,n_int*dim)) ./ repmat(nonzeros(H)',dim,1);           % Forward finite difference
+    % dFcn_ds = (Fcn(1/omega.*theta_dim,Z_dim_plus_h,param) - reshape(repmat(Fcn_eval,dim,1),dim,n_int*dim)) ./ repmat(nonzeros(H)',dim,1);         % Forward finite difference
     % dFcn_ds = (Fcn(1/omega.*theta_dim,Z_dim_plus_h,param) - Fcn(1/omega.*theta_dim,Z_dim_minus_h,param)) ./ (2.*repmat(nonzeros(H)',dim,1));      % OPTIONAL: central finite difference
+    % NEW: dFcn_ds is computed by DYN.jacobian, i.e. either via central finite differences in the drhs_dz function or analytically in a user-supplied function
+    dFcn_ds = DYN.jacobian(1/omega.*theta,Z,param);
     dFcn_ds_mat = sparse(obj.p_ind_blkdiag_mat(:,1), obj.p_ind_blkdiag_mat(:,2), reshape(dFcn_ds,n_int*dim*dim,1), n_int*dim, n_int*dim); 
     dg_ds = omega/DeltaTheta .* obj.p_w_mat_J - dFcn_ds_mat;            % Calculate dg/ds 
 
@@ -123,20 +125,20 @@ function [res,J_res] = PS_FDM_residuum(obj,y,DYN)
     h_mu = h*(1+abs(mu));                                               % Set h_mu to approximate derivatives with respect to mu
     param_plus_h = param;                                               % Define a new parameter array
     param_plus_h{DYN.act_param} = mu + h_mu;                            % Update the new parameter array by mu + h_mu
-    % param_minus_h = param;                                            % Define a new parameter array (OPTIONAL: needed for central finite difference)
-    % param_minus_h{DYN.act_param} = mu - h_mu;                         % Update the new parameter array by mu - h_mu (OPTIONAL: needed for central finite difference)
+    param_minus_h = param;                                              % Define a new parameter array (OPTIONAL: needed for central finite difference)
+    param_minus_h{DYN.act_param} = mu - h_mu;                           % Update the new parameter array by mu - h_mu (OPTIONAL: needed for central finite difference)
     if n_auto == 0                                                      % Non-Autonomous case: mu can be the frequency -> angular frequency omega must be updated
         omega_plus_h = DYN.non_auto_freq(mu+h_mu);                      % Update the frequency
-        % omega_minus_h = DYN.non_auto_freq(mu-h_mu);                   % Update the frequency (OPTIONAL: needed for central finite difference)
-        Fcn_eval_plus_h = Fcn(1/omega_plus_h.*theta,Z,param_plus_h);        % Evaluate the rhs of omega.*dz/dtheta = f(t,z,param) with the "mu+h_mu" updated t and param array   
-        % Fcn_eval_minus_h = Fcn(1/omega_minus_h.*theta,Z,param_minus_h);   % Evaluate the rhs of omega.*dz/dtheta = f(t,z,param) with the "mu-h_mu" updated t and param array (OPTIONAL: needed for central finite difference)
-        dg_dmu = ( (omega_plus_h/DeltaTheta.*Z_i_sigma*w - reshape(Fcn_eval_plus_h,n_int*dim,1)) - g) / h_mu;          % Forward finite difference
-        % dg_dmu = ( (omega_plus_h/DeltaTheta.*Z_i_sigma*w - reshape(Fcn_eval_plus_h,n_int*dim,1)) - (omega_minus_h/DeltaTheta.*Z_i_sigma*w - reshape(Fcn_eval_minus_h,n_int*dim,1))) / (2*h_mu);      % OPTIONAL: central finite difference
+        omega_minus_h = DYN.non_auto_freq(mu-h_mu);                     % Update the frequency (OPTIONAL: needed for central finite difference)
+        Fcn_eval_plus_h = Fcn(1/omega_plus_h.*theta,Z,param_plus_h);    % Evaluate the rhs of omega.*dz/dtheta = f(t,z,param) with the "mu+h_mu" updated t and param array   
+        Fcn_eval_minus_h = Fcn(1/omega_minus_h.*theta,Z,param_minus_h); % Evaluate the rhs of omega.*dz/dtheta = f(t,z,param) with the "mu-h_mu" updated t and param array (OPTIONAL: needed for central finite difference)
+        % dg_dmu = ( (omega_plus_h/DeltaTheta.*Z_i_sigma*w - reshape(Fcn_eval_plus_h,n_int*dim,1)) - g) / h_mu;     % Forward finite difference
+        dg_dmu = ( (omega_plus_h/DeltaTheta.*Z_i_sigma*w - reshape(Fcn_eval_plus_h,n_int*dim,1)) - (omega_minus_h/DeltaTheta.*Z_i_sigma*w - reshape(Fcn_eval_minus_h,n_int*dim,1))) / (2*h_mu); % OPTIONAL: central finite difference
     elseif n_auto == 1                                                  % Autonomous case: mu is not the frequency and omega does not have to be updated                                               
         Fcn_eval_plus_h = Fcn(1/omega.*theta,Z,param_plus_h);           % Evaluate the rhs of omega.*dz/dtheta = f(t,z,param) with the "mu+h_mu" updated param array (t does not need to be updated since system is autonomous)
-        % Fcn_eval_minus_h = Fcn(1/omega.*theta,Z,param_minus_h);       % Evaluate the rhs of omega.*dz/dtheta = f(t,z,param) with the "mu-h_mu" updated t and param array (OPTIONAL: needed for central finite difference)
-        dg_dmu = ( - reshape(Fcn_eval_plus_h,n_int*dim,1) + reshape(Fcn_eval,n_int*dim,1) ) / h_mu;                 % Forward finite difference. OPTIONAL: Use h = h*(1+abs(mu))  
-        % dg_dmu = ( - reshape(Fcn_eval_plus_h,n_int*dim,1) + reshape(Fcn_eval_minus_h,n_int*dim,1) ) / (2*h_mu);   % OPTIONAL: central finite difference
+        Fcn_eval_minus_h = Fcn(1/omega.*theta,Z,param_minus_h);         % Evaluate the rhs of omega.*dz/dtheta = f(t,z,param) with the "mu-h_mu" updated t and param array (OPTIONAL: needed for central finite difference)
+        % dg_dmu = ( - reshape(Fcn_eval_plus_h,n_int*dim,1) + reshape(Fcn_eval,n_int*dim,1) ) / h_mu;               % Forward finite difference 
+        dg_dmu = ( - reshape(Fcn_eval_plus_h,n_int*dim,1) + reshape(Fcn_eval_minus_h,n_int*dim,1) ) / (2*h_mu);     % OPTIONAL: central finite difference
     end
 
     % Build the Jacobian matrix J_res
@@ -150,8 +152,8 @@ function [res,J_res] = PS_FDM_residuum(obj,y,DYN)
                 dpc_dmu = 0;                                            % dpc/dmu = 0, because the phase condition is independent of the continuation parameter
             case 'poincare'
                 dpc_ds = [f_zp_0', zeros(1,(n_int-1)*dim)];             % dpc/ds of Poincare phase condition
-                dpc_dmu = (Fcn(0,zp_0,param_plus_h) - f_zp_0)' * (z_0 - zp_0) / h_mu;                           % dpc/dmu of Poincare phase condition calculated using forward finite difference
-                % dpc_dmu = (Fcn(0,zp_0,param_plus_h) - Fcn(0,zp_0,param_minus_h))' * (z_0 - zp_0) / (2*h_mu);  % OPTIONAL: dpc/dmu of Poincare phase condition calculated using central finite difference
+                % dpc_dmu = (Fcn(0,zp_0,param_plus_h) - f_zp_0)' * (z_0 - zp_0) / h_mu;                         % dpc/dmu of Poincare phase condition calculated using forward finite difference
+                dpc_dmu = (Fcn(0,zp_0,param_plus_h) - Fcn(0,zp_0,param_minus_h))' * (z_0 - zp_0) / (2*h_mu);    % OPTIONAL: dpc/dmu of Poincare phase condition calculated using central finite difference
         end
         dpc_domega = 0;                                                 % dpc/domega = 0, because the phase conditions are independent of the frequency
         J_res = [dg_ds,  dg_domega,  dg_dmu;                            % Build the Jacobian matrix

@@ -636,3 +636,94 @@ check_costar: the tmp variable is initialised.
         - check_tutorials:
             --> The codewords are converted to upper cases now (line 40)
             --> Empty entries are removed from the variable filenames after scanning all test file names (line 58)
+
+
+
+--------------------------------------------
+------------------ v3.2.4 ------------------
+--------------------------------------------
+
+The Jacobian df/dz of the right-hand side of the system can now be supplied by the user for equilibrium and periodic solutions.
+If it is not supplied, df/dz is approximated by means of central finite differences within the new function drhs_dz.
+
+    @Continuation:
+        - Continuation:
+            --> fsolve options set for equilibrium solution: Jacobian is supplied by the user (lines 114 - 115)
+
+    @DynamicalSystem:
+        - drhs_dz:
+            --> Completely added
+        - DynamicalSystem:
+            --> Added property "jacobian" as function handle (line 20)
+            --> obj.jacobian is set to obj.drhs_dz if not supplied by the user (lines 89 - 94)
+            --> Added method drhs_dz (line 107)
+        - s_DYN_gatekeeper:
+            --> Added 'jacobian' to the allowed fieldnames of system (line 13)
+            --> Added check_data for field 'jacobian' (lines 40 - 42)
+            --> Added check of number of input argements (lines 111 - 115, 219 - 223 and 319 - 323)
+        - s_help_system:
+            --> Added description of optional field 'jacobian' (lines 33 - 39)
+
+    @AM_EQ:
+        - AM_EQ/residual_function:
+            --> Added the computation of the Jacobian of res (lines 33 and 47 - 54)
+        - AM_EQ/res_fun_init:
+            --> Added the Jacobian as output argument (lines 59 - 63)
+        - AM_EQ/res_fun_init:
+            --> Added the Jacobian as output argument (lines 68 - 72)
+
+    @AM_PS_FDM:
+        - PS_FDM_residuum:
+            --> The Jacobian matrices of the RHS are now computed via DYN.jacobian (lines 112 - 117 deactivated, lines 119 and 120 added)
+            --> All other derivatives are also computed by means of central finite differences 
+                (lines 100, 135, 140 and 155 deactivated, lines 101, 128, 129, 132, 134, 136, 139, 141 and 156 activated)
+
+    @AM_PS_SHM:
+        - getIV:
+            --> Get the ODE options as variable and set the Jacobian (lines 20, 21, 39 and 79)
+        - PS_SHM_residuum:
+            --> Get the ODE options as variable and set the Jacobian, removed the setting of the Jacobian pattern (former lines 46 - 49 deleted, new lines 46 and 47 added, line 97 modified)
+            --> Get the ODE options as variable and set the Jacobian for integration with perturbed mu-value (lines 81 - 84, 105 and 109)
+            --> Added a function wrapper for the Jacobian (lines 272 - 287)
+
+    @SOL_PS_SHM:
+        - evalsol_time:
+            --> Get the ODE options as variable and set the Jacobian (lines 19, 48 and 59)
+            --> Define n_time as in AM_PS_SHM and get the integrated trajectory at the time values like in the residuum function (lines 40 and 59)
+
+    Functions:
+        - initial_solution:
+            --> fsolve options set for equilibrium solution: Jacobian is supplied by the user (lines 26 - 27)
+
+    RHS:
+        --> The following functions were added:
+                - duffing_Jac       - parable_Jac       - vdP_auto_Jac
+
+    test:
+        - test_EQ_parable:
+            --> Added function for Jacobian (parable_Jac) to the options (lines 16 and 20)
+        - test_PS_FDM_duffing:
+            --> Added function for Jacobian (duffing_Jac) to the options (lines 20 and 26)
+        - test_PS_FDM_vdP:
+            --> Added function for Jacobian (vdP_auto_Jac) to the options (lines 15 and 22)
+
+    Tutorials:
+        --> EQ: Added the Jacobian for the parable example and updated the explanation of options.system
+                - Example_EQ (lines 38 and 41)
+                - Tutorial_EQ (lines 10 and 13 and table for options.system)
+        --> PS: Added function for the Jacobian for both examples (only FDM) and updated the explanation of options.system (all AM)
+                - Example_PS_FDM (lines 43, 46, 100 and 103)
+                - Tutorial_PS_FDM (lines 109 - 111, 119, 180, 181, 192 - 197, 471 - 473, 479 - 481, 530, 531 and 542 - 547)
+                - Tutorial_PS_FGM (lines 192, 204 - 209, 563 and 575 - 580)
+                - Tutorial_PS_SHM (lines 168, 180 - 186, 490 and 502 - 508)
+
+
+----------
+
+@DynamicalSystem:
+    - s_help_system:
+        --> Improved the description of the field 'rhs' (lines 22 and 23 added)
+
+@AM_EQ:
+    - AM_EQ/IF_up_res_data:
+        --> Changed the output argument from f to obj (line 77)

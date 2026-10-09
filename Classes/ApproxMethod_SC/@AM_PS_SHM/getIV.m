@@ -16,6 +16,9 @@ function obj = getIV(obj,DYN)
     n_auto = DYN.n_auto;                % Number of autonomous frequencies
     n_shoot = obj.n_shoot;              % Number of shooting points
     n_time = obj.n_time;                % Number of time evaluation points in each shooting interval for the integral phase condition
+
+    odeOpts = obj.odeOpts;              % Set the Jacobian for the ODE solver
+    odeOpts = odeset(odeOpts,'Jacobian',@(t,z) DYN.jacobian(t,z,param));
     
 
     if numel(s0) == dim*n_shoot         % The complete method solution vector is already supplied
@@ -33,7 +36,7 @@ function obj = getIV(obj,DYN)
         end
         T_int = linspace(0,T*(1-1/n_shoot),n_shoot);        % Time vector of shooting points
 
-        [~,Z] = obj.solver_function(@(t,z) Fcn(t,z,param), T_int, s0, obj.odeOpts);     % Integration to get required shooting points
+        [~,Z] = obj.solver_function(@(t,z) Fcn(t,z,param), T_int, s0, odeOpts);     % Integration to get required shooting points
 
         if n_shoot == 2                                     % In this case, t is a [1x2] vector and is therefore interpreted as [t_start, t_end] by the solver
             Z = Z([1,end],:);                               % Thus, Z stores the values at all computed time points, but we only need the Z values at t
@@ -73,7 +76,7 @@ function obj = getIV(obj,DYN)
 
             % Integration
             for k = 1:n_shoot
-                [~,Z] = obj.solver_function(@(t,z) Fcn(t,z,param), linspace(T0_int(k,1),T0_int(k,2),n_time+1), x0_mat(:,k), obj.odeOpts);
+                [~,Z] = obj.solver_function(@(t,z) Fcn(t,z,param), linspace(T0_int(k,1),T0_int(k,2),n_time+1), x0_mat(:,k), odeOpts);
                 Z0(:,:,k) = Z(1:end-1,:).';                             % Save the trajectory (not Z(t_end) because t_end already belongs to the next interval)
             end
 

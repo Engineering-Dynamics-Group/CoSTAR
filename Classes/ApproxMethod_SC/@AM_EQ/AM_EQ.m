@@ -30,7 +30,7 @@ classdef AM_EQ < ApproxMethod
         end
         
         % Functions for equilibrium algorithm
-        function res = residual_function(obj,y,DYN)                     % Set up the residual function
+        function [res,J_res] = residual_function(obj,y,DYN)             % Set up the residual function
                 
                 %For some reason it is way faster to preallocate the variables first and then use them... 
                 % it could have something to do with Matlab intern code optimization
@@ -44,24 +44,37 @@ classdef AM_EQ < ApproxMethod
 
                 res = Fcn(x,param);                                     % Define residual function  
 
+                % Calculate the Jacobian
+                dFcn_dz = DYN.jacobian(x,param);                        % df/dz
+                h = eps^(1/3)*(1+abs(mu));                              % Finite difference step width
+                param_mu_plus = param;  param_mu_minus = param;
+                param_mu_plus{DYN.act_param} = mu + h;                  % param array with "+ h" perturbed mu-value
+                param_mu_minus{DYN.act_param} = mu - h;                 % param array with "- h" perturbed mu-value
+                dFcn_dmu = (Fcn(x,param_mu_plus) - Fcn(x,param_mu_minus)) ./ (2*h);     % df/dmu
+                J_res = [dFcn_dz, dFcn_dmu];                            % Jacobian
+
         end
 
         % Function wrapper that sets the complete residuum function for the initial solution
-        function F = res_fun_init(obj,y,y0)
+        function [F,J] = res_fun_init(obj,y,y0)
 
-            F = [obj.res(y); y(end)-y0(end)];
+            [res,J_res] = obj.res(y);
+            F = [res; y(end)-y0(end)];
+            J = [J_res; zeros(1,length(y)-1), 1];
 
         end
 
         % Function wrapper that sets the complete residuum function
-        function F = res_fun(obj,y,CON)
+        function [F,J] = res_fun(obj,y,CON)
 
-            F = [obj.res(y); CON.sub_con(y,CON)];
+            [res,J_res] = obj.res(y);
+            F = [res; CON.sub_con(y,CON)];
+            J = [J_res; CON.d_sub_con(y,CON)];
 
         end
 
         % Interface methods
-        function f = IF_up_res_data(obj,var,DYN); end                   % Nothing needs to be done here
+        function obj = IF_up_res_data(obj,var,DYN); end                 % Nothing needs to be done here
         
         obj = getIV(obj,DYN);                                           % Compute initial value
 

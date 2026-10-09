@@ -16,6 +16,7 @@ function  [S,mu,t] = evalsol_time(obj,DYN,options)
     dim = DYN.dim;              % Dimension of the system
     Fcn = DYN.rhs;              % RHS of ODE
     param = DYN.param;          % Parameter array
+    odeOpts = obj.odeOpts;      % ODE options
 
     index = options.index;      % Solution index (options.index is unique due to S.solget_up_index)
     n_eval = numel(index);      % Number of solutions to evaluate
@@ -36,6 +37,7 @@ function  [S,mu,t] = evalsol_time(obj,DYN,options)
         s = obj.s(:,index(i));            % Method solution vector
         param{DYN.act_param} = mu(i);     % Update parameter array
         n_shoot = numel(s)/dim;           % Number of shooting points
+        n_time = ceil(100/n_shoot);       % Number of time evaluation points in each shooting interval
 
         T = 2*pi/freq;                                                          % Periodic time
         if isfield(options,'interval')                                          % If an integration interval was supplied by the user
@@ -43,6 +45,7 @@ function  [S,mu,t] = evalsol_time(obj,DYN,options)
         else                                                                    % If an integration interval was not supplied by the user
             t(:,1,i) = linspace(0,T,res);                                       % Integration interval is one period
         end
+        odeOpts = odeset(odeOpts,'Jacobian',@(t,z) DYN.jacobian(t,z,param));    % Set the Jacobian of the RHS with the correct mu value
 
 
         % Get the data for one period by reshooting the solution using the integration from multiple shooting
@@ -53,7 +56,7 @@ function  [S,mu,t] = evalsol_time(obj,DYN,options)
         Z_ODE = cell(n_shoot,1);                            % Initialize a cell array to store all solution values of the integration
         numel_T = zeros(n_shoot,1);                         % Stores the number of time values of the integration
         for k = 1:n_shoot
-            [t_ode,z_ode] = obj.solver_function(@(t,z) Fcn(t,z,param), T_int(k,:), z0_mat(:,k), obj.odeOpts);
+            [t_ode,z_ode] = obj.solver_function(@(t,z) Fcn(t,z,param), linspace(T_int(k,1),T_int(k,2),n_time+1), z0_mat(:,k), odeOpts);
             T_ODE{k} = t_ode;                               % Save the time values
             Z_ODE{k} = z_ode;                               % Save the solution values
             numel_T(k) = numel(t_ode);                      % Save the number of time values

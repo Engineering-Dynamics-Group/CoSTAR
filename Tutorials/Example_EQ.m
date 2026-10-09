@@ -35,9 +35,10 @@ param = {mu0, a, b};    active_parameter = 1;       % Parameter array and locati
 
 % Function
 Fcn =  @(z,param) parable(z,param);                 % Right-hand side of 0 = f(z,mu)
+dFcn_dz = @(z,param) parable_Jac(z,param);          % Jacobian df/dz of the RHS
 
 % Options
-options.system   = costaropts('order',0,'dim',1,'rhs',Fcn,'param',param,'info','Continuation of Parable Equation');     % Properties of the system
+options.system   = costaropts('order',0,'dim',1,'rhs',Fcn,'param',param,'jacobian',dFcn_dz,'info','Continuation of Parable Equation');      % Properties of the system
 options.opt_sol  = costaropts('sol_type','equilibrium','cont','on','stability','off','act_param',active_parameter);     % Properties of the solution
 options.opt_init = costaropts('ic',IC);                                                                                 % Property for initial solution
 options.opt_cont = costaropts('mu_limit',mu_limit,'step_control','off');                                                % Properties for continuation

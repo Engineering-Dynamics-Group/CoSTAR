@@ -111,7 +111,9 @@ classdef Continuation < handle
             if isempty(obj.step_width_limit); obj.step_width_limit = [0.2.*obj.step_width,5.*obj.step_width]; end
 
             % Set some corrector options
-            if strcmpi(DYN.approx_method,'shooting')
+            if strcmpi(DYN.sol_type,'equilibrium')
+                obj.fsolve_opts.SpecifyObjectiveGradient = true;            %Jacobian matrix is passed by the user
+            elseif strcmpi(DYN.approx_method,'shooting')
                 obj.fsolve_opts.MaxIter = 50;
                 obj.fsolve_opts.SpecifyObjectiveGradient = true;            %Jacobian matrix is passed by the user
             elseif strcmpi(DYN.approx_method,'finite-difference')

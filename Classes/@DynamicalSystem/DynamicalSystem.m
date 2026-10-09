@@ -17,6 +17,7 @@ classdef DynamicalSystem
         %system structure
         order   uint8                                                   %order of the ode
         rhs     function_handle                                         %right hand side of the ode
+        jacobian function_handle                                        %derivative of the rhs
         dim     double                                                  %dimension of the state space
         param = {0};                                                    %array for the parameter vector
         
@@ -63,6 +64,7 @@ classdef DynamicalSystem
 
         % Constructor
         function obj = DynamicalSystem(options)                         %Constructor
+
             obj = updateoptions(obj,options.system);                    %Assign all variables to  the properties   
             obj = updateoptions(obj,options.opt_sol);                   %Assign all variables to  the properties   
 
@@ -84,17 +86,25 @@ classdef DynamicalSystem
             elseif strcmpi(obj.approx_method,'fdm');    obj.approx_method = 'finite-difference';
             end
 
+            %Set the Jacobian if it was not supplied by the user
+            if isempty(obj.jacobian)
+                if strcmpi(obj.sol_type,'equilibrium');     obj.jacobian = @(z,param)obj.drhs_dz(0,z,param);
+                else;                                       obj.jacobian = @(t,z,param)obj.drhs_dz(t,z,param);
+                end
+            end
+
             obj = obj.updatefreq();
             
             % Creates an unique ID (used to match DynamicalSystem and Solution objects in postprocessing)
             obj.DYN_id = append('ID_', char(datetime('now','TimeZone','local','Format','yyyy-MM-dd_HH.mm.ss')));  
 
-            lastwarn('');                                               %Reset lastwarn (needed for the "Finished" message)        
+            lastwarn('');                                               %Reset lastwarn (needed for the "Finished" message)
+            
         end
         
-
         % Other methods
         obj = updatefreq(obj,opt_init);                                 %This function sets the frequency and initial conditions vectors correctly.
+        J = drhs_dz(obj,t,z,param);                                     %Computes the derivative of the RHS vectorized via central finite differences
     
     end
 

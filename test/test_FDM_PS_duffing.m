@@ -17,12 +17,13 @@ active_parameter = 3;                           % Defines where the continuation
 
 non_auto_freq = @(mu) mu;                       % Non autonomous frequency
 Fcn = @(t,z,param) duffing(t,z,param);          % Right-hand side of ODE
+dFcn_dz = @(t,z,param) duffing_Jac(t,z,param);  % Jacobian of the RHS
 
 C1 = [g;0];     S1 = [0;-eta0*g];               % Fourier-coefficients to create an initial value for fsolve to find the first point on the curve
 
 
 %% Properties
-options.system = costaropts('order',1,'dim',2,'rhs',Fcn,'param',param,'info','continuation of Duffing equation');           % Properties of the system
+options.system = costaropts('order',1,'dim',2,'rhs',Fcn,'jacobian',dFcn_dz,'param',param,'info','continuation of Duffing equation');    % Properties of the system
 options.opt_sol = costaropts('sol_type','periodic','approx_method','finite-difference','cont','on','stability','on', ...    % Properties of the solution
                              'non_auto_freq',non_auto_freq,'act_param',active_parameter,'display','step-control');          % Properties of the solution
 options.opt_init = costaropts('c1',C1,'s1',S1);                                                                             % Property for initial solution
